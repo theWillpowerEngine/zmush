@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("zmush")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+eda936d7232bbf28d94462625a9c61bacfc84e9f")]
 [assembly: System.Reflection.AssemblyProductAttribute("zmush")]
 [assembly: System.Reflection.AssemblyTitleAttribute("zmush")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
