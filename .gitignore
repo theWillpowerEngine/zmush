@@ -362,3 +362,5 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+obj/Debug/net10.0/zmush.AssemblyInfo.cs
+obj/Debug/net10.0/zmush.AssemblyInfoInputs.cache
