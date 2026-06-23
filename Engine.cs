@@ -15,7 +15,7 @@ public static partial class Engine
 
     public static bool Running { get; private set; }
 
-    public static List<SessionModel> Sessions { get; private set; } = new();
+    public static ConcurrentDictionary<string, SessionModel> Sessions { get; private set; } = new();
 
     public static void Run(int port)
     {
@@ -33,7 +33,7 @@ public static partial class Engine
 
         for (; ; )
         {
-            Log("Press 'X' to stop the server, or 'R' to restart it.  'L' will reload the site content without disrupting the server.");
+            Log("Press 'X' to stop the server, or 'R' to restart it.  'L' will reload the site content without disrupting the server.  '\\' will shut down AND delete all your files so don't press that unless you really want to.");
 
             string cmd = Console.ReadKey(true).KeyChar.ToString().ToUpperInvariant();
 
@@ -52,6 +52,13 @@ public static partial class Engine
                 Loader.LoadSiteContent();
                 Log("dev", "Site content reloaded.");
                 continue;
+            }
+
+            if (cmd == "\\")
+            {
+                Log("dev", "Deleting driver directory before shutting down...");
+                Directory.Delete(RootPath, true);
+                break;
             }
         }
 
@@ -72,7 +79,7 @@ public static partial class Engine
 
     internal static SessionModel MakeSessionFor(User dbUser)
     {
-        var existing = Sessions.FirstOrDefault(s => s.UserId == dbUser.Id);
+        var existing = Sessions.Values.FirstOrDefault(s => s.UserId == dbUser.Id);
         if (existing != null)
         {
             existing.LastActivity = DateTime.Now;
@@ -86,7 +93,7 @@ public static partial class Engine
             LastActivity = DateTime.Now
         };
 
-        Sessions.Add(session);
+        Sessions.AddOrUpdate(session.Key.ToString(), session, (key, oldValue) => session);
         return session;
     }
 }

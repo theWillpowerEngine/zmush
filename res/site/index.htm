@@ -7,17 +7,83 @@
     <script src="https://code.jquery.com/jquery-4.0.0.min.js"
         integrity="sha256-OaVG6prZf4v69dPg6PhVattBXkcOWQB62pdZ3ORyrao=" crossorigin="anonymous"></script>
 
+    <script src=" https://cdn.jsdelivr.net/npm/js-cookie@3.0.8/dist/js.cookie.min.js "></script>
 </head>
 
 <body>
-    <button id="b">Start</button>
+
+    <br />
+    <div id="banner">
+        <center>ZMUSH v {ZMVER} is Loading...</center>
+    </div>
+
+    <div id="login" style="display:none">
+        <input type="text" id="user" placeholder="Username" /><br />
+        <input type="password" id="pass" placeholder="Password" /><br />
+        <button id="b">Login</button>
+    </div>
+
+    <div id="authed" style="display:none">
+    </div>
 
     <script>
-        $(() => {
-            $("#b").click(() => {
-                $.post("/auth", JSON.stringify({ u: "owner", p: "owner" }), (res) => {
-                    console.log(res)
+        const Z = {
+            post: (url, data, callback) => {
+                $.post(url, data instanceof Object ? JSON.stringify(data) : data, (res) => {
+                    callback(1, res)
+                }).fail((xhr, status, error) => {
+                    callback(0, { status: xhr.status, error: error })
                 })
+            },
+
+            startGame() {
+                $("#login").fadeOut(() => {
+                    $("#authed").fadeIn()
+                })
+            }
+        }
+
+        window['ZVER'] = "{ZMVER}";
+        window['sessionId'] = Cookies.get("ZSession")
+
+        $(() => {
+            if (sessionId) {
+                Z.post("/reauth", sessionId, (suc, res) => {
+                    if (suc) {
+                        $("#banner").fadeOut(() => {
+                            Z.startGame();
+                        })
+                    } else {
+                        alert(res.status)
+                    }
+                })
+
+            } else {
+                $("#banner").fadeOut(() => {
+                    $("#login").fadeIn()
+                })
+            }
+
+            $('#pass').keypress(function (e) {
+                if (e.keyCode == 13) {
+                    $('#b').click()
+                    return false
+                }
+            })
+
+            $("#user").focus();
+
+            $("#b").click(() => {
+                Z.post("/auth", { u: $("#user").val(), p: $("#pass").val() }, (suc, res) => {
+                    if (suc) {
+                        sessionId = res
+                        Cookies.set("ZSession", sessionId, { expires: 7 })
+                        Z.startGame();
+                    } else {
+                        alert(res.error)
+                    }
+                })
+
             })
         })
     </script>

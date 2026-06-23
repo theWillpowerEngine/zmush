@@ -57,6 +57,18 @@ class HttpGameSession : HttpSession
                     }
                     break;
 
+                case "reauth":
+                    var sessionId = request.Body;
+                    if (!Engine.Sessions.TryGetValue(sessionId, out var existingSession))
+                        SendResponseAsync(Response.MakeErrorResponse(403, "Session not found or expired."));
+
+                    else
+                    {
+                        existingSession.LastActivity = DateTime.Now;
+                        SendResponseAsync(Response.MakeGetResponse(existingSession.Key.ToString(), "text/plain"));
+                    }
+                    break;
+
                 default:
                     SendResponseAsync(Response.MakeErrorResponse(404, "Requested resource not found: /" + route));
                     break;
