@@ -7,72 +7,15 @@ using System.Security.Authentication;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 
-public static class Engine
+public static partial class Engine
 {
     public const string Version = "0.0.1";
 
     public static Settings Settings { get; private set; } = new();
 
     public static bool Running { get; private set; }
-    public static string RootPath { get; private set; }
-    public static string DriverPath => Path.Combine(RootPath, "drv") + Path.DirectorySeparatorChar;
-    public static string PlayerPath => Path.Combine(RootPath, "usr") + Path.DirectorySeparatorChar;
-    public static string ObjectPath => Path.Combine(RootPath, "obj") + Path.DirectorySeparatorChar;
-    public static string HTMLRoot => Path.Combine(RootPath, "site") + Path.DirectorySeparatorChar;
 
-    public static void InitDirectories(string rootPath)
-    {
-        if (!rootPath.EndsWith(Path.DirectorySeparatorChar))
-            rootPath += Path.DirectorySeparatorChar;
-
-        if (!Directory.Exists(rootPath))
-        {
-            Directory.CreateDirectory(rootPath);
-            Log($"Created root directory '{rootPath}', driver will be the system default.");
-        }
-
-        RootPath = rootPath;
-
-        if (!Directory.Exists(DriverPath))
-        {
-            Directory.CreateDirectory(DriverPath);
-            Log($"No driver directory found.  Initializing to defaults...");
-
-            File.WriteAllText(Path.Combine(DriverPath, "default.z"), Loader.GetEmbeddedResource("default.z"));
-            Log($"Default driver created at '{DriverPath}default.z'.");
-        }
-
-        if (!Directory.Exists(PlayerPath))
-        {
-            Directory.CreateDirectory(PlayerPath);
-            Log($"No player directory found.  Initializing to defaults...");
-
-            //File.WriteAllText(Path.Combine(PlayerPath, "owner.z"), Loader.GetEmbeddedResource("owner.z"));
-            //TODO:  Create whatever object goes in this file and YAML it out.
-
-            Log("CRITICAL", "Created default player: owner, password: owner");
-        }
-
-        if (!Directory.Exists(ObjectPath))
-        {
-            Directory.CreateDirectory(ObjectPath);
-            Log($"No object directory found.  Initializing to defaults...");
-
-            File.WriteAllText(Path.Combine(ObjectPath, "0.zo"), Loader.GetEmbeddedResource("0.zo"));
-            File.WriteAllText(Path.Combine(ObjectPath, "1.zo"), Loader.GetEmbeddedResource("1.zo"));
-        }
-
-        if (!Directory.Exists(HTMLRoot))
-        {
-            Directory.CreateDirectory(HTMLRoot);
-            Log($"No HTML root directory found.  Initializing to default site (hope you like it ugly)");
-
-            File.WriteAllText(Path.Combine(HTMLRoot, "index.htm"), Loader.GetEmbeddedResource("site.index.htm").Replace("{ZMVER}", Engine.Version));
-        }
-
-        Loader.LoadSiteContent();
-        Log("Site content is loaded and cached.");
-    }
+    public static List<SessionModel> Sessions { get; private set; } = new();
 
     public static void Run(int port)
     {
@@ -120,10 +63,30 @@ public static class Engine
 
     public static void Log(string message)
     {
-        Console.WriteLine($"{message}");
+        Console.WriteLine($"[{DateTime.Now.Hour:00}{DateTime.Now.Minute:00}]  {message}");
     }
     public static void Log(string component, string message)
     {
-        Console.WriteLine($"[{component}]  {message}");
+        Console.WriteLine($"[{component}:{DateTime.Now.Hour:00}{DateTime.Now.Minute:00}]  {message}");
+    }
+
+    internal static SessionModel MakeSessionFor(User dbUser)
+    {
+        var existing = Sessions.FirstOrDefault(s => s.UserId == dbUser.Id);
+        if (existing != null)
+        {
+            existing.LastActivity = DateTime.Now;
+            return existing;
+        }
+
+        var session = new SessionModel
+        {
+            Key = Guid.NewGuid(),
+            UserId = dbUser.Id,
+            LastActivity = DateTime.Now
+        };
+
+        Sessions.Add(session);
+        return session;
     }
 }

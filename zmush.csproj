@@ -8,14 +8,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="BCrypt" Version="1.0.0" />
     <PackageReference Include="NetCoreServer" Version="8.0.7" />
+    <PackageReference Include="YamlDotNet" Version="16.3.0" />
   </ItemGroup>
 
   <ItemGroup>
     <EmbeddedResource Include="res\default.z" />
-    <EmbeddedResource Include="res\0.zo" />
-    <EmbeddedResource Include="res\1.zo" />
-
     <EmbeddedResource Include="res\site\index.htm" />
   </ItemGroup>
 

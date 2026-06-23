@@ -21,6 +21,7 @@ public static class Loader
     {
         _cache.Clear();
         CachedURLs.Clear();
+        _cachedMimes.Clear();
 
         var files = Directory.GetFiles(Engine.HTMLRoot, "*.*", SearchOption.AllDirectories);
         foreach (var file in files)

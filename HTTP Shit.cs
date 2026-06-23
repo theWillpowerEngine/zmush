@@ -16,6 +16,7 @@ class HttpGameSession : HttpSession
         if (Engine.Settings.ShowHttpRequest)
             Engine.Log("DEBUG - Request", request.ToString());
 
+        //Web server with memory cache
         if (request.Method == "GET")
         {
             string route = request.Url.TrimStart('/');
@@ -25,13 +26,45 @@ class HttpGameSession : HttpSession
                 SendResponseAsync(Response.MakeGetResponse(content, mime));
             }
             else
-                SendResponseAsync(Response.MakeErrorResponse(404, "Requested resource not found: " + route));
-
+                SendResponseAsync(Response.MakeErrorResponse(404, "Requested resource not found: /" + route));
         }
+
+        //Endpoints
         else if ((request.Method == "POST") || (request.Method == "PUT"))
         {
+            var route = request.Url.TrimStart('/');
+
+            switch (route)
+            {
+                case "auth":
+                    var userYaml = request.Body;
+                    var user = AuthModel.FromYaml(userYaml);
+                    if (user == null)
+                        SendResponseAsync(Response.MakeErrorResponse(400, "Invalid user data."));
+                    else
+                    {
+                        var dbUser = User.Load(user.u);
+                        if (dbUser == null)
+                            SendResponseAsync(Response.MakeErrorResponse(401, "User not found."));
+                        else if (!dbUser.IsPasswordValid(user.p))
+                            SendResponseAsync(Response.MakeErrorResponse(401, "Login failed."));
+
+                        else
+                        {
+                            var session = Engine.MakeSessionFor(dbUser);
+                            SendResponseAsync(Response.MakeGetResponse(session.Key.ToString(), "text/plain"));
+                        }
+                    }
+                    break;
+
+                default:
+                    SendResponseAsync(Response.MakeErrorResponse(404, "Requested resource not found: /" + route));
+                    break;
+            }
+
             SendResponseAsync(Response.MakeErrorResponse(404, "This shit don't work yet, chill."));
         }
+
         else if (request.Method == "HEAD")
             SendResponseAsync(Response.MakeHeadResponse());
         else if (request.Method == "OPTIONS")

@@ -3,10 +3,24 @@
 <head>
     <meta charset="utf-8">
     <title>zmush v{ZMVER}</title>
+
+    <script src="https://code.jquery.com/jquery-4.0.0.min.js"
+        integrity="sha256-OaVG6prZf4v69dPg6PhVattBXkcOWQB62pdZ3ORyrao=" crossorigin="anonymous"></script>
+
 </head>
 
 <body>
-    Hello Nurse!
+    <button id="b">Start</button>
+
+    <script>
+        $(() => {
+            $("#b").click(() => {
+                $.post("/auth", JSON.stringify({ u: "owner", p: "owner" }), (res) => {
+                    console.log(res)
+                })
+            })
+        })
+    </script>
 </body>
 
 </html>
