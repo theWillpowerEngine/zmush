@@ -1,18 +1,22 @@
-﻿using NetCoreServer;
-using System;
-using System.Collections.Concurrent;
-using System.Net;
-using System.Net.Sockets;
-using System.Security.Authentication;
-using System.Security.Cryptography.X509Certificates;
-using System.Text;
-
-//Docs for this lib:  https://github.com/chronoxor/NetCoreServer#example-https-server
+﻿using CommandLine;
 
 var serverRoot = "/home/malf/z";
 
+CLA opts = null;
+
+Parser.Default.ParseArguments<CLA>(args).WithParsed<CLA>(o => { opts = o; });
+
+if (opts == null) return;
+if (opts.Reset)
+{
+    if (Directory.Exists(serverRoot))
+    {
+        Directory.Delete(serverRoot, true);
+        Console.WriteLine("Data files have been reset from command line argument.");
+        Console.WriteLine();
+    }
+}
+
 Engine.InitDirectories(serverRoot);
 
-Engine.Run(4676);
-
-
+Engine.Run(opts.Port);
