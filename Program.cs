@@ -16,7 +16,7 @@ if (opts.Reset)
         Console.WriteLine();
     }
 }
+if (opts.Http) Engine.Settings.ShowHttpRequest = true;
 
 Engine.InitDirectories(serverRoot);
-
 Engine.Run(opts.Port);

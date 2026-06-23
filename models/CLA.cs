@@ -7,4 +7,7 @@ public class CLA
 
     [Option('r', "reset", Required = false, HelpText = "Reset the data files (they will be lost!)")]
     public bool Reset { get; set; }
+
+    [Option('h', "http", Required = false, HelpText = "Show HTTP requests in the console log (spammy)")]
+    public bool Http { get; set; }
 }
