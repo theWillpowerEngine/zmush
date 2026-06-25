@@ -1,5 +1,5 @@
-* Add the YAML library and copy the PersistedObject infra from riven world
-* .zo load/save
-* Basic zelazny reader/parser.  See if we can make a simple compiler infrastructure for it to maximize performance (it only has to compile to memory, so quite easy)
+* 'chat' infrastructure with the server and ability to see and set room desc
+
 * Implement .z file load on startup
-* 
+
+

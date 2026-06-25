@@ -2,6 +2,10 @@
 
 var serverRoot = "/home/malf/z";
 
+
+ZString s = "Hello [rev Nurse]!";
+Console.WriteLine(s.Evaluate(null));
+
 CLA opts = null;
 
 Parser.Default.ParseArguments<CLA>(args).WithParsed<CLA>(o => { opts = o; });
@@ -19,4 +23,6 @@ if (opts.Reset)
 if (opts.Http) Engine.Settings.ShowHttpRequest = true;
 
 Engine.InitDirectories(serverRoot);
+Engine.Init();
+
 Engine.Run(opts.Port);

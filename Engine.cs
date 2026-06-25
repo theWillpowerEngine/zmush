@@ -17,6 +17,8 @@ public static partial class Engine
 
     public static ConcurrentDictionary<string, SessionModel> Sessions { get; private set; } = new();
 
+    public static ConcurrentDictionary<long, ZObject> Objects { get; private set; } = new();
+
     public static void Run(int port)
     {
         if (string.IsNullOrEmpty(RootPath))

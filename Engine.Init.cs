@@ -80,4 +80,10 @@ public static partial class Engine
         Loader.LoadSiteContent();
         Log("Site content is loaded and cached.");
     }
+
+    public static void Init()
+    {
+        Loader.LoadZObjects();
+        Log("Initialization complete!  Almost there.");
+    }
 }

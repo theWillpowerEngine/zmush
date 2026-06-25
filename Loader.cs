@@ -17,6 +17,31 @@ public static class Loader
     private static Dictionary<string, string> _cachedMimes = new Dictionary<string, string>();
     public static HashSet<string> CachedURLs { get; private set; } = new();
 
+    public static void LoadZObjects()
+    {
+        var files = Directory.GetFiles(Engine.ObjectPath, "*.zo", SearchOption.AllDirectories);
+
+        Engine.Log($"Loading {files.Length} ZObjects...");
+        var start = DateTime.Now;
+        Engine.Objects.Clear();
+
+        //TODO:  Parallel foreach this?
+        foreach (var file in files)
+        {
+            var yaml = File.ReadAllText(file);
+            var obj = ZObject.FromYaml(yaml);
+
+            var retry = 0;
+            while (!Engine.Objects.TryAdd(obj.Id, obj))
+            {
+                retry++;
+                if (retry > 3)
+                    throw new Exception($"Failed to add object with ID {obj.Id} to Engine.Objects after 10 retries.  Check for duplicate IDs in your .zo files.  Object: {Environment.NewLine}{yaml}");
+            }
+        }
+        Engine.Log($"Load Complete.  Total ZObjects loaded: {Engine.Objects.Count} in {(DateTime.Now - start).TotalMilliseconds} ms.");
+    }
+
     public static void LoadSiteContent()
     {
         _cache.Clear();
