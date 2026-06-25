@@ -33,48 +33,72 @@ class HttpGameSession : HttpSession
         else if ((request.Method == "POST") || (request.Method == "PUT"))
         {
             var route = request.Url.TrimStart('/');
+            var sessionId = "";
 
-            switch (route)
+            try
             {
-                case "auth":
-                    var userYaml = request.Body;
-                    var user = AuthModel.FromYaml(userYaml);
-                    if (user == null)
-                        SendResponseAsync(Response.MakeErrorResponse(400, "Invalid user data."));
-                    else
-                    {
-                        var dbUser = User.Load(user.u);
-                        if (dbUser == null)
-                            SendResponseAsync(Response.MakeErrorResponse(401, "User not found."));
-                        else if (!dbUser.IsPasswordValid(user.p))
-                            SendResponseAsync(Response.MakeErrorResponse(401, "Login failed."));
+                switch (route)
+                {
+                    case "auth":
+                        var userYaml = request.Body;
+                        var user = AuthModel.FromYaml(userYaml);
+                        if (user == null)
+                            SendResponseAsync(Response.MakeErrorResponse(400, "Invalid user data."));
+                        else
+                        {
+                            var dbUser = User.Load(user.u);
+                            if (dbUser == null)
+                                SendResponseAsync(Response.MakeErrorResponse(401, "User not found."));
+                            else if (!dbUser.IsPasswordValid(user.p))
+                                SendResponseAsync(Response.MakeErrorResponse(401, "Login failed."));
+
+                            else
+                            {
+                                var session = Engine.MakeSessionFor(dbUser);
+                                SendResponseAsync(Response.MakeGetResponse(session.Key.ToString(), "text/plain"));
+                            }
+                        }
+                        break;
+
+                    case "reauth":
+                        sessionId = request.Body;
+                        if (!Engine.Sessions.TryGetValue(sessionId, out var existingSession))
+                            SendResponseAsync(Response.MakeErrorResponse(403, "Session not found or expired."));
 
                         else
                         {
-                            var session = Engine.MakeSessionFor(dbUser);
-                            SendResponseAsync(Response.MakeGetResponse(session.Key.ToString(), "text/plain"));
+                            existingSession.LastActivity = DateTime.Now;
+                            SendResponseAsync(Response.MakeGetResponse(existingSession.Key.ToString(), "text/plain"));
                         }
-                    }
-                    break;
+                        break;
 
-                case "reauth":
-                    var sessionId = request.Body;
-                    if (!Engine.Sessions.TryGetValue(sessionId, out var existingSession))
-                        SendResponseAsync(Response.MakeErrorResponse(403, "Session not found or expired."));
+                    case "frame":
+                        sessionId = request.Body;
+                        if (!Engine.Sessions.TryGetValue(sessionId, out var frameSession))
+                            SendResponseAsync(Response.MakeErrorResponse(403, "Session not found or expired."));
 
-                    else
-                    {
-                        existingSession.LastActivity = DateTime.Now;
-                        SendResponseAsync(Response.MakeGetResponse(existingSession.Key.ToString(), "text/plain"));
-                    }
-                    break;
+                        else
+                        {
+                            frameSession.LastActivity = DateTime.Now;
+                            var text = Engine.RenderFrame(frameSession.UserId);
 
-                default:
-                    SendResponseAsync(Response.MakeErrorResponse(404, "Requested resource not found: /" + route));
-                    break;
+                            SendResponseAsync(Response.MakeGetResponse(text, "text/plain"));
+                        }
+                        break;
+
+                    default:
+                        SendResponseAsync(Response.MakeErrorResponse(404, "Requested resource not found: /" + route));
+                        break;
+                }
+
+                SendResponseAsync(Response.MakeErrorResponse(404, "This shit don't work yet, chill."));
             }
-
-            SendResponseAsync(Response.MakeErrorResponse(404, "This shit don't work yet, chill."));
+            catch (Exception ex)
+            {
+                Guid corrId = Guid.NewGuid();
+                Engine.Log("ERROR", $"Error in API route {route}: {ex.Message} (Correlation ID: {corrId})");
+                SendResponseAsync(Response.MakeErrorResponse(500, "Correlation ID: " + corrId));
+            }
         }
 
         else if (request.Method == "HEAD")

@@ -8,6 +8,11 @@ public abstract class BaseModel<T> where T : new()
     }
 }
 
+public class FrameModel : BaseModel<FrameModel>
+{
+    public string text;
+}
+
 public class AuthModel : BaseModel<AuthModel>
 {
     public string u;

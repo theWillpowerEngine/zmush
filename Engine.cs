@@ -76,7 +76,7 @@ public static partial class Engine
     }
     public static void Log(string component, string message)
     {
-        Console.WriteLine($"[{component}:{DateTime.Now.Hour:00}{DateTime.Now.Minute:00}]  {message}");
+        Console.WriteLine($"[{DateTime.Now.Hour:00}{DateTime.Now.Minute:00}:{component}]  {message}");
     }
 
     internal static SessionModel MakeSessionFor(User dbUser)

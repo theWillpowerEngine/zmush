@@ -1,6 +1,6 @@
 public static class Interpreter
 {
-    internal static string Evaluate(Token toke, ZObject context)
+    internal static string Evaluate(Token toke, ZObject context, ref int quota)
     {
         if (!toke.IsList) return toke.Value;
 
@@ -10,13 +10,18 @@ public static class Interpreter
         if (cmd.IsList)
             return "[Exception: Keyword is a list]";
 
+        if (quota == 0)
+            return "[Limit:  Quota exceeded]";
+        else if (quota > 0)
+            quota -= 1;
+
         switch (cmd.Value)
         {
             case "rev":
                 if (list.Count != 2)
                     return "[Exception: 'rev' requires exactly 1 parameter]";
 
-                var revResult = ParseValue(list[1], context);
+                var revResult = ParseValue(list[1], context, ref quota);
                 return new string(revResult.Reverse().ToArray());
 
             default:
@@ -24,9 +29,9 @@ public static class Interpreter
         }
     }
 
-    private static string ParseValue(Token t, ZObject context)
+    private static string ParseValue(Token t, ZObject context, ref int quota)
     {
-        if (t.IsList) return Evaluate(t, context);
+        if (t.IsList) return Evaluate(t, context, ref quota);
 
         return t.Value;
 

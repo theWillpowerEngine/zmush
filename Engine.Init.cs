@@ -57,7 +57,8 @@ public static partial class Engine
                 ZOT = ZObType.Character,
                 Name = "Stimpy",
                 Desc = "The default admin character.  Very powerful.  Also adorable.",
-                Owner = 0
+                Owner = 0,
+                Location = 1
             };
 
             wizard.Save();

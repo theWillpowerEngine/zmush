@@ -91,7 +91,7 @@ public class ZString
 
 
     ReaderOutput? ro = null;
-    public string Evaluate(ZObject context)
+    public string Evaluate(ZObject context, int quota = -1)
     {
         if (dirty || ro == null)
         {
@@ -104,8 +104,19 @@ public class ZString
 
         var evalled = "";
         foreach (var token in ro.List.Children)
-            evalled += Interpreter.Evaluate(token, context) + " ";
+        {
+            if (quota == 0)
+                return "[Limit:  Quota exceeded]";
+
+            evalled += Interpreter.Evaluate(token, context, ref quota) + " ";
+        }
 
         return evalled.TrimEnd();
+    }
+
+    internal static string Eval(string s, ZObject context, int quota = -1)
+    {
+        ZString zs = s;
+        return zs.Evaluate(context, quota);
     }
 }

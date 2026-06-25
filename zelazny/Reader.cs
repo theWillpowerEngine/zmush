@@ -46,20 +46,6 @@ public static class Reader
         {
             if (!string.IsNullOrEmpty(work))
             {
-                // if (isAutoV)
-                // {
-                //     isAutoV = false;
-                //     retVal.Add(new Token(new Token[] { new Token("v"), new Token(work) }));
-                // }
-                // else if (isAutoLambda)
-                //     Error("The element following an auto-lambda must be a list, not " + work);
-                // else if (work == "nil")
-                //     retVal.Add(Token.Nil);
-                // else if (work == "true" || work == "True" || work == "TRUE")
-                //     retVal.Add(Token.True);
-                // else if (work == "false" || work == "False" || work == "FALSE")
-                //     retVal.Add(Token.False);
-                //else 
                 retVal.Add(new Token(work, scanToDepth));
             }
         };
@@ -71,7 +57,7 @@ public static class Reader
             if (i + 1 < code.Length)
                 lookAhead = code[i + 1];
 
-            if (stringDelim != '#')
+            if (stringDelim != '#' || (scope == 0 && c != '[' && c != '{'))
             {
                 if (c == '%' && lookAhead == stringDelim)
                 {
@@ -82,19 +68,19 @@ public static class Reader
                 else if (c == '%' && lookAhead == 's')
                 {
                     i += 1;
-                    work += " ";
+                    work += "&nbsp;";
                     continue;
                 }
                 else if (c == '%' && lookAhead == 't')
                 {
                     i += 1;
-                    work += "\t";
+                    work += "&nbsp;&nbsp;&nbsp;&nbsp;";
                     continue;
                 }
                 else if (c == '%' && lookAhead == 'n')
                 {
                     i += 1;
-                    work += Environment.NewLine;
+                    work += "<br />";
                     continue;
                 }
                 else if (c == '%' && lookAhead == '%')
@@ -104,7 +90,7 @@ public static class Reader
                     continue;
                 }
 
-                else if (c == stringDelim)
+                else if (stringDelim != '#' && c == stringDelim)
                 {
                     stringDelim = '#';
                     if (scanToDepth > 0)

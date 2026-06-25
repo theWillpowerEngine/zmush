@@ -1,3 +1,5 @@
+using YamlDotNet.Serialization;
+
 public enum ZObType
 {
     Room,
@@ -19,7 +21,8 @@ public class ZObject
     public long Owner;
 
     public string Name;
-    public string Desc;
+
+    public string Desc = "";
 
     public static ZObject FromYaml(string yaml)
     {

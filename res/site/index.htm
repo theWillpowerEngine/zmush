@@ -14,7 +14,7 @@
 
     <br />
     <div id="banner">
-        <center>ZMUSH v {ZMVER} is Loading...</center>
+        <center>ZMUSH v{ZMVER} is Loading...</center>
     </div>
 
     <div id="login" style="display:none">
@@ -28,18 +28,35 @@
 
     <script>
         const Z = {
-            post: (url, data, callback) => {
+            frameText: null,
+
+            post(url, data, callback) {
                 $.post(url, data instanceof Object ? JSON.stringify(data) : data, (res) => {
                     callback(1, res)
                 }).fail((xhr, status, error) => {
-                    callback(0, { status: xhr.status, error: error })
+                    callback(0, { status: xhr.status, statusMsg: error, error: xhr.responseText })
                 })
             },
 
             startGame() {
-                $("#login").fadeOut(() => {
-                    $("#authed").fadeIn()
-                })
+                $("#authed").fadeIn()
+                Z.frame()
+            },
+
+            frame() {
+                if (!Z.frameText) {
+                    Z.post("/frame", window.sessionId, (suc, res) => {
+                        if (suc) {
+                            Z.frameText = res
+                            Z.frame()
+                        } else {
+                            alert("API Error!  " + res.error)
+                        }
+                    })
+                } else {
+                    $("#authed").html(Z.frameText)
+                    //setTimeout(Z.frame, 1000)
+                }
             }
         }
 
@@ -54,7 +71,9 @@
                             Z.startGame();
                         })
                     } else {
-                        alert(res.status)
+                        $("#banner").fadeOut(() => {
+                            $("#login").fadeIn()
+                        })
                     }
                 })
 
@@ -78,7 +97,10 @@
                     if (suc) {
                         sessionId = res
                         Cookies.set("ZSession", sessionId, { expires: 7 })
-                        Z.startGame();
+
+                        $("#login").fadeOut(() => {
+                            Z.startGame()
+                        })
                     } else {
                         alert(res.error)
                     }
