@@ -19,7 +19,7 @@ public static partial class Engine
 
     public static ConcurrentDictionary<string, List<string>> Logs { get; private set; } = new();
 
-    public static ConcurrentDictionary<long, ZObject> Objects { get; private set; } = new();
+    public static ConcurrentDictionary<int, ZObject> Objects { get; private set; } = new();
 
     public static void Run(int port)
     {
@@ -90,7 +90,7 @@ public static partial class Engine
             log.RemoveAt(0);
     }
 
-    public static ZObject Find(long userId, string name)
+    public static ZObject Find(int userId, string name)
     {
         if (!Objects.TryGetValue(userId, out var user))
             return null;
@@ -108,7 +108,7 @@ public static partial class Engine
 
         if (name.StartsWith("#"))
         {
-            if (long.TryParse(name.Substring(1), out var id))
+            if (int.TryParse(name.Substring(1), out var id))
             {
                 if (Objects.TryGetValue(id, out var obj))
                     return obj;

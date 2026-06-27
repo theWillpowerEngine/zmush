@@ -3,7 +3,7 @@ using DevOne.Security.Cryptography.BCrypt;
 public class User
 {
     public string Name;
-    public long Id;
+    public int Id;
 
     public string HashedPW;
     public string Salt;
@@ -12,7 +12,7 @@ public class User
 
     public HashSet<string> Roles = new();
 
-    public User(long id, string name, string version)
+    public User(int id, string name, string version)
     {
         Id = id;
         Name = name;

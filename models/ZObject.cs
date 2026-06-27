@@ -14,17 +14,17 @@ public enum ZFlag
 
 public class ZObject
 {
-    public long Id;
+    public int Id;
     public ZObType ZOT;
 
-    public long Parent = -1;
-    public long Location = -1;
+    public int Parent = -1;
+    public int Location = -1;
     public int Quota = -1;
 
     public HashSet<ZFlag> Flags = new();
     public Dictionary<string, string> Attrs = new();
 
-    public long Owner;
+    public int Owner;
     public List<(string, string)> Locks = new();
 
     public string Name = "A Formless Form";
@@ -50,7 +50,7 @@ public class ZObject
         File.WriteAllText(path, ToYaml());
     }
 
-    public bool CheckPermissions(long userId)
+    public bool CheckPermissions(int userId)
     {
         var user = Engine.Objects[userId];
 

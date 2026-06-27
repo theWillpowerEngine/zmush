@@ -37,7 +37,7 @@ While the server is running you will see a running log, resembling the following
     [2334:net]  Server running!  You can now access the server at http://localhost:4676
     [2334]  Press 'X' to stop the server, or 'R' to restart it.  'L' will reload the site content without disrupting the server.  '\' will shut down AND delete all your files so don't press that unless you really want to.
 
-The thing in brackets is a time stamp (hour and then minute in 24h time).  This log will get very long over time and consistent use, but it can be very helpful when troubleshooting things or trying to figure out something that happened on the server.  There are extra levels of detail you can turn on with CLA, including HTTP requests (some nerd shit, don't worry about it if you don't know what it is), etc.
+The thing in brackets is a time stamp (hour and then minute in 24h time).  This log will get very int over time and consistent use, but it can be very helpful when troubleshooting things or trying to figure out something that happened on the server.  There are extra levels of detail you can turn on with CLA, including HTTP requests (some nerd shit, don't worry about it if you don't know what it is), etc.
 
 ## Rooms, Items, Characters and ZObjects in general
 
@@ -59,6 +59,8 @@ You can use the @lock command family to manipulate locks on ZObjects.
 ## First Login - Basic Tutorial
 
 ## Command Reference
+
+look (l)
 
 @name
 @desc

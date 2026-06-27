@@ -74,7 +74,6 @@ public static partial class Engine
                 PlayerEmit(session.Key, $"Updated description of #{o.Id} to '{s2}'");
                 break;
 
-
             case "@lock":
                 (s, s2) = GetNamedValue(rest);
                 o = Find(user, s);
@@ -146,6 +145,22 @@ public static partial class Engine
                 }
 
                 break;
+
+            case "look":
+            case "l":
+                if (string.IsNullOrEmpty(rest))
+                    break;
+
+                o = Find(user, rest);
+                if (o == null)
+                {
+                    PlayerEmit(session.Key, $"Look at what?");
+                    break;
+                }
+                PlayerEmit(session.Key, o.Desc);
+                break;
+
+
 
             default:
                 PlayerEmit(session.Key, $"Unknown command '{kw}'");

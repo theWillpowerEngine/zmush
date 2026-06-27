@@ -29,7 +29,7 @@ public class CommandModel
 public class SessionModel : BaseModel<SessionModel>
 {
     public string Key;
-    public long UserId;
+    public int UserId;
     public HashSet<string> Roles = new HashSet<string>();
 
     public DateTime LastActivity = DateTime.Now;
