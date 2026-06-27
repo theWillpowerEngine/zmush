@@ -65,7 +65,7 @@ public static partial class Engine
         var ret = "";
         ret += $"<b>{loc.Name}</b>%n";
         ret += loc.Desc;
-        ret += "%n%n";
+        ret += "<br /><br />";
 
         var log = Logs.GetOrAdd(session.Key, _ => new List<string>());
 

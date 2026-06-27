@@ -7,6 +7,11 @@ public enum ZObType
     Item
 }
 
+public enum ZFlag
+{
+
+}
+
 public class ZObject
 {
     public long Id;
@@ -16,12 +21,13 @@ public class ZObject
     public long Location = -1;
     public int Quota = -1;
 
-    public HashSet<string> Flags = new();
+    public HashSet<ZFlag> Flags = new();
     public Dictionary<string, string> Attrs = new();
 
     public long Owner;
+    public List<(string, string)> Locks = new();
 
-    public string Name;
+    public string Name = "A Formless Form";
 
     public string Desc = "";
 
