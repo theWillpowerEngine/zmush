@@ -91,6 +91,10 @@ public static partial class Engine
                     break;
                 }
 
+                var lockParts = s2.Split(':', 2).Select(s => s.Trim()).ToArray();
+                var lp1 = lockParts[0].ToLowerInvariant();
+                var lp2 = lockParts.Length > 1 ? lockParts[1] : "";
+
                 switch (subCmd)
                 {
                     case null:
@@ -99,10 +103,6 @@ public static partial class Engine
                             PlayerEmit(session.Key, $"You must specify a lock type and value.");
                             break;
                         }
-
-                        var lockParts = s2.Split(':', 2).Select(s => s.Trim()).ToArray();
-                        var lp1 = lockParts[0].ToLowerInvariant();
-                        var lp2 = lockParts.Length > 1 ? lockParts[1] : "";
 
                         if (o.Locks.Any(l => l.Item1 == lp1 && l.Item2 == lp2))
                         {
@@ -117,13 +117,6 @@ public static partial class Engine
 
                     case "list":
                     case "l":
-                        if (!o.CheckPermissions(session.UserId))
-                        {
-                            PlayerEmit(session.Key, $"You don't have permission to lock #{o.Id}");
-                            Log("hax", $"User #{session.UserId} attempted to lock #{o.Id} without permission.");
-                            break;
-                        }
-
                         if (!o.Locks.Any())
                         {
                             PlayerEmit(session.Key, $"No locks on #{o.Id}");
@@ -132,7 +125,24 @@ public static partial class Engine
                         PlayerEmit(session.Key, $"Locks on #{o.Id}: {string.Join(", ", o.Locks.Select(l => string.IsNullOrEmpty(l.Item2) ? l.Item1 : $"{l.Item1}:{l.Item2}"))}");
                         break;
 
+                    case "unlock":
+                    case "un":
+                        if (string.IsNullOrEmpty(s2))
+                        {
+                            PlayerEmit(session.Key, $"You must specify a lock to remove.");
+                            break;
+                        }
 
+                        var lockToRemove = o.Locks.FirstOrDefault(l => l.Item1 == lp1 && l.Item2 == lp2);
+                        if (lockToRemove == default)
+                        {
+                            PlayerEmit(session.Key, $"Lock '{(string.IsNullOrEmpty(lp2) ? lp1 : $"{lp1}:{lp2}")}' does not exist on #{o.Id}");
+                            break;
+                        }
+                        o.Locks.Remove(lockToRemove);
+                        o.Save();
+                        PlayerEmit(session.Key, $"Removed lock '{(string.IsNullOrEmpty(lp2) ? lp1 : $"{lp1}:{lp2}")}' from #{o.Id}");
+                        break;
                 }
 
                 break;
