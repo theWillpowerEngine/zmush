@@ -45,8 +45,6 @@ public static partial class Engine
 
         switch (kw)
         {
-
-
             case "look":
                 break;
 
@@ -67,11 +65,33 @@ public static partial class Engine
         var ret = "";
         ret += $"<b>{loc.Name}</b>%n";
         ret += loc.Desc;
+        ret += "%n%n";
 
         var log = Logs.GetOrAdd(session.Key, _ => new List<string>());
-        if (log.Any()) ret += "%n%n" + string.Join("%n", log) + "%n";
-        log.Clear();
 
-        return ZString.Eval(ret, loc);
+        ret = ZString.Eval(ret, loc);
+
+        if (log.Any())
+        {
+            ret += "<div id='log'>";
+            ret += string.Join("<br />", log) + "<br />";
+            ret += "</div>";
+        }
+        else
+        {
+            ret += "<div id='log' style='display:none;'> </div>";
+        }
+
+        return ret;
+    }
+
+    internal static string[] GetLog(SessionModel session)
+    {
+        PlayerEmit(session.Key, "Log was checked");
+
+        var log = Logs.GetOrAdd(session.Key, _ => new List<string>());
+        var ret = log.ToArray();
+
+        return ret;
     }
 }

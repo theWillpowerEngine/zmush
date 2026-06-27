@@ -107,6 +107,23 @@ class HttpGameSession : HttpSession
                         }
                         break;
 
+                    case "log":
+                        sessionId = request.Body;
+                        if (!Engine.Sessions.TryGetValue(sessionId, out var logSession))
+                            SendResponseAsync(Response.MakeErrorResponse(403, "Session not found or expired."));
+
+                        else
+                        {
+                            //logSession.LastActivity = DateTime.Now;   //I don't *think* this counts as activity, we might want to use this to throttle refresh or timeout or something
+
+                            var items = Engine.GetLog(logSession);
+                            var logString = string.Join("\n", items);
+
+                            SendResponseAsync(Response.MakeGetResponse(logString, "text/plain"));
+                        }
+                        break;
+
+
                     default:
                         SendResponseAsync(Response.MakeErrorResponse(404, "Requested resource not found: /" + route));
                         break;

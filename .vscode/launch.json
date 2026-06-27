@@ -5,7 +5,7 @@
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build",
-            "program": "${workspaceFolder}/bin/Debug/net10.0/zmush.dll",
+            "program": "${workspaceFolder}/bin/Debug/zmush.dll",
             "console": "externalTerminal",
             "stopAtEntry": false,
         }

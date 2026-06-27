@@ -11,7 +11,12 @@ public static class Interpreter
             return "[Exception: Keyword is a list]";
 
         if (quota == 0)
+        {
+            if (Engine.Settings.LogQuotaExceeds)
+                Engine.Log("quota", $"Quota exceeded for context #{context.Id}.  Command: {string.Join(" ", list.Select(t => t.Value))}");
+
             return "[Limit:  Quota exceeded]";
+        }
         else if (quota > 0)
             quota -= 1;
 

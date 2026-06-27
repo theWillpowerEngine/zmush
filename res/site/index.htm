@@ -51,6 +51,8 @@
     </div>
 
     <script>
+        var refreshTimer = null;
+
         const Z = {
             frameText: null,
 
@@ -70,7 +72,34 @@
                 });
             },
 
+            setRefreshTimer(clearOnly) {
+                if (refreshTimer) clearTimeout(refreshTimer);
+                if (clearOnly) return;
+
+                refreshTimer = setTimeout(() => {
+                    Z.post("/log", window.sessionId, (suc, res) => {
+                        if (suc) {
+                            var eles = res.split("\n")
+                            var html = "";
+                            for (var i = 0; i < eles.length; i++) {
+                                if (eles[i].trim() != "") {
+                                    html += eles[i] + "<br />"
+                                }
+                            }
+                            $("#log").html(html)
+
+                        } else {
+                            alert("API Error!  " + res.error)
+                        }
+                        Z.setRefreshTimer()
+                    })
+
+                }, 5000);
+            },
+
             frame() {
+                Z.setRefreshTimer(true)
+
                 if (!Z.frameText) {
                     Z.post("/frame", window.sessionId, (suc, res) => {
                         if (suc) {
@@ -82,11 +111,13 @@
                     })
                 } else {
                     $("#authed").html(Z.frameText)
-                    //setTimeout(Z.frame, 1000)
+                    Z.setRefreshTimer()
                 }
             },
 
             command(cmd) {
+                Z.setRefreshTimer(true)
+
                 Z.post("/command", { sessionId: window.sessionId, command: cmd }, (suc, res) => {
                     if (suc) {
                         Z.frameText = res
@@ -96,6 +127,7 @@
                     } else {
                         alert("API Error!  " + res.error)
                     }
+                    Z.setRefreshTimer()
                 })
             }
         }
@@ -112,7 +144,9 @@
                         })
                     } else {
                         $("#banner").fadeOut(() => {
-                            $("#login").fadeIn()
+                            $("#login").fadeIn(() => {
+                                $("#user").focus()
+                            })
                         })
                     }
                 })

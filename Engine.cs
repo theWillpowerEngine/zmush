@@ -85,6 +85,9 @@ public static partial class Engine
     {
         var log = Logs.GetOrAdd(sessionId.ToString(), _ => new List<string>());
         log.Add(message);
+
+        while (log.Count > Settings.LogCount)
+            log.RemoveAt(0);
     }
 
     public static ZObject Find(long userId, string name)
