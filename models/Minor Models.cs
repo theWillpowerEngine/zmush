@@ -19,10 +19,18 @@ public class AuthModel : BaseModel<AuthModel>
     public string p;
 }
 
+//Not a BaseModel (this one gets JSON deserialized, not YAMLfied)
+public class CommandModel
+{
+    public string sessionId { get; set; }
+    public string command { get; set; }
+}
+
 public class SessionModel : BaseModel<SessionModel>
 {
-    public Guid Key;
+    public string Key;
     public long UserId;
+    public HashSet<string> Roles = new HashSet<string>();
 
     public DateTime LastActivity = DateTime.Now;
 }

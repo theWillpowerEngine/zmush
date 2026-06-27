@@ -1,3 +1,5 @@
+using Microsoft.VisualBasic;
+
 public class ZString
 {
     private string _s = "";
@@ -91,7 +93,13 @@ public class ZString
 
 
     ReaderOutput? ro = null;
-    public string Evaluate(ZObject context, int quota = -1)
+
+    public string Evaluate(ZObject context)
+    {
+        int i = -1;
+        return Evaluate(context, ref i);
+    }
+    public string Evaluate(ZObject context, ref int quota)
     {
         if (dirty || ro == null)
         {
@@ -114,9 +122,15 @@ public class ZString
         return evalled.TrimEnd();
     }
 
-    internal static string Eval(string s, ZObject context, int quota = -1)
+    internal static string Eval(string s, ZObject context, ref int quota)
     {
         ZString zs = s;
-        return zs.Evaluate(context, quota);
+        return zs.Evaluate(context, ref quota);
+    }
+
+    internal static string Eval(string s, ZObject context)
+    {
+        ZString zs = s;
+        return zs.Evaluate(context);
     }
 }

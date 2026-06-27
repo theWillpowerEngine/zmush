@@ -39,11 +39,22 @@ public static partial class Engine
                 Id = 1,
                 ZOT = ZObType.Room,
                 Name = "Master Room",
-                Desc = "This room is the master room.  It's the parent of every other room (by default at least).  This room is very powerful.",
+                Desc = "This room is the parent of every other room (by default at least), which means anything you put here will be accessible everywhere.  This room is very powerful.  As a reminder, the Master User is #2.  It works the same way as the Master Room, but for users.",
                 Owner = 0
             };
 
             room.Save();
+
+            var mu = new ZObject
+            {
+                Id = 2,
+                ZOT = ZObType.Character,
+                Name = "Master Character",
+                Desc = "A formless blob",
+                Owner = 0
+            };
+
+            mu.Save();
         }
 
         if (!Directory.Exists(PlayerPath))
@@ -58,12 +69,14 @@ public static partial class Engine
                 Name = "Stimpy",
                 Desc = "The default admin character.  Very powerful.  Also adorable.",
                 Owner = 0,
-                Location = 1
+                Location = 1,
+                Parent = 2
             };
 
             wizard.Save();
 
             var wizUser = new User(0, "owner", Version);
+            wizUser.Roles.Add("admin");
             wizUser.SetPassword("owner");
             wizUser.Save();
 

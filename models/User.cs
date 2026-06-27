@@ -10,6 +10,8 @@ public class User
 
     public string Version;
 
+    public HashSet<string> Roles = new();
+
     public User(long id, string name, string version)
     {
         Id = id;

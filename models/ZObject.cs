@@ -14,6 +14,7 @@ public class ZObject
 
     public long Parent = -1;
     public long Location = -1;
+    public int Quota = -1;
 
     public HashSet<string> Flags = new();
     public Dictionary<string, string> Attrs = new();
@@ -41,6 +42,29 @@ public class ZObject
     {
         var path = Path.Combine(Engine.ObjectPath, $"{Id}.zo");
         File.WriteAllText(path, ToYaml());
+    }
+
+    internal List<ZObject> GetCompleteParentage()
+    {
+        var ret = new List<ZObject>();
+
+        var parent = Parent;
+
+        while (parent != -1)
+        {
+            if (!Engine.Objects.TryGetValue(parent, out var obj))
+            {
+                Engine.Log("WARN", $"Object #{Id} has a parent #{parent} that does not exist.");
+                break;
+            }
+            ret.Add(obj);
+            if (obj.Parent != -1 && obj.Parent != parent)
+                parent = obj.Parent;
+            else
+                break;
+        }
+
+        return ret;
     }
 }
 

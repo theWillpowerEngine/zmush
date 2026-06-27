@@ -17,6 +17,8 @@ public static partial class Engine
 
     public static ConcurrentDictionary<string, SessionModel> Sessions { get; private set; } = new();
 
+    public static ConcurrentDictionary<string, List<string>> Logs { get; private set; } = new();
+
     public static ConcurrentDictionary<long, ZObject> Objects { get; private set; } = new();
 
     public static void Run(int port)
@@ -79,6 +81,58 @@ public static partial class Engine
         Console.WriteLine($"[{DateTime.Now.Hour:00}{DateTime.Now.Minute:00}:{component}]  {message}");
     }
 
+    public static void PlayerEmit(string sessionId, string message)
+    {
+        var log = Logs.GetOrAdd(sessionId.ToString(), _ => new List<string>());
+        log.Add(message);
+    }
+
+    public static ZObject Find(long userId, string name)
+    {
+        if (!Objects.TryGetValue(userId, out var user))
+            return null;
+
+        return Find(user, name);
+    }
+
+    public static ZObject? Find(ZObject user, string name)
+    {
+        name = name.ToLower().Trim();
+        var location = user.Location;
+
+        if (name.StartsWith("#"))
+        {
+            if (long.TryParse(name.Substring(1), out var id))
+            {
+                if (Objects.TryGetValue(id, out var obj))
+                    return obj;
+            }
+        }
+
+        if (name == "here")
+        {
+            if (Objects.TryGetValue(location, out var obj))
+                return obj;
+        }
+
+        if (name == "me")
+            return user;
+
+
+        name = name.ToLowerInvariant();
+        var found = Objects.Values.FirstOrDefault(o => o.Location == location && o.Name.ToLower().StartsWith(name));
+
+        var parentage = Objects[location].GetCompleteParentage();
+        for (var i = 0; i < parentage.Count; i++)
+        {
+            var parent = parentage[i];
+            found = Objects.Values.FirstOrDefault(o => o.Location == parent.Id && o.Name.ToLower().StartsWith(name));
+            if (found != null) return found;
+        }
+
+        return null;
+    }
+
     internal static SessionModel MakeSessionFor(User dbUser)
     {
         var existing = Sessions.Values.FirstOrDefault(s => s.UserId == dbUser.Id);
@@ -90,12 +144,13 @@ public static partial class Engine
 
         var session = new SessionModel
         {
-            Key = Guid.NewGuid(),
+            Key = Guid.NewGuid().ToString(),
             UserId = dbUser.Id,
-            LastActivity = DateTime.Now
+            LastActivity = DateTime.Now,
+            Roles = dbUser.Roles.ToHashSet()
         };
 
-        Sessions.AddOrUpdate(session.Key.ToString(), session, (key, oldValue) => session);
+        Sessions.AddOrUpdate(session.Key, session, (key, oldValue) => session);
         return session;
     }
 }

@@ -1,3 +1,4 @@
+using CommandLine;
 using NetCoreServer;
 using System;
 using System.Collections.Concurrent;
@@ -6,6 +7,8 @@ using System.Net.Sockets;
 using System.Security.Authentication;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 class HttpGameSession : HttpSession
 {
@@ -55,7 +58,7 @@ class HttpGameSession : HttpSession
                             else
                             {
                                 var session = Engine.MakeSessionFor(dbUser);
-                                SendResponseAsync(Response.MakeGetResponse(session.Key.ToString(), "text/plain"));
+                                SendResponseAsync(Response.MakeGetResponse(session.Key, "text/plain"));
                             }
                         }
                         break;
@@ -68,7 +71,7 @@ class HttpGameSession : HttpSession
                         else
                         {
                             existingSession.LastActivity = DateTime.Now;
-                            SendResponseAsync(Response.MakeGetResponse(existingSession.Key.ToString(), "text/plain"));
+                            SendResponseAsync(Response.MakeGetResponse(existingSession.Key, "text/plain"));
                         }
                         break;
 
@@ -80,9 +83,27 @@ class HttpGameSession : HttpSession
                         else
                         {
                             frameSession.LastActivity = DateTime.Now;
-                            var text = Engine.RenderFrame(frameSession.UserId);
+                            var text = Engine.RenderFrame(frameSession);
 
                             SendResponseAsync(Response.MakeGetResponse(text, "text/plain"));
+                        }
+                        break;
+
+                    case "command":
+                        var commandData = request.Body.TrimStart('"').TrimEnd('"').Replace("\\\"", "\"");
+                        var command = JsonSerializer.Deserialize<CommandModel>(commandData, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+
+                        if (command == null || command.command == null || command.sessionId == null)
+                            SendResponseAsync(Response.MakeErrorResponse(400, "Invalid command data."));
+                        else if (!Engine.Sessions.TryGetValue(command.sessionId, out var commandSession))
+                            SendResponseAsync(Response.MakeErrorResponse(403, "Session not found or expired."));
+                        else
+                        {
+                            commandSession.LastActivity = DateTime.Now;
+
+                            var result = Engine.Command(commandSession, command.command);
+
+                            SendResponseAsync(Response.MakeGetResponse(result, "text/plain"));
                         }
                         break;
 
