@@ -50,6 +50,32 @@ public class ZObject
         File.WriteAllText(path, ToYaml());
     }
 
+    public bool CheckPermissions(long userId)
+    {
+        var user = Engine.Objects[userId];
+
+        if (userId == Owner)
+            return true;
+
+        if (!Locks.Any(l => l.Item1 == "full"))
+        {
+            if (Locks.Any(l => l.Item1 == "public"))
+                return true;
+
+            if (Locks.Any(l => l.Item1 == "pc" && l.Item2 == $"#{userId}"))
+                return true;
+        }
+
+        if (Engine.Sessions.Any(s => s.Value.UserId == userId))
+        {
+            var session = Engine.Sessions.FirstOrDefault(s => s.Value.UserId == userId).Value;
+            if (session != null && session.Roles.Contains("admin"))
+                return true;
+        }
+
+        return false;
+    }
+
     internal List<ZObject> GetCompleteParentage()
     {
         var ret = new List<ZObject>();

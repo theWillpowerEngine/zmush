@@ -101,7 +101,10 @@ public static partial class Engine
     public static ZObject? Find(ZObject user, string name)
     {
         name = name.ToLower().Trim();
+
         var location = user.Location;
+        if (!Objects.TryGetValue(location, out var room))
+            room = null;
 
         if (name.StartsWith("#"))
         {
@@ -113,14 +116,13 @@ public static partial class Engine
         }
 
         if (name == "here")
-        {
-            if (Objects.TryGetValue(location, out var obj))
-                return obj;
-        }
+            return room;
+
+        if (room != null && room.Name.ToLowerInvariant().StartsWith(name))
+            return room;
 
         if (name == "me")
             return user;
-
 
         name = name.ToLowerInvariant();
         var found = Objects.Values.FirstOrDefault(o => o.Location == location && o.Name.ToLower().StartsWith(name));
