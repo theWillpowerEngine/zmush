@@ -2,23 +2,56 @@
 
 ## Building, Configuring and Running the Server
 
-Make sure you have git installed, and the ability to build .net core 10.0 applications (you'll need dotnet itself, and the 10.0 SDK or whatever TF they call it these days).
+Make sure you have git installed, and the ability to build .net core 10.0 applications (you'll need dotnet itself, and the 10.0 SDK).
 
 Run the following commands:
 
     git clone https://github.com/theWillpowerEngine/zmush.git
     cd zmush
     dotnet build
-    
 
+    cd bin/Debug
+    ./zmush
+
+The server is now running.  You can shut it down by pressing 'x', or shut it down and delete all data (which will cause it to restore the defaults) by pressing '\'.
+
+The server supports several command line arguments (CLAs).  You can add --help when running the server to see a full list of them.  The most important ones are:
+
+* -p, --port : Set the port number (default 4676)
+* -r, --reset : reset all data files (back them up or they're gone forever!)
+
+While the server is running you will see a running log, resembling the following:
+
+    [2334]  Created root directory '/home/malf/z/', driver will be the system default.  Initializing for version 0.0.1.
+    [2334]  No driver directory found.  Initializing to defaults...
+    [2334]  Default driver created at '/home/malf/z/drv/default.z'.
+    [2334]  No object directory found.  Initializing to defaults...
+    [2334]  No player directory found.  Initializing to defaults...
+    [2334:CRITICAL]  Created admin user.  login: owner, password: owner
+    [2334]  No HTML root directory found.  Initializing to default site (hope you like it ugly)
+    [2334]  Site content is loaded and cached.
+    [2334]  Loading 3 ZObjects...
+    [2334]  Load Complete.  Total ZObjects loaded: 3 in 18.3483 ms.
+    [2334]  Initialization complete!  Almost there.
+    [2334:net]  Starting server on port 4676 in working directory '/home/malf/z/'...
+    [2334:net]  Server running!  You can now access the server at http://localhost:4676
+    [2334]  Press 'X' to stop the server, or 'R' to restart it.  'L' will reload the site content without disrupting the server.  '\' will shut down AND delete all your files so don't press that unless you really want to.
+
+The thing in brackets is a time stamp (hour and then minute in 24h time).  This log will get very long over time and consistent use, but it can be very helpful when troubleshooting things or trying to figure out something that happened on the server.  There are extra levels of detail you can turn on with CLA, including HTTP requests (some nerd shit, don't worry about it if you don't know what it is), etc.
 
 ## Rooms, Items, Characters and ZObjects in general
+
+Everything in ZMUSH is a ZObject, which is a fancy way of saying "a thing".  Rooms, items and characters are all ZObjects.  
+
+...
 
 ### ZObject Inheritance and Masters
 
 ## First Login - Basic Tutorial
 
 ## Command Reference
+
+@name
 
 ## Zelazny Reference
 
