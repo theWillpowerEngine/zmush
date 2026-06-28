@@ -6,6 +6,12 @@ public abstract class BaseModel<T> where T : new()
         var obj = deserializer.Deserialize<T>(yaml);
         return obj;
     }
+
+    public string ToYaml()
+    {
+        var yaml = new YamlDotNet.Serialization.Serializer().Serialize(this);
+        return yaml;
+    }
 }
 
 public class FrameModel : BaseModel<FrameModel>

@@ -21,6 +21,9 @@ public static partial class Engine
 
     public static ConcurrentDictionary<int, ZObject> Objects { get; private set; } = new();
 
+    private static HashSet<int> FreeIds = new();
+    private static int NextId;
+
     public static void Run(int port)
     {
         if (string.IsNullOrEmpty(RootPath))
@@ -88,6 +91,24 @@ public static partial class Engine
 
         while (log.Count > Settings.LogCount)
             log.RemoveAt(0);
+    }
+
+    private static object IdLock = new object();
+    public static int GetNextId()
+    {
+        lock (IdLock)
+        {
+            if (FreeIds.Count > 0)
+            {
+                var id = FreeIds.First();
+                FreeIds.Remove(id);
+                return id;
+            }
+            else
+            {
+                return NextId++;
+            }
+        }
     }
 
     public static ZObject Find(int userId, string name)

@@ -39,9 +39,15 @@ While the server is running you will see a running log, resembling the following
 
 The thing in brackets is a time stamp (hour and then minute in 24h time).  This log will get very int over time and consistent use, but it can be very helpful when troubleshooting things or trying to figure out something that happened on the server.  There are extra levels of detail you can turn on with CLA, including HTTP requests (some nerd shit, don't worry about it if you don't know what it is), etc.
 
+This output can be logged to a file using your terminal system.  This has high utility value of course, allowing you to reference logs and deal with troublesome scenarios, but it can consume a lot of disk space and may require periodic cleanup.  I recommend avoiding this until you're a power user, and then using it selectively as needed.  
+
+### Roles and Permissions
+
+...
+
 ## Rooms, Items, Characters and ZObjects in general
 
-Everything in ZMUSH is a ZObject, which is a fancy way of saying "a thing".  Rooms, items and characters are all ZObjects.  
+Everything in ZMUSH is a ZObject, which is a fancy way of saying "a thing in the game world".  Rooms, items, exits and characters are all ZObjects.  
 
 ...
 
@@ -58,16 +64,25 @@ You can use the @lock command family to manipulate locks on ZObjects.
 
 ## First Login - Basic Tutorial
 
+## Admin/Mod/Wizard Guide
+
 ## Command Reference
 
-look (l)
+    look (l)
 
-@name
-@desc
+    @name <obj>=<name>
+    @desc <obj>=<name>
 
-@lock
-@lock/list (@lock/l)
-@lock/unlock (@lock/un)
+    @lock <obj>=<lock>[:<lock argument>]
+    @lock/list (@lock/l) <obj>
+    @lock/unlock (@lock/un) <obj>=<lock>[:<lock argument>]
+
+    @create (@cr) <name>
+        @cr/item (@cr/i)
+        @cr/character (@cr/c)
+        @cr/room (@cr/r)
+
+    @dig <name>
 
 ## Zelazny Reference
 

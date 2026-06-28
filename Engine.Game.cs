@@ -30,6 +30,26 @@ public static partial class Engine
             subCmd = eles2[1].ToLowerInvariant();
         }
 
+        //Check permissions if necessary
+        if (!isAdmin && Settings.ProtectedCommands.Contains(kw))
+        {
+            var requiredPerms = Settings.CommandPerms.FirstOrDefault(kvp => kvp.Key.Contains(kw)).Value;
+            if (requiredPerms == null || !requiredPerms.Any())
+            {
+                PlayerEmit(session.Key, $"You don't have permission to use the '{kw}' command.");
+                Log("hax", $"User #{session.UserId} attempted to use protected command '{kw}' without permission.");
+                return RenderFrame(session);
+            }
+
+            var allowedRoles = Settings.Roles.Where(r => r.Value.Any(v => requiredPerms.Contains(v))).Select(r => r.Key).ToHashSet();
+            if (!session.Roles.Any(r => allowedRoles.Contains(r)))
+            {
+                PlayerEmit(session.Key, $"You don't have permission to use the '{kw}' command.");
+                Log("hax", $"User #{session.UserId} attempted to use protected command '{kw}' without permission.  Gate 2");
+                return RenderFrame(session);
+            }
+        }
+
         switch (kw)
         {
             case "@name":
@@ -146,6 +166,57 @@ public static partial class Engine
 
                 break;
 
+            case "@create":
+            case "@cr":
+                ZObType zot = subCmd switch
+                {
+                    "room" => ZObType.Room,
+                    "r" => ZObType.Room,
+                    "character" => ZObType.Character,
+                    "c" => ZObType.Character,
+                    "item" => ZObType.Item,
+                    "i" => ZObType.Item,
+                    _ => ZObType.Item
+                };
+
+                var loc = subCmd switch
+                {
+                    "room" => -1,
+                    "r" => -1,
+                    "character" => user.Location,
+                    "c" => user.Location,
+                    "item" => user.Id,
+                    "i" => user.Id,
+                    _ => user.Id
+                };
+
+                //TODO:  Make configurable and add master item (at least as an optional setting)
+                var parent = subCmd switch
+                {
+                    "room" => 1,
+                    "r" => 1,
+                    "character" => 2,
+                    "c" => 2,
+                    "item" => -1,
+                    "i" => -1,
+                    _ => -1
+                };
+
+                var newObj = new ZObject
+                {
+                    Id = GetNextId(),
+                    ZOT = zot,
+                    Name = rest,
+                    Desc = "It's still in the oven...",
+                    Owner = session.UserId,
+                    Location = loc,
+                    Parent = parent
+                };
+
+                newObj.Save();
+                PlayerEmit(session.Key, $"Created new {zot} #{newObj.Id} named '{newObj.Name}'");
+                break;
+
             case "look":
             case "l":
                 if (string.IsNullOrEmpty(rest))
@@ -159,8 +230,6 @@ public static partial class Engine
                 }
                 PlayerEmit(session.Key, o.Desc);
                 break;
-
-
 
             default:
                 PlayerEmit(session.Key, $"Unknown command '{kw}'");

@@ -29,6 +29,24 @@ public static partial class Engine
             Log($"Default driver created at '{DriverPath}default.z'.");
         }
 
+        if (File.Exists(Path.Combine(RootPath, "Settings")))
+        {
+            var settings = File.ReadAllText(Path.Combine(RootPath, "Settings"));
+            try
+            {
+                Settings = Settings.FromYaml(settings);
+            }
+            catch (Exception ex)
+            {
+                Log("CRITICAL", $"Failed to load settings from '{Path.Combine(RootPath, "Settings")}'.  Using defaults.  Error: {ex.Message}");
+                Settings = new Settings();
+            }
+        }
+        else
+        {
+            File.WriteAllText(Path.Combine(RootPath, "Settings"), Settings.ToYaml());
+        }
+
         if (!Directory.Exists(ObjectPath))
         {
             Directory.CreateDirectory(ObjectPath);
@@ -99,5 +117,23 @@ public static partial class Engine
     {
         Loader.LoadZObjects();
         Log("Initialization complete!  Almost there.");
+
+        var ids = Objects.Keys.ToList();
+        ids.Sort();
+        NextId = ids.Last() + 1;
+
+        int cur = -1;
+        while (ids.Count > 0)
+        {
+            cur++;
+            if (ids[0] == cur)
+            {
+                ids.RemoveAt(0);
+
+                continue;
+            }
+
+            FreeIds.Add(cur);
+        }
     }
 }
