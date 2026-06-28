@@ -41,6 +41,12 @@ The thing in brackets is a time stamp (hour and then minute in 24h time).  This 
 
 This output can be logged to a file using your terminal system.  This has high utility value of course, allowing you to reference logs and deal with troublesome scenarios, but it can consume a lot of disk space and may require periodic cleanup.  I recommend avoiding this until you're a power user, and then using it selectively as needed.  
 
+### Connecting, and Basic Concepts
+
+Commands and subcommands
+User vs Character
+ZObject Types (only as they relate to the player experience)
+
 ### Understanding the Log
 
 CRITICAL
@@ -78,8 +84,6 @@ You can use the @lock command family to manipulate locks on ZObjects.
 
 The locks detailed above are the "access" locks, which can go on any ZObject and effect who has access to them.  There are other kinds of locks as well.
 
-
-
 #### Lock Quick Reference
 
     Lock        Arg        Type(s)      Category    Function
@@ -89,6 +93,15 @@ The locks detailed above are the "access" locks, which can go on any ZObject and
 
     fixed       -           Item        Item        Only those with access to the ZObject can pick it up or drop it
     static      -           Item        Item        Cannot be picked up or dropped (the static lock has to be removed first)
+
+
+### Flags
+
+Dark
+Darksight
+User1 - User10
+System1 - System10
+
 
 ## First Login - Basic Tutorial
 
@@ -109,6 +122,9 @@ The locks detailed above are the "access" locks, which can go on any ZObject and
     @lock <obj>=<lock>[:<lock argument>]
     @lock/list (@lock/l) <obj>
     @unlock <obj>=<lock>[:<lock argument>]
+
+    @flag <obj>=<flag>
+    @flag <obj>=!<flag>
 
     @create (@cr) <name>
         @cr/item (@cr/i)

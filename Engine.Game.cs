@@ -185,6 +185,65 @@ public static partial class Engine
                 PlayerEmit(session.Key, $"Removed lock '{(string.IsNullOrEmpty(up2) ? up1 : $"{up1}:{up2}")}' from #{o.Id}");
                 break;
 
+            case "@flag":
+                (s, s2) = GetNamedValue(rest);
+                o = Find(user, s);
+                if (o == null)
+                {
+                    PlayerEmit(session.Key, $"I can't find '{s}'");
+                    break;
+                }
+
+                if (!o.CheckPermissions(session.UserId))
+                {
+                    PlayerEmit(session.Key, $"You don't have permission to flag #{o.Id}");
+                    Log("hax", $"User #{session.UserId} attempted to manipulate flags on #{o.Id} without permission.");
+                    break;
+                }
+
+                var unset = s2.StartsWith("!");
+                if (unset)
+                    s2 = s2.Substring(1);
+
+                if (!Enum.TryParse<Flag>(s2, true, out var flag))
+                {
+                    PlayerEmit(session.Key, $"'{s2}' is not a valid flag.");
+                    break;
+                }
+
+                var requiredRoles = Settings.RolesRequiredForFlag(flag);
+                if (requiredRoles != null && !session.Roles.Any(r => requiredRoles.Contains(r)))
+                {
+                    PlayerEmit(session.Key, $"You don't have permission to set the '{flag}' flag.");
+                    Log("hax", $"User #{session.UserId} attempted to set the '{flag}' flag on #{o.Id} without permission.");
+                    break;
+                }
+
+                if (o.HasFlag(flag) && !unset)
+                {
+                    PlayerEmit(session.Key, $"#{o.Id} already has the '{flag}' flag.  If you want to unset it, use: @flag #{o.Id} !{flag}");
+                    break;
+                }
+                else if (!o.HasFlag(flag) && unset)
+                {
+                    PlayerEmit(session.Key, $"#{o.Id} does not have the '{flag}' flag.  If you want to set it, use: @flag #{o.Id} {flag}");
+                    break;
+                }
+
+                if (unset)
+                {
+                    o.Flags.Remove(flag);
+                    o.Save();
+                    PlayerEmit(session.Key, $"Removed '{flag}' flag from #{o.Id}");
+                }
+                else
+                {
+                    o.Flags.Add(flag);
+                    o.Save();
+                    PlayerEmit(session.Key, $"Added '{flag}' flag to #{o.Id}");
+                }
+                break;
+
             case "@create":
             case "@cr":
                 ZObType zot = subCmd switch
@@ -498,7 +557,6 @@ public static partial class Engine
                 break;
         }
 
-
         return RenderFrame(session);
     }
 
@@ -512,9 +570,9 @@ public static partial class Engine
         ret += loc.Desc;
 
         var zobs = Objects.Values.Where(o => o.Location == loc.Id && o.Id != user.Id).ToList();
-        var items = zobs.Where(o => o.ZOT == ZObType.Item).ToList();
-        var pcs = zobs.Where(o => o.ZOT == ZObType.Character).ToList();
-        var exits = zobs.Where(o => o.ZOT == ZObType.Exit).ToList();
+        var items = zobs.Where(o => o.ZOT == ZObType.Item).Where(o => o.IsVisibleTo(user)).ToList();
+        var pcs = zobs.Where(o => o.ZOT == ZObType.Character).Where(o => o.IsVisibleTo(user)).ToList();
+        var exits = zobs.Where(o => o.ZOT == ZObType.Exit).Where(o => o.IsVisibleTo(user)).ToList();
 
         ret += "<br /><br /><table width='99%'><tr><td width='33%' valign='top'>";
         if (exits.Any())

@@ -19,9 +19,28 @@ public class Settings : BaseModel<Settings>
         { new HashSet<string>() { "@tel" }, new HashSet<string>() { "basic" } },
     };
 
+    public Dictionary<HashSet<Flag>, HashSet<string>> FlagPerms = new Dictionary<HashSet<Flag>, HashSet<string>>()
+    {
+        { new HashSet<Flag>() { Flag.Darksight }, new HashSet<string>() { "basic" } },
+        { new HashSet<Flag>() { Flag.Dark }, new HashSet<string>() { "advanced" } },
+    };
+
+    public HashSet<string>? RolesRequiredForFlag(Flag flag)
+    {
+        var ret = new HashSet<string>();
+        foreach (var kvp in FlagPerms)
+        {
+            if (kvp.Key.Contains(flag))
+                ret.UnionWith(kvp.Value);
+        }
+
+        if (!ret.Any()) return null;
+        return ret;
+    }
+
     public Dictionary<string, HashSet<string>> Roles = new Dictionary<string, HashSet<string>>()
     {
-        { "wizard", new HashSet<string>() { "build", "basic" } },
+        { "wizard", new HashSet<string>() { "build", "basic", "advanced" } },
         { "moderatus", new HashSet<string>() { "basic" } }
     };
 

@@ -8,9 +8,13 @@ public enum ZObType
     Exit,
 }
 
-public enum ZFlag
+public enum Flag
 {
+    Dark,
+    Darksight,
 
+    User1, User2, User3, User4, User5, User6, User7, User8, User9, User10,
+    System1, System2, System3, System4, System5, System6, System7, System8, System9, System10,
 }
 
 public class ZObject
@@ -22,11 +26,13 @@ public class ZObject
     public int Location = -1;
     public int Quota = -1;
 
-    public HashSet<ZFlag> Flags = new();
+    public HashSet<Flag> Flags = new();
     public Dictionary<string, string> Attrs = new();
 
     public int Owner;
     public List<(string, string)> Locks = new();
+
+    public HashSet<byte> Subrealities = new();
 
     public string Name = "A Formless Form";
 
@@ -76,6 +82,51 @@ public class ZObject
             if (session != null && session.Roles.Contains("admin"))
                 return true;
         }
+
+        return false;
+    }
+
+    public bool HasFlag(Flag flag, bool excludeParent = false)
+    {
+        if (Flags.Contains(flag))
+            return true;
+
+        if (excludeParent)
+            return false;
+
+        var parentage = GetCompleteParentage();
+        foreach (var parent in parentage)
+            if (parent.Flags.Contains(flag))
+                return true;
+
+        return false;
+    }
+
+    public bool IsVisibleTo(int userId)
+    {
+        var user = Engine.Objects[userId];
+        return IsVisibleTo(user);
+    }
+
+    public bool IsVisibleTo(ZObject user)
+    {
+        if (user.Id == Owner)
+            return true;
+
+        if (HasFlag(Flag.Dark))
+        {
+            if (user.HasFlag(Flag.Darksight))
+                return true;
+
+            return false;
+        }
+
+        if (Subrealities.Count == 0 || Subrealities.Contains(0))
+            return true;
+        //At this point we know we have subrealities and this object is not in the base reality
+
+        if (Subrealities.Overlaps(user.Subrealities))
+            return true;
 
         return false;
     }
