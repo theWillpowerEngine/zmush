@@ -94,6 +94,9 @@ The locks detailed above are the "access" locks, which can go on any ZObject and
     fixed       -           Item        Item        Only those with access to the ZObject can pick it up or drop it
     static      -           Item        Item        Cannot be picked up or dropped (the static lock has to be removed first)
 
+    allow       Id          Exit        Exit        Allow certain people (locked otherwise.  Can't combine with deny)
+    deny        Id          Exit        Exit        Deny certain people (unlocked otherwise.  Can't combine with allow)
+
 
 ### Flags
 
@@ -146,6 +149,8 @@ System1 - System10
 
     @dig <name>
     @dig/1 <name>
+    @dig/t <name>
+    @dig/1t <name>
 
     @tel <room>         Can be #id or name part
 

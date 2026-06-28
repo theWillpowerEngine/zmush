@@ -15,7 +15,7 @@ public class Settings : BaseModel<Settings>
 
     public Dictionary<HashSet<string>, HashSet<string>> CommandPerms = new Dictionary<HashSet<string>, HashSet<string>>()
     {
-        { new HashSet<string>() { "@create", "@cr", "@dig" }, new HashSet<string>() { "build" } },
+        { new HashSet<string>() { "@create", "@cr", "@dig" }, new HashSet<string>() { "advanced" } },
         { new HashSet<string>() { "@tel" }, new HashSet<string>() { "basic" } },
     };
 
@@ -40,7 +40,7 @@ public class Settings : BaseModel<Settings>
 
     public Dictionary<string, HashSet<string>> Roles = new Dictionary<string, HashSet<string>>()
     {
-        { "wizard", new HashSet<string>() { "build", "basic", "advanced" } },
+        { "wizard", new HashSet<string>() { "basic", "advanced" } },
         { "moderatus", new HashSet<string>() { "basic" } }
     };
 

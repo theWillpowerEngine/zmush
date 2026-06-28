@@ -3,9 +3,8 @@
     * Which also requires attributes
 
 * Exits
-  * Locks
-  * Reality Levels (plumb into everywhere), or equivalent of DARK
   * Action Links (use as an excuse to plumb in action links)
+  * Lock and transport messages (will need numbered zelazny args (%0 type shit))
 
 * "Special Output" and who as a test for it
 

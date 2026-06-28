@@ -396,7 +396,9 @@ public static partial class Engine
                 break;
 
             case "@dig":
-                var oneSidedExit = subCmd == "1";
+                var oneSidedExit = subCmd?.Contains("1") ?? false;
+                var tpAfterDig = subCmd?.Contains("t") ?? false;
+
                 o = new ZObject
                 {
                     Id = GetNextId(),
@@ -437,6 +439,12 @@ public static partial class Engine
                     o.Save();
 
                     PlayerEmit(session.Key, $"Created new room #{newRoomId} named '{rest}' with exits to and from #{user.Location}");
+
+                    if (tpAfterDig)
+                    {
+                        user.Location = newRoomId;
+                        user.Save();
+                    }
                 }
                 else
                     PlayerEmit(session.Key, $"Created new room #{newRoomId} named '{rest}' with exit from #{user.Location}");
@@ -614,6 +622,20 @@ public static partial class Engine
                 var exit = Objects.Values.FirstOrDefault(o => o.ZOT == ZObType.Exit && o.Location == user.Location && o.Name.ToLowerInvariant().Contains(kw));
                 if (exit != null)
                 {
+                    if (exit.Locks.Any(l => l.Item1 == "allow"))
+                    {
+                        if (!exit.Locks.Any(l => l.Item1 == "allow" && l.Item2 == "#" + session.UserId.ToString()))
+                        {
+                            PlayerEmit(session.Key, $"It's locked!");
+                            break;
+                        }
+                    }
+                    else if (exit.Locks.Any(l => l.Item1 == "deny" && l.Item2 == "#" + session.UserId.ToString()))
+                    {
+                        PlayerEmit(session.Key, $"It's locked!");
+                        break;
+                    }
+
                     var dest = Objects.GetValueOrDefault(exit.Parent);
                     if (dest != null)
                     {
