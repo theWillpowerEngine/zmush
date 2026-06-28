@@ -18,6 +18,23 @@ public static partial class Engine
         var kw = eles[0].ToLowerInvariant();
         var rest = string.Join(' ', eles.Skip(1));
 
+        //Command aliases
+        if (command.StartsWith("\""))
+        {
+            kw = "say";
+            rest = command.Substring(1);
+        }
+        else if (command.StartsWith(":"))
+        {
+            kw = "emote";
+            rest = command.Substring(1);
+        }
+        else if (command.StartsWith(";"))
+        {
+            kw = "emote/ns";
+            rest = command.Substring(1);
+        }
+
         var isAdmin = session.Roles.Contains("admin");
         ZObject o, o2;
         string s, s2;
@@ -569,6 +586,28 @@ public static partial class Engine
                     break;
                 }
                 PlayerEmit(session.Key, $"You are carrying: {string.Join(", ", inv.Select(o => o.Name))}");
+                break;
+
+            case "say":
+                if (string.IsNullOrEmpty(rest))
+                {
+                    PlayerEmit(session.Key, $"Say what?");
+                    break;
+                }
+                RoomEmit(user.Location, $"{user.Name} says, \"{rest}\"");
+                break;
+
+            case "emote":
+            case "em":
+                if (string.IsNullOrEmpty(rest))
+                {
+                    PlayerEmit(session.Key, $"Emote what?");
+                    break;
+                }
+                if (subCmd == "ns")
+                    RoomEmit(user.Location, $"{user.Name}{rest}");
+                else
+                    RoomEmit(user.Location, $"{user.Name} {rest}");
                 break;
 
             default:

@@ -1,5 +1,3 @@
-* Say, emote and all that shit
-
 * Objects:
   * Custom commands
     * Which also requires attributes

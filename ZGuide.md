@@ -116,6 +116,15 @@ System1 - System10
 
     inventory (inv, i)
 
+    say <text>
+    "<text>
+
+    emote (em) <text>
+    :<text>
+
+    emote/ns <text>
+    ;<text>
+
     @name <obj>=<name>
     @desc <obj>=<name>
 
