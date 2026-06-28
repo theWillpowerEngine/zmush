@@ -212,7 +212,7 @@ public static partial class Engine
                 }
 
                 var requiredRoles = Settings.RolesRequiredForFlag(flag);
-                if (requiredRoles != null && !session.Roles.Any(r => requiredRoles.Contains(r)))
+                if (requiredRoles != null && !session.Roles.Contains("admin") && !session.Roles.Any(r => requiredRoles.Contains(r)))
                 {
                     PlayerEmit(session.Key, $"You don't have permission to set the '{flag}' flag.");
                     Log("hax", $"User #{session.UserId} attempted to set the '{flag}' flag on #{o.Id} without permission.");
@@ -246,6 +246,47 @@ public static partial class Engine
 
             case "@create":
             case "@cr":
+                //@cr/u <name>[:<pwd>]=#<character id>
+                if (subCmd == "user" || subCmd == "u")
+                {
+                    (s, s2) = GetNamedValue(rest);
+                    if (!s2.StartsWith("#") || !int.TryParse(s2.Substring(1), out var charId))
+                    {
+                        PlayerEmit(session.Key, $"You must specify a character to create the user with.  Example: @cr/u <name>[:<pwd>]=#<character id>");
+                        break;
+                    }
+                    var character = Objects.GetValueOrDefault(charId);
+                    if (character == null || character.ZOT != ZObType.Character)
+                    {
+                        PlayerEmit(session.Key, $"I can't find character #{charId}");
+                        break;
+                    }
+
+                    if (s.Contains(":"))
+                    {
+                        var parts = s.Split(':', 2);
+                        s = parts[0];
+                        s2 = parts[1];
+                    }
+                    else
+                    {
+                        s2 = s;
+                    }
+
+                    if (User.Load(s) != null)
+                    {
+                        PlayerEmit(session.Key, $"A user with the name '{s}' already exists.");
+                        break;
+                    }
+
+                    var newUser = new User(charId, s, Version);
+                    newUser.SetPassword(s2);
+                    newUser.Save();
+                    PlayerEmit(session.Key, $"Created new user '{s}' with character #{charId}, password: '{s2}'");
+                    Log("admin", $"User #{session.UserId} created new user '{s}' with character #{charId}");
+                    break;
+                }
+
                 ZObType zot = subCmd switch
                 {
                     "room" => ZObType.Room,

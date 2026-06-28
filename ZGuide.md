@@ -132,6 +132,9 @@ System1 - System10
         @cr/room (@cr/r)
         @cr/exit (@cr/x, @cr/ex)
 
+        @cr/user (@cr/u) <name>[:<pwd>]=#<character id>         If no password the user name is used
+
+
     @dig <name>
     @dig/1 <name>
 
