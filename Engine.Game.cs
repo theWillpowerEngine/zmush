@@ -231,6 +231,77 @@ public static partial class Engine
                 PlayerEmit(session.Key, o.Desc);
                 break;
 
+            case "get":
+            case "g":
+                if (string.IsNullOrEmpty(rest))
+                {
+                    PlayerEmit(session.Key, $"Get what?");
+                    break;
+                }
+
+                o = Find(user, rest);
+                if (o == null)
+                {
+                    PlayerEmit(session.Key, $"You can't find '{rest}' anywhere...");
+                    break;
+                }
+                if (o.Location == user.Id)
+                {
+                    PlayerEmit(session.Key, $"You're already carrying {o.Name}");
+                    break;
+                }
+                if (o.Location != user.Location)
+                {
+                    PlayerEmit(session.Key, $"You can't reach {o.Name}...");
+                    break;
+                }
+
+                //TODO:  locks
+
+                o.Location = user.Id;
+                o.Save();
+                RoomEmit(user.Location, $"{user.Name} picks up {o.Name}.");
+                break;
+
+            case "drop":
+            case "dr":
+                if (string.IsNullOrEmpty(rest))
+                {
+                    PlayerEmit(session.Key, $"Drop what?");
+                    break;
+                }
+
+                o = Find(user, rest);
+                if (o == null)
+                {
+                    PlayerEmit(session.Key, $"You can't find '{rest}' anywhere...");
+                    break;
+                }
+                if (o.Location != user.Id)
+                {
+                    PlayerEmit(session.Key, $"You're not carrying {o.Name}");
+                    break;
+                }
+
+                //TODO:  locks
+
+                o.Location = user.Location;
+                o.Save();
+                RoomEmit(user.Location, $"{user.Name} drops {o.Name} on the ground.");
+                break;
+
+            case "inventory":
+            case "inv":
+            case "i":
+                var inv = Objects.Values.Where(o => o.Location == user.Id).ToList();
+                if (!inv.Any())
+                {
+                    PlayerEmit(session.Key, $"You're not carrying anything.");
+                    break;
+                }
+                PlayerEmit(session.Key, $"You are carrying: {string.Join(", ", inv.Select(o => o.Name))}");
+                break;
+
             default:
                 PlayerEmit(session.Key, $"Unknown command '{kw}'");
                 break;
@@ -248,7 +319,44 @@ public static partial class Engine
         var ret = "";
         ret += $"<b>{loc.Name}</b>%n";
         ret += loc.Desc;
-        ret += "<br /><br />";
+
+        var zobs = Objects.Values.Where(o => o.Location == loc.Id && o.Id != user.Id).ToList();
+        var items = zobs.Where(o => o.ZOT == ZObType.Item).ToList();
+        var pcs = zobs.Where(o => o.ZOT == ZObType.Character).ToList();
+        var exits = zobs.Where(o => o.ZOT == ZObType.Exit).ToList();
+
+        ret += "<br /><br /><table width='99%'><tr><td width='33%' valign='top'>";
+        if (exits.Any())
+        {
+            ret += "<b>Exits:</b><br />";
+            foreach (var exit in exits)
+            {
+                ret += $"{exit.Name}<br />";
+            }
+        }
+
+        ret += "</td><td width='33%' valign='top'>";
+        if (pcs.Any())
+        {
+            ret += "<b>Players:</b><br />";
+            foreach (var pc in pcs)
+            {
+                ret += pc.Name + "<br />";
+            }
+        }
+
+        ret += "</td><td width='33%' valign='top'>";
+        if (items.Any())
+        {
+            ret += "<b>Items:</b><br />";
+            foreach (var item in items)
+            {
+                ret += item.Name + "<br />";
+            }
+        }
+        ret += "</td></tr></table>";
+
+
 
         var log = Logs.GetOrAdd(session.Key, _ => new List<string>());
 

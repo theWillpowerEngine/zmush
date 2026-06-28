@@ -93,6 +93,12 @@ public static partial class Engine
             log.RemoveAt(0);
     }
 
+    public static void RoomEmit(int roomId, string message)
+    {
+        var sessions = Sessions.Values.Where(s => Objects.TryGetValue(s.UserId, out var obj) && obj.Location == roomId).ToList();
+        sessions.ForEach(s => PlayerEmit(s.Key, message));
+    }
+
     private static object IdLock = new object();
     public static int GetNextId()
     {
@@ -111,6 +117,55 @@ public static partial class Engine
         }
     }
 
+    public static List<ZObject> GetObjectsInScope(ZObject scope, bool includeRoomHierarchy = false)
+    {
+        var ret = new List<ZObject>();
+
+        List<int> locationsInScope = new List<int>() { scope.Id };
+
+        locationsInScope.Add(scope.Id);
+        switch (scope.ZOT)
+        {
+            case ZObType.Room:
+                if (includeRoomHierarchy)
+                    locationsInScope.AddRange(scope.GetCompleteParentage().Select(p => p.Id));
+                break;
+
+            case ZObType.Character:
+                locationsInScope.Add(scope.Location);
+                if (includeRoomHierarchy)
+                    locationsInScope.AddRange(Objects[scope.Location].GetCompleteParentage().Select(p => p.Id));
+                break;
+
+            case ZObType.Item:
+                locationsInScope.Add(scope.Location);
+                var loc = Objects[scope.Location];
+                if (loc.ZOT == ZObType.Character)
+                {
+                    locationsInScope.Add(loc.Location);
+                    if (includeRoomHierarchy)
+                        locationsInScope.AddRange(Objects[loc.Location].GetCompleteParentage().Select(p => p.Id));
+                }
+                break;
+
+            case ZObType.Exit:
+                locationsInScope.Add(scope.Location);
+                locationsInScope.Add(scope.Parent);
+                if (includeRoomHierarchy)
+                {
+                    locationsInScope.AddRange(Objects[scope.Location].GetCompleteParentage().Select(p => p.Id));
+                    locationsInScope.AddRange(Objects[scope.Parent].GetCompleteParentage().Select(p => p.Id));
+                }
+                break;
+
+            default:
+                throw new Exception($"Unknown ZObType {scope.ZOT} for object {scope.Id} in GetObjectsInScope");
+        }
+
+        ret.AddRange(Objects.Values.Where(o => locationsInScope.Contains(o.Location)));
+        return ret;
+    }
+
     public static ZObject Find(int userId, string name)
     {
         if (!Objects.TryGetValue(userId, out var user))
@@ -119,11 +174,11 @@ public static partial class Engine
         return Find(user, name);
     }
 
-    public static ZObject? Find(ZObject user, string name)
+    public static ZObject? Find(ZObject context, string name)
     {
         name = name.ToLower().Trim();
 
-        var location = user.Location;
+        var location = context.ZOT == ZObType.Room ? context.Id : context.Location;
         if (!Objects.TryGetValue(location, out var room))
             room = null;
 
@@ -136,25 +191,22 @@ public static partial class Engine
             }
         }
 
+        if (name == "this" || name == "self" || name == "me")
+            return context;
+
         if (name == "here")
             return room;
 
         if (room != null && room.Name.ToLowerInvariant().StartsWith(name))
             return room;
 
-        if (name == "me")
-            return user;
-
         name = name.ToLowerInvariant();
         var found = Objects.Values.FirstOrDefault(o => o.Location == location && o.Name.ToLower().StartsWith(name));
+        if (found != null) return found;
 
-        var parentage = Objects[location].GetCompleteParentage();
-        for (var i = 0; i < parentage.Count; i++)
-        {
-            var parent = parentage[i];
-            found = Objects.Values.FirstOrDefault(o => o.Location == parent.Id && o.Name.ToLower().StartsWith(name));
-            if (found != null) return found;
-        }
+        var inScope = GetObjectsInScope(context, true);
+        found = inScope.FirstOrDefault(o => o.Name.ToLower().StartsWith(name));
+        if (found != null) return found;
 
         return null;
     }

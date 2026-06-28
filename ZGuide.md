@@ -68,7 +68,12 @@ You can use the @lock command family to manipulate locks on ZObjects.
 
 ## Command Reference
 
-    look (l)
+    look (l) [<obj>]
+
+    get (g) <obj>
+    drop (dr) <obj>
+
+    inventory (inv, i)
 
     @name <obj>=<name>
     @desc <obj>=<name>

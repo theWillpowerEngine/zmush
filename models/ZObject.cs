@@ -4,7 +4,8 @@ public enum ZObType
 {
     Room,
     Character,
-    Item
+    Item,
+    Exit,
 }
 
 public enum ZFlag
@@ -46,6 +47,9 @@ public class ZObject
 
     public void Save()
     {
+        if (!Engine.Objects.ContainsKey(Id))
+            Engine.Objects.AddOrUpdate(Id, this, (key, oldValue) => this);
+
         var path = Path.Combine(Engine.ObjectPath, $"{Id}.zo");
         File.WriteAllText(path, ToYaml());
     }
