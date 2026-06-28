@@ -51,6 +51,16 @@ Everything in ZMUSH is a ZObject, which is a fancy way of saying "a thing in the
 
 ...
 
+### Anatomy of a ZObjects
+
+#### Inheritance / Master ZObjects
+
+### How to Find Things
+
+Id or partial name syntax.  Object hierarchy
+
+Special commands
+
 ### Understanding Locks
 
 By default only the owner of a ZObject or an admin with elevated permissions can edit and modify ZObjects.  There are ways to adjust these permissions, called locks.  Locks can have other effects as well, but one of their most common use cases is controlling access to a ZObject.
@@ -58,9 +68,6 @@ By default only the owner of a ZObject or an admin with elevated permissions can
 If you want to let anyone edit something, you can add the "public" lock.  This basically turns off security.  If you would like to enable particular users to edit the ZObject, you can add "pc" locks, with an argument of the user's ZObject Id.  You can have multiple pc locks on the same ZObject.  If you have setup a more complex permission system and would like to temporarily disable all but the owner and admin access you can add the "full" lock.
 
 You can use the @lock command family to manipulate locks on ZObjects.
-
-
-### ZObject Inheritance and Masters
 
 ## First Login - Basic Tutorial
 
@@ -86,8 +93,10 @@ You can use the @lock command family to manipulate locks on ZObjects.
         @cr/item (@cr/i)
         @cr/character (@cr/c)
         @cr/room (@cr/r)
+        @cr/exit (@cr/x, @cr/ex)
 
     @dig <name>
+    @dig/1 <name>
 
 ## Zelazny Reference
 

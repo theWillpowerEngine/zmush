@@ -8,14 +8,21 @@ public class Settings : BaseModel<Settings>
 
     public int LogCount = 15;
 
+    public int NewCharacterStartingRoom = 1;
+    public int MasterRoom = 1;
+    public int MasterCharacter = 2;
+    public int MasterItem = -1;
+
     public Dictionary<HashSet<string>, HashSet<string>> CommandPerms = new Dictionary<HashSet<string>, HashSet<string>>()
     {
-        { new HashSet<string>() { "@create", "@cr" }, new HashSet<string>() { "create" } },
+        { new HashSet<string>() { "@create", "@cr", "@dig" }, new HashSet<string>() { "build" } },
+        { new HashSet<string>() { "@tel" }, new HashSet<string>() { "basic" } },
     };
 
     public Dictionary<string, HashSet<string>> Roles = new Dictionary<string, HashSet<string>>()
     {
-        { "wizard", new HashSet<string>() { "create" } }
+        { "wizard", new HashSet<string>() { "build", "basic" } },
+        { "moderatus", new HashSet<string>() { "basic" } }
     };
 
     private List<string> _protectedCommands = null;

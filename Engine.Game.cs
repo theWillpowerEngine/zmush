@@ -174,6 +174,9 @@ public static partial class Engine
                     "r" => ZObType.Room,
                     "character" => ZObType.Character,
                     "c" => ZObType.Character,
+                    "exit" => ZObType.Exit,
+                    "x" => ZObType.Exit,
+                    "ex" => ZObType.Exit,
                     "item" => ZObType.Item,
                     "i" => ZObType.Item,
                     _ => ZObType.Item
@@ -183,30 +186,69 @@ public static partial class Engine
                 {
                     "room" => -1,
                     "r" => -1,
-                    "character" => user.Location,
-                    "c" => user.Location,
+                    "character" => Settings.NewCharacterStartingRoom,
+                    "c" => Settings.NewCharacterStartingRoom,
+                    "exit" => user.Location,
+                    "x" => user.Location,
+                    "ex" => user.Location,
                     "item" => user.Id,
                     "i" => user.Id,
                     _ => user.Id
                 };
 
-                //TODO:  Make configurable and add master item (at least as an optional setting)
+                ZObject? farSide = null;
+                var name = rest;
+                if (zot == ZObType.Exit)
+                {
+                    if (rest.StartsWith("#"))
+                    {
+                        if (int.TryParse(rest.Substring(1), out var id))
+                        {
+                            farSide = Objects.GetValueOrDefault(id);
+                            if (farSide == null)
+                            {
+                                PlayerEmit(session.Key, $"I can't find #{id} to create an exit to.");
+                                break;
+                            }
+                        }
+                        else
+                        {
+                            PlayerEmit(session.Key, $"Invalid exit target '{rest}'");
+                            break;
+                        }
+                    }
+                    else
+                    {
+                        farSide = Objects.Values.FirstOrDefault(z => z.ZOT == ZObType.Room && z.Name.ToLowerInvariant().Contains(rest));
+                        if (farSide == null)
+                        {
+                            PlayerEmit(session.Key, $"I can't find '{rest}' to create an exit to.");
+                            break;
+                        }
+                    }
+
+                    name = farSide.Name;
+                }
+
                 var parent = subCmd switch
                 {
-                    "room" => 1,
-                    "r" => 1,
-                    "character" => 2,
-                    "c" => 2,
-                    "item" => -1,
-                    "i" => -1,
-                    _ => -1
+                    "room" => Settings.MasterRoom,
+                    "r" => Settings.MasterRoom,
+                    "character" => Settings.MasterCharacter,
+                    "c" => Settings.MasterCharacter,
+                    "exit" => farSide?.Id ?? -1,
+                    "x" => farSide?.Id ?? -1,
+                    "ex" => farSide?.Id ?? -1,
+                    "item" => Settings.MasterItem,
+                    "i" => Settings.MasterItem,
+                    _ => Settings.MasterItem
                 };
 
                 var newObj = new ZObject
                 {
                     Id = GetNextId(),
                     ZOT = zot,
-                    Name = rest,
+                    Name = name,
                     Desc = "It's still in the oven...",
                     Owner = session.UserId,
                     Location = loc,
@@ -215,6 +257,53 @@ public static partial class Engine
 
                 newObj.Save();
                 PlayerEmit(session.Key, $"Created new {zot} #{newObj.Id} named '{newObj.Name}'");
+                break;
+
+            case "@dig":
+                var oneSidedExit = subCmd == "1";
+                o = new ZObject
+                {
+                    Id = GetNextId(),
+                    ZOT = ZObType.Room,
+                    Name = rest,
+                    Desc = "It's still in the oven...",
+                    Owner = session.UserId,
+                    Location = -1,
+                    Parent = Settings.MasterRoom
+                };
+                o.Save();
+                var newRoomId = o.Id;
+
+                o2 = new ZObject
+                {
+                    Id = GetNextId(),
+                    ZOT = ZObType.Exit,
+                    Name = rest,
+                    Desc = "",
+                    Owner = session.UserId,
+                    Location = user.Location,
+                    Parent = newRoomId
+                };
+                o2.Save();
+
+                if (!oneSidedExit)
+                {
+                    o = new ZObject
+                    {
+                        Id = GetNextId(),
+                        ZOT = ZObType.Exit,
+                        Name = Objects[user.Location].Name,
+                        Desc = "",
+                        Owner = session.UserId,
+                        Location = newRoomId,
+                        Parent = user.Location
+                    };
+                    o.Save();
+
+                    PlayerEmit(session.Key, $"Created new room #{newRoomId} named '{rest}' with exits to and from #{user.Location}");
+                }
+                else
+                    PlayerEmit(session.Key, $"Created new room #{newRoomId} named '{rest}' with exit from #{user.Location}");
                 break;
 
             case "look":
@@ -303,6 +392,28 @@ public static partial class Engine
                 break;
 
             default:
+                var exit = Objects.Values.FirstOrDefault(o => o.ZOT == ZObType.Exit && o.Location == user.Location && o.Name.ToLowerInvariant().Contains(kw));
+                if (exit != null)
+                {
+                    var dest = Objects.GetValueOrDefault(exit.Parent);
+                    if (dest != null)
+                    {
+                        RoomEmit(user.Location, $"{user.Name} leaves, heading toward {dest.Name}.");
+                        user.Location = dest.Id;
+                        user.Save();
+                        RoomEmit(user.Location, $"{user.Name} arrives.");
+                    }
+                    else
+                    {
+                        PlayerEmit(session.Key, $"The exit {exit.Name} seems to lead nowhere...");
+                    }
+                    break;
+                }
+                else
+                {
+                    Log("hax", $"User #{session.UserId} attempted unknown command '{kw}'");
+                }
+
                 PlayerEmit(session.Key, $"Unknown command '{kw}'");
                 break;
         }
@@ -354,9 +465,7 @@ public static partial class Engine
                 ret += item.Name + "<br />";
             }
         }
-        ret += "</td></tr></table>";
-
-
+        ret += "</td></tr></table><br />";
 
         var log = Logs.GetOrAdd(session.Key, _ => new List<string>());
 

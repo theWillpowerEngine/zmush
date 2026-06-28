@@ -166,15 +166,15 @@ public static partial class Engine
         return ret;
     }
 
-    public static ZObject Find(int userId, string name)
+    public static ZObject Find(int userId, string name, bool localRoomOnly = false)
     {
         if (!Objects.TryGetValue(userId, out var user))
             return null;
 
-        return Find(user, name);
+        return Find(user, name, localRoomOnly);
     }
 
-    public static ZObject? Find(ZObject context, string name)
+    public static ZObject? Find(ZObject context, string name, bool localRoomOnly = false)
     {
         name = name.ToLower().Trim();
 
@@ -204,7 +204,7 @@ public static partial class Engine
         var found = Objects.Values.FirstOrDefault(o => o.Location == location && o.Name.ToLower().StartsWith(name));
         if (found != null) return found;
 
-        var inScope = GetObjectsInScope(context, true);
+        var inScope = GetObjectsInScope(context, !localRoomOnly);
         found = inScope.FirstOrDefault(o => o.Name.ToLower().StartsWith(name));
         if (found != null) return found;
 
