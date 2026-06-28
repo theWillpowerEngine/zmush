@@ -102,5 +102,13 @@ public class ZObject
 
         return ret;
     }
+
+    public bool HasLock(string lockName, string lockVal = null)
+    {
+        if (lockVal == null)
+            return Locks.Any(l => l.Item1 == lockName);
+        else
+            return Locks.Any(l => l.Item1 == lockName && l.Item2 == lockVal);
+    }
 }
 

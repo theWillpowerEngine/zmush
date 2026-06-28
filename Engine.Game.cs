@@ -143,27 +143,46 @@ public static partial class Engine
                         }
                         PlayerEmit(session.Key, $"Locks on #{o.Id}: {string.Join(", ", o.Locks.Select(l => string.IsNullOrEmpty(l.Item2) ? l.Item1 : $"{l.Item1}:{l.Item2}"))}");
                         break;
-
-                    case "unlock":
-                    case "un":
-                        if (string.IsNullOrEmpty(s2))
-                        {
-                            PlayerEmit(session.Key, $"You must specify a lock to remove.");
-                            break;
-                        }
-
-                        var lockToRemove = o.Locks.FirstOrDefault(l => l.Item1 == lp1 && l.Item2 == lp2);
-                        if (lockToRemove == default)
-                        {
-                            PlayerEmit(session.Key, $"Lock '{(string.IsNullOrEmpty(lp2) ? lp1 : $"{lp1}:{lp2}")}' does not exist on #{o.Id}");
-                            break;
-                        }
-                        o.Locks.Remove(lockToRemove);
-                        o.Save();
-                        PlayerEmit(session.Key, $"Removed lock '{(string.IsNullOrEmpty(lp2) ? lp1 : $"{lp1}:{lp2}")}' from #{o.Id}");
-                        break;
                 }
 
+                break;
+
+            case "@unlock":
+                (s, s2) = GetNamedValue(rest);
+                o = Find(user, s);
+                if (o == null)
+                {
+                    PlayerEmit(session.Key, $"I can't find '{s}'");
+                    break;
+                }
+
+                if (!o.CheckPermissions(session.UserId))
+                {
+                    PlayerEmit(session.Key, $"You don't have permission to unlock #{o.Id}");
+                    Log("hax", $"User #{session.UserId} attempted to unlock #{o.Id} without permission.");
+                    break;
+                }
+
+                var unlockParts = s2.Split(':', 2).Select(s => s.Trim()).ToArray();
+                var up1 = unlockParts[0].ToLowerInvariant();
+                var up2 = unlockParts.Length > 1 ? unlockParts[1] : "";
+
+                if (string.IsNullOrEmpty(s2))
+                {
+                    PlayerEmit(session.Key, $"You must specify a lock to remove.");
+                    break;
+                }
+
+                var lockToRemove = o.Locks.FirstOrDefault(l => l.Item1 == up1 && l.Item2 == up2);
+                if (lockToRemove == default)
+                {
+                    PlayerEmit(session.Key, $"Lock '{(string.IsNullOrEmpty(up2) ? up1 : $"{up1}:{up2}")}' does not exist on #{o.Id}");
+                    break;
+                }
+                o.Locks.Remove(lockToRemove);
+                o.Save();
+
+                PlayerEmit(session.Key, $"Removed lock '{(string.IsNullOrEmpty(up2) ? up1 : $"{up1}:{up2}")}' from #{o.Id}");
                 break;
 
             case "@create":
@@ -306,6 +325,47 @@ public static partial class Engine
                     PlayerEmit(session.Key, $"Created new room #{newRoomId} named '{rest}' with exit from #{user.Location}");
                 break;
 
+            case "@tel":
+                if (rest.StartsWith("#"))
+                {
+                    if (int.TryParse(rest.Substring(1), out var id))
+                    {
+                        o = Objects.GetValueOrDefault(id);
+                        if (o == null)
+                        {
+                            PlayerEmit(session.Key, $"I can't find #{id} to teleport to.");
+                            break;
+                        }
+
+                        if (o.ZOT != ZObType.Room)
+                        {
+                            PlayerEmit(session.Key, $"You can only teleport to rooms.");
+                            break;
+                        }
+                    }
+                    else
+                    {
+                        PlayerEmit(session.Key, $"Invalid teleport target '{rest}'");
+                        break;
+                    }
+                }
+                else
+                {
+                    o = Objects.Values.FirstOrDefault(z => z.ZOT == ZObType.Room && z.Name.ToLowerInvariant().Contains(rest));
+                    if (o == null)
+                    {
+                        PlayerEmit(session.Key, $"I can't find '{rest}' to teleport to.");
+                        break;
+                    }
+                }
+
+                RoomEmit(user.Location, $"{user.Name} disappears in a puff of smoke.");
+                user.Location = o.Id;
+                user.Save();
+                RoomEmit(user.Location, $"{user.Name} appears in a puff of smoke.");
+                Log("admin", $"{user.Name} (#{user.Id}) teleported to #{o.Id} '{o.Name}'");
+                break;
+
             case "look":
             case "l":
                 if (string.IsNullOrEmpty(rest))
@@ -345,7 +405,17 @@ public static partial class Engine
                     break;
                 }
 
-                //TODO:  locks
+                if (o.HasLock("fixed") && !o.CheckPermissions(session.UserId))
+                {
+                    PlayerEmit(session.Key, $"You can't pick up {o.Name}.");
+                    break;
+                }
+
+                if (o.HasLock("static"))
+                {
+                    PlayerEmit(session.Key, $"You can't pick up {o.Name}, it's static.");
+                    break;
+                }
 
                 o.Location = user.Id;
                 o.Save();
@@ -372,7 +442,17 @@ public static partial class Engine
                     break;
                 }
 
-                //TODO:  locks
+                if (o.HasLock("fixed") && !o.CheckPermissions(session.UserId))
+                {
+                    PlayerEmit(session.Key, $"You can't drop {o.Name}.");
+                    break;
+                }
+
+                if (o.HasLock("static"))
+                {
+                    PlayerEmit(session.Key, $"You can't drop {o.Name}, it's static.");
+                    break;
+                }
 
                 o.Location = user.Location;
                 o.Save();

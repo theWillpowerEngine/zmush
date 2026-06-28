@@ -41,9 +41,16 @@ The thing in brackets is a time stamp (hour and then minute in 24h time).  This 
 
 This output can be logged to a file using your terminal system.  This has high utility value of course, allowing you to reference logs and deal with troublesome scenarios, but it can consume a lot of disk space and may require periodic cleanup.  I recommend avoiding this until you're a power user, and then using it selectively as needed.  
 
-### Roles and Permissions
+### Understanding the Log
+
+CRITICAL
+hax
+WARN
+
+### Settings, Roles and Permissions
 
 ...
+
 
 ## Rooms, Items, Characters and ZObjects in general
 
@@ -51,7 +58,7 @@ Everything in ZMUSH is a ZObject, which is a fancy way of saying "a thing in the
 
 ...
 
-### Anatomy of a ZObjects
+### Anatomy of a ZObject
 
 #### Inheritance / Master ZObjects
 
@@ -68,6 +75,20 @@ By default only the owner of a ZObject or an admin with elevated permissions can
 If you want to let anyone edit something, you can add the "public" lock.  This basically turns off security.  If you would like to enable particular users to edit the ZObject, you can add "pc" locks, with an argument of the user's ZObject Id.  You can have multiple pc locks on the same ZObject.  If you have setup a more complex permission system and would like to temporarily disable all but the owner and admin access you can add the "full" lock.
 
 You can use the @lock command family to manipulate locks on ZObjects.
+
+The locks detailed above are the "access" locks, which can go on any ZObject and effect who has access to them.  There are other kinds of locks as well.
+
+
+
+#### Lock Quick Reference
+
+    Lock        Arg        Type(s)      Category    Function
+    public      -           -           Access      Disable normal security, anyone can edit
+    pc          Id          -           Access      Allow certain characters access to the ZObject
+    full        -           -           Access      Overrides any other acccess-level locks and returns to default (only owner + admins)
+
+    fixed       -           Item        Item        Only those with access to the ZObject can pick it up or drop it
+    static      -           Item        Item        Cannot be picked up or dropped (the static lock has to be removed first)
 
 ## First Login - Basic Tutorial
 
@@ -87,7 +108,7 @@ You can use the @lock command family to manipulate locks on ZObjects.
 
     @lock <obj>=<lock>[:<lock argument>]
     @lock/list (@lock/l) <obj>
-    @lock/unlock (@lock/un) <obj>=<lock>[:<lock argument>]
+    @unlock <obj>=<lock>[:<lock argument>]
 
     @create (@cr) <name>
         @cr/item (@cr/i)
@@ -97,6 +118,8 @@ You can use the @lock command family to manipulate locks on ZObjects.
 
     @dig <name>
     @dig/1 <name>
+
+    @tel <room>         Can be #id or name part
 
 ## Zelazny Reference
 
