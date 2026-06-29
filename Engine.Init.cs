@@ -106,16 +106,30 @@ public static partial class Engine
             Directory.CreateDirectory(HTMLRoot);
             Log($"No HTML root directory found.  Initializing to default site (hope you like it ugly)");
 
-            File.WriteAllText(Path.Combine(HTMLRoot, "index.htm"), Loader.GetEmbeddedResource("site.index.htm").Replace("{ZMVER}", Engine.Version));
+            File.WriteAllText(Path.Combine(HTMLRoot, "index.htm"), Loader.GetEmbeddedResource("site.index.htm").Replace("{ZMVER}", Version));
+            File.WriteAllText(Path.Combine(HTMLRoot, "site.css"), Loader.GetEmbeddedResource("site.site.css"));
         }
 
         Loader.LoadSiteContent();
         Log("Site content is loaded and cached.");
     }
 
+    private static void CreateDefaultFormatters()
+    {
+        Formatters.Clear();
+        Formatters.TryAdd("red", (s) => $"<span class=\"color-red\">{s}</span>");
+        Formatters.TryAdd("yellow", (s) => $"<span class=\"color-yellow\">{s}</span>");
+        Formatters.TryAdd("green", (s) => $"<span class=\"color-green\">{s}</span>");
+        Formatters.TryAdd("blue", (s) => $"<span class=\"color-blue\">{s}</span>");
+        Formatters.TryAdd("purple", (s) => $"<span class=\"color-purple\">{s}</span>");
+        Formatters.TryAdd("orange", (s) => $"<span class=\"color-orange\">{s}</span>");
+        Formatters.TryAdd("cyan", (s) => $"<span class=\"color-cyan\">{s}</span>");
+    }
+
     public static void Init()
     {
         Loader.LoadZObjects();
+        CreateDefaultFormatters();
         Log("Initialization complete!  Almost there.");
 
         var ids = Objects.Keys.ToList();

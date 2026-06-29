@@ -119,7 +119,7 @@ public class ZString
             evalled += Interpreter.Evaluate(token, context, ref quota) + " ";
         }
 
-        return evalled.TrimEnd();
+        return Interpreter.ApplyFormats(evalled.TrimEnd());
     }
 
     internal static string Eval(string s, ZObject context, ref int quota)

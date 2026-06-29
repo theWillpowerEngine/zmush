@@ -21,6 +21,8 @@ public static partial class Engine
 
     public static ConcurrentDictionary<int, ZObject> Objects { get; private set; } = new();
 
+    public static ConcurrentDictionary<string, Func<string, string>> Formatters { get; private set; } = new();
+
     private static HashSet<int> FreeIds = new();
     private static int NextId;
 

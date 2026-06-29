@@ -179,6 +179,12 @@ System1 - System10
 
 ## Zelazny Reference
 
+## Built in Formatters
+
+    {blah} - Action link (command = text)
+    {blah:cmd} - Action link (text = blah, command = cmd)
+    {<c> text} - Color text.  c = red, yellow, green, blue, purple
+
 ## Appendix:  Common Snippets and Libraries
 
 

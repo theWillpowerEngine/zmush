@@ -1,0 +1,42 @@
+body {
+    background-color: #003049;
+    color: #EAE2B7;
+}
+
+.color-red {
+    color: #D62828;
+}
+
+.color-orange {
+    color: #F77F00;
+}
+
+.color-yellow {
+    color: #F4D06F;
+}
+
+.color-green {
+    color: #47682C;
+}
+
+.color-blue {
+    color: #5BC0EB;
+}
+
+.color-purple {
+    color: #A833B9;
+}
+
+.color-cyan {
+    color: #06BCC1;
+}
+
+.action-link {
+    text-decoration: none;
+    cursor: pointer;
+    color: #FCBF49;
+}
+
+.action-link:hover {
+    text-decoration: underline;
+}
