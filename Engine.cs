@@ -225,6 +225,7 @@ public static partial class Engine
             Key = Guid.NewGuid().ToString(),
             UserId = dbUser.Id,
             LastActivity = DateTime.Now,
+            LoginName = dbUser.Name,
             Roles = dbUser.Roles.ToHashSet()
         };
 

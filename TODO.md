@@ -11,3 +11,4 @@
 * Implement .z file load on startup
 * externalize the HTML rendering to settings (stuff like the nbsps and brs as well as CSS)
 
+* Setting and implementation for multi character per user (will need UI too)

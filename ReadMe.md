@@ -43,9 +43,29 @@ This output can be logged to a file using your terminal system.  This has high u
 
 ### Connecting, and Basic Concepts
 
-Commands and subcommands
-User vs Character
-ZObject Types (only as they relate to the player experience)
+Once the server is running you can connect to the URL shown in the log message that starts "Server Running!" using any web browser.  You will be presented with a login page.  You can use the user 'owner' with the password 'owner' to establish the initial connect.  This user is a special user called an 'admin' that has access to everything in the MUSH.  In general it's best not to actually login and use this user for day-to-day things, but we'll talk more about that later.  For now, to explore, it's fine.
+
+Once you've logged in you should see that you're in a place called the Master Room, and you can start typing instructions.  In general, the first word of whatever you type is called a command, and it tells the game what you actually want to do.  For example, you could type:
+
+    say Hello everyone!
+
+And the result will be your character saying "Hello everyone!" to anyone else who is in the same room as you.  In this case that's only you, but you'll see it at least.  If you did the above, you'll see the following in your game screen:
+
+    Stimpy says, "Hello everyone!"
+
+Which might have you wondering who 'Stimpy' is.  In ZMUSH, there is a difference between the User (that you log into) and the character (that you actually play in the world).  One User can have multiple Characters if you've enabled that in the Settings.  'owner' is the User you logged into, and Stimpy is the character that User uses to play the game.  Your permissions are inherited at the User level, not the Character level, so in general you won't want to create other characters on the 'owner' User unless you want them to also be admins.
+
+There are two kinds of special commands, @-commands and !-commands.  @-commands start with an @, and usually modify game objects or perform administrative functions.  Access to these is controlled in the settings, and most users use them fairly rarely unless they're building or coding something.  !-commands start with an !, and are accessible to all users (generally -- the server owner can restrict any commands they want) performing "out of game" type actions.  Resetting your password is a common example.
+
+Since having a username and a password of 'owner' is extremely insecure, let's experiment with an !-command right now and fix that.  Type the following:
+
+    !password owner=some new password
+
+Once you do this, you will change the password for the 'owner' user.  Note that the 'owner' in this line refers to your current password, not the user itself.  You can only change your own password with this command.  Admins (and often privileged users in other roles like wizards or moderators) can change another user's password like this:
+
+    @password owner=new password
+
+In this case 'owner' refers to the user whose password is being changed.  Since this command is generally used to help people regain access when they forget their password, it's assumed you don't have acccess to the existing password.
 
 ### Understanding the Log
 
@@ -131,6 +151,8 @@ System1 - System10
     @name <obj>=<name>
     @desc <obj>=<name>
 
+    @password <user name>=<new password>
+
     @lock <obj>=<lock>[:<lock argument>]
     @lock/list (@lock/l) <obj>
     @unlock <obj>=<lock>[:<lock argument>]
@@ -146,13 +168,14 @@ System1 - System10
 
         @cr/user (@cr/u) <name>[:<pwd>]=#<character id>         If no password the user name is used
 
-
     @dig <name>
     @dig/1 <name>
     @dig/t <name>
     @dig/1t <name>
 
     @tel <room>         Can be #id or name part
+
+    !password <current password>=<new password>
 
 ## Zelazny Reference
 

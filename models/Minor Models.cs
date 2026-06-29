@@ -36,6 +36,7 @@ public class SessionModel : BaseModel<SessionModel>
 {
     public string Key;
     public int UserId;
+    public string LoginName;
     public HashSet<string> Roles = new HashSet<string>();
 
     public DateTime LastActivity = DateTime.Now;

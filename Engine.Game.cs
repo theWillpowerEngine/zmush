@@ -491,6 +491,34 @@ public static partial class Engine
                 Log("admin", $"{user.Name} (#{user.Id}) teleported to #{o.Id} '{o.Name}'");
                 break;
 
+            case "@password":
+                (s, s2) = GetNamedValue(rest);
+                var dbU = User.Load(s);
+                if (dbU == null)
+                {
+                    PlayerEmit(session.Key, $"I can't find user '{s}'");
+                    break;
+                }
+                dbU.SetPassword(s2);
+                dbU.Save();
+                PlayerEmit(session.Key, $"Updated password for user '{s}'");
+                Log("admin", $"User #{session.UserId} updated password for user '{s}'");
+                break;
+
+            case "!password":
+                (s, s2) = GetNamedValue(rest);
+                var dbU2 = User.Load(session.LoginName);
+                if (!dbU2.IsPasswordValid(s))
+                {
+                    PlayerEmit(session.Key, $"Current password is incorrect.");
+                    break;
+                }
+
+                dbU2.SetPassword(s2);
+                dbU2.Save();
+                PlayerEmit(session.Key, $"Updated your password");
+                break;
+
             case "look":
             case "l":
                 if (string.IsNullOrEmpty(rest))

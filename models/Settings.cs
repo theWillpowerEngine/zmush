@@ -16,7 +16,7 @@ public class Settings : BaseModel<Settings>
     public Dictionary<HashSet<string>, HashSet<string>> CommandPerms = new Dictionary<HashSet<string>, HashSet<string>>()
     {
         { new HashSet<string>() { "@create", "@cr", "@dig" }, new HashSet<string>() { "advanced" } },
-        { new HashSet<string>() { "@tel" }, new HashSet<string>() { "basic" } },
+        { new HashSet<string>() { "@tel", "@password" }, new HashSet<string>() { "basic" } },
     };
 
     public Dictionary<HashSet<Flag>, HashSet<string>> FlagPerms = new Dictionary<HashSet<Flag>, HashSet<string>>()
