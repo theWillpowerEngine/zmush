@@ -72,6 +72,12 @@
                     Z.frame()
                     $("#cmd").focus()
                 });
+
+                $("#cmd").on('blur', function () {
+                    setTimeout(() => {
+                        $("#cmd").focus()
+                    }, 100)
+                })
             },
 
             setRefreshTimer(clearOnly) {
@@ -138,6 +144,12 @@
         window['sessionId'] = Cookies.get("ZSession")
 
         $(() => {
+            $(document).on('click', ".action-link", function (e) {
+                e.preventDefault();
+                const cmd = $(this).attr("data-action");
+                Z.command(cmd);
+            });
+
             if (sessionId) {
                 Z.post("/reauth", sessionId, (suc, res) => {
                     if (suc) {

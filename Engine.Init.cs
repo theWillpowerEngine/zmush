@@ -4,7 +4,7 @@ public static partial class Engine
     public static string DriverPath => Path.Combine(RootPath, "drv") + Path.DirectorySeparatorChar;
     public static string PlayerPath => Path.Combine(RootPath, "usr") + Path.DirectorySeparatorChar;
     public static string ObjectPath => Path.Combine(RootPath, "obj") + Path.DirectorySeparatorChar;
-    public static string HTMLRoot => Path.Combine(RootPath, "site") + Path.DirectorySeparatorChar;
+    public static string HTMLRoot => (Settings.OverrideSiteDirectory ?? Path.Combine(RootPath, "site")) + Path.DirectorySeparatorChar;
 
     public static void InitDirectories(string rootPath)
     {
@@ -39,7 +39,6 @@ public static partial class Engine
             catch (Exception ex)
             {
                 Log("CRITICAL", $"Failed to load settings from '{Path.Combine(RootPath, "Settings")}'.  Using defaults.  Error: {ex.Message}");
-                Settings = new Settings();
             }
         }
         else

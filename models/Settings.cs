@@ -13,6 +13,10 @@ public class Settings : BaseModel<Settings>
     public int MasterCharacter = 2;
     public int MasterItem = -1;
 
+    public bool AutoLinkExits = true;
+
+    public string? OverrideSiteDirectory = null;
+
     public Dictionary<HashSet<string>, HashSet<string>> CommandPerms = new Dictionary<HashSet<string>, HashSet<string>>()
     {
         { new HashSet<string>() { "@create", "@cr", "@dig" }, new HashSet<string>() { "advanced" } },

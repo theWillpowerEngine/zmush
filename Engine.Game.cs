@@ -710,7 +710,10 @@ public static partial class Engine
             ret += "<b>Exits:</b><br />";
             foreach (var exit in exits)
             {
-                ret += $"{exit.Name}<br />";
+                if (Settings.AutoLinkExits)
+                    ret += "{" + exit.Name + "}<br />";
+                else
+                    ret += exit.Name + "<br />";
             }
         }
 
