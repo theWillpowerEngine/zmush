@@ -12,7 +12,7 @@ public static partial class Engine
     internal static string Command(SessionModel session, string command)
     {
         var user = Objects[session.UserId];
-        var cmd = ZString.Eval(command, user, ref user.Quota);  //TODO:  Config gate this?
+        var cmd = command;    //ZString.Eval(command, user, ref user.Quota);  //TODO:  Config gate this?
 
         var eles = cmd.Split(' ', StringSplitOptions.RemoveEmptyEntries);
         var kw = eles[0].ToLowerInvariant();
@@ -258,6 +258,87 @@ public static partial class Engine
                     o.Flags.Add(flag);
                     o.Save();
                     PlayerEmit(session.Key, $"Added '{flag}' flag to #{o.Id}");
+                }
+                break;
+
+            case "@attr":
+                var clear = !rest.Contains("=") || subCmd == "clear" || subCmd == "c";
+
+                (s, s2) = GetNamedValue(rest);
+                var attrParts = s.Split(".", 2).Select(s => s.Trim()).ToArray();
+
+                o = Find(user, attrParts[0]);
+                if (o == null)
+                {
+                    PlayerEmit(session.Key, $"I can't find '{attrParts[0]}'");
+                    break;
+                }
+
+                if (!o.CheckPermissions(session.UserId))
+                {
+                    PlayerEmit(session.Key, $"You don't have permission to set attributes on #{o.Id}");
+                    Log("hax", $"User #{session.UserId} attempted to set the '{attrParts[1]}' attribute on #{o.Id} without permission.");
+                    break;
+                }
+
+                var attrName = attrParts.Length > 1 ? attrParts[1].ToLowerInvariant() : "";
+
+                switch (subCmd)
+                {
+                    case "val":
+                    case "v":
+                        if (o.Attrs.ContainsKey(attrName))
+                        {
+                            PlayerEmit(session.Key, $"#{o.Id} attribute '{attrName}' = '{o.Attrs[attrName]}'");
+                        }
+                        else
+                        {
+                            PlayerEmit(session.Key, $"#{o.Id} does not have an attribute named '{attrName}'");
+                        }
+                        break;
+
+                    case "list":
+                    case "l":
+                        var attrList = "{bold Attributes for #" + o.Id + ":}%n";
+                        foreach (var kvp in o.Attrs)
+                        {
+                            attrList += $"%t{kvp.Key} = {kvp.Value}%n";
+                        }
+                        session.SpecialOutput.AppendLine(attrList);
+                        break;
+
+                    case "clear":
+                    case "c":
+                    default:
+                        if (o.Attrs.ContainsKey(attrName))
+                        {
+                            if (clear)
+                            {
+                                o.Attrs.Remove(attrName);
+                                o.Save();
+                                PlayerEmit(session.Key, $"Removed '{attrName}' attribute from #{o.Id}");
+                            }
+                            else
+                            {
+                                o.Attrs[attrName] = s2;
+                                o.Save();
+                                PlayerEmit(session.Key, $"Set '{attrName}' attribute on #{o.Id} to '{s2}'");
+                            }
+                        }
+                        else
+                        {
+                            if (clear)
+                            {
+                                PlayerEmit(session.Key, $"#{o.Id} does not have an attribute named '{attrName}'.  If you want to set it, use: @attr object.attribute=value");
+                            }
+                            else
+                            {
+                                o.Attrs[attrName] = s2;
+                                o.Save();
+                                PlayerEmit(session.Key, $"Set '{attrName}' attribute on #{o.Id} to '{s2}'");
+                            }
+                        }
+                        break;
                 }
                 break;
 
@@ -704,6 +785,8 @@ public static partial class Engine
         var pcs = zobs.Where(o => o.ZOT == ZObType.Character).Where(o => o.IsVisibleTo(user)).ToList();
         var exits = zobs.Where(o => o.ZOT == ZObType.Exit).Where(o => o.IsVisibleTo(user)).ToList();
 
+        ret = ZString.Eval(ret, loc);
+
         ret += "<br /><br /><table width='99%'><tr><td width='33%' valign='top'>";
         if (exits.Any())
         {
@@ -738,9 +821,15 @@ public static partial class Engine
         }
         ret += "</td></tr></table><br />";
 
-        var log = Logs.GetOrAdd(session.Key, _ => new List<string>());
+        if (session.SpecialOutput.Length > 0)
+        {
+            ret += "<div id='specialOutput'>";
+            ret += ZString.Eval(session.SpecialOutput.ToString(), loc);
+            ret += "</div>";
+            session.SpecialOutput.Clear();
+        }
 
-        ret = ZString.Eval(ret, loc);
+        var log = Logs.GetOrAdd(session.Key, _ => new List<string>());
 
         if (log.Any())
         {

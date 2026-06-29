@@ -161,5 +161,24 @@ public class ZObject
         else
             return Locks.Any(l => l.Item1 == lockName && l.Item2 == lockVal);
     }
+
+    internal string? GetAttrValue(string name, bool excludeParent = false)
+    {
+        name = name.ToLowerInvariant();
+        if (Attrs.ContainsKey(name))
+            return Attrs[name];
+
+        if (excludeParent)
+            return null;
+
+        var parentage = GetCompleteParentage();
+        foreach (var parent in parentage)
+        {
+            if (parent.Attrs.ContainsKey(name))
+                return parent.Attrs[name];
+        }
+
+        return null;
+    }
 }
 

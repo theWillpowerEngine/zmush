@@ -123,6 +123,9 @@ public static partial class Engine
         Formatters.TryAdd("purple", (s) => $"<span class=\"color-purple\">{s}</span>");
         Formatters.TryAdd("orange", (s) => $"<span class=\"color-orange\">{s}</span>");
         Formatters.TryAdd("cyan", (s) => $"<span class=\"color-cyan\">{s}</span>");
+
+        Formatters.TryAdd("bold", (s) => $"<b>{s}</b>");
+        Formatters.TryAdd("italic", (s) => $"<i>{s}</i>");
     }
 
     public static void Init()

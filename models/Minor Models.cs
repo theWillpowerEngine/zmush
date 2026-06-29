@@ -1,3 +1,5 @@
+using System.Text;
+
 public abstract class BaseModel<T> where T : new()
 {
     public static T FromYaml(string yaml)
@@ -38,6 +40,8 @@ public class SessionModel : BaseModel<SessionModel>
     public int UserId;
     public string LoginName;
     public HashSet<string> Roles = new HashSet<string>();
+
+    public StringBuilder SpecialOutput = new();
 
     public DateTime LastActivity = DateTime.Now;
 }

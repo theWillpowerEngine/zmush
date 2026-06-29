@@ -160,6 +160,13 @@ System1 - System10
     @flag <obj>=<flag>
     @flag <obj>=!<flag>
 
+    @attr <object>.<attribute>=<value>
+    @attr <object>.<attribute>              //Shorthand for removing an attribute, you can also @attr/clear or @attr/c
+    
+    @attr/val (@attr/v) <obj>.<attr>
+
+    @attr/list (@attr/l) <obj>
+
     @create (@cr) <name>
         @cr/item (@cr/i)
         @cr/character (@cr/c)

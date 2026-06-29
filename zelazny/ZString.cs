@@ -113,6 +113,12 @@ public class ZString
         var evalled = "";
         foreach (var token in ro.List.Children)
         {
+            if (!token.IsList)
+            {
+                evalled += token.Value;
+                continue;
+            }
+
             if (quota == 0)
                 return "[Limit:  Quota exceeded]";
 

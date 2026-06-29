@@ -8,29 +8,41 @@ public static class Interpreter
 
         var cmd = list[0];
         if (cmd.IsList)
-            return "[Exception: Keyword is a list]";
+            return "--Exception: Keyword is a list--";
 
         if (quota == 0)
         {
             if (Engine.Settings.LogQuotaExceeds)
                 Engine.Log("quota", $"Quota exceeded for context #{context.Id}.  Command: {string.Join(" ", list.Select(t => t.Value))}");
 
-            return "[Limit:  Quota exceeded]";
+            return "--Limit:  Quota exceeded--";
         }
         else if (quota > 0)
             quota -= 1;
 
         switch (cmd.Value)
         {
+            case "val":
+            case "v":
+                if (list.Count != 3)
+                    return "--Exception: 'val' requires 2 parameters--";
+
+                var oVName = ParseValue(list[1], context, ref quota);
+                var oV = Engine.Find(context, oVName);
+                if (oV == null)
+                    return $"--Exception: Object '{oVName}' not found--";
+
+                return oV.GetAttrValue(ParseValue(list[2], context, ref quota)) ?? "";
+
             case "rev":
                 if (list.Count != 2)
-                    return "[Exception: 'rev' requires exactly 1 parameter]";
+                    return "--Exception: 'rev' requires exactly 1 parameter--";
 
                 var revResult = ParseValue(list[1], context, ref quota);
                 return new string(revResult.Reverse().ToArray());
 
             default:
-                return $"[Exception: Unknown command '{cmd.Value}']";
+                return $"--Exception: Unknown command '{cmd.Value}'--";
         }
     }
 

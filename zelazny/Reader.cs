@@ -28,8 +28,6 @@ public class Token
 
 public static class Reader
 {
-    public static readonly string[] Keywords = ["+", "-", "*", "/", "1st", "else", "extern", "global", "if", "let", "pragma", "quote", "rest", "use"];
-
     public static ReaderOutput Read(string code)
     {
         var retVal = new List<Token>();
