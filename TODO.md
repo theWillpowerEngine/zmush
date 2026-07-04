@@ -1,4 +1,4 @@
-*The reader isn't reading spaces, which is good for the string part, but breaks for the list part.  Might need a ReadList (but the current Read SHOULD be ReadListing so it's all fucked, might need rewrite)
+* Fix the log handoff so we can clear it on the server and it stays on the client
 
 * Objects:
   * Custom commands

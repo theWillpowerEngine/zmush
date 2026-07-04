@@ -186,6 +186,10 @@ System1 - System10
 
 ## Zelazny Reference
 
+    val (v) <attr> - Get value of attribute from context
+    val (v) <obj> <attr> - Get alue of attribute from object
+
+
 ## Built in Formatters
 
     {blah} - Action link (command = text)

@@ -2,13 +2,12 @@ public static class Interpreter
 {
     internal static string Evaluate(Token toke, ZObject context, ref int quota)
     {
-        if (!toke.IsList) return toke.Value;
-
         var list = toke.Children;
 
         var cmd = list[0];
-        if (cmd.IsList)
-            return "--Exception: Keyword is a list--";
+
+        if (cmd.TT != TokenType.Keyword)
+            return "--Exception: First token must be a keyword--";
 
         if (quota == 0)
         {
@@ -24,22 +23,22 @@ public static class Interpreter
         {
             case "val":
             case "v":
-                if (list.Count != 3)
-                    return "--Exception: 'val' requires 2 parameters--";
+                if (list.Count == 3)
+                {
+                    var oVName = ParseValue(list[1], context, ref quota);
+                    var oV = Engine.Find(context, oVName);
+                    if (oV == null)
+                        return $"--Exception: Object '{oVName}' not found--";
 
-                var oVName = ParseValue(list[1], context, ref quota);
-                var oV = Engine.Find(context, oVName);
-                if (oV == null)
-                    return $"--Exception: Object '{oVName}' not found--";
+                    return oV.GetAttrValue(ParseValue(list[2], context, ref quota)) ?? "";
+                }
+                else if (list.Count == 2)
+                {
+                    return context.GetAttrValue(ParseValue(list[1], context, ref quota)) ?? "";
+                }
+                else
+                    return "--Exception: 'val' requires 1 or 2 parameters--";
 
-                return oV.GetAttrValue(ParseValue(list[2], context, ref quota)) ?? "";
-
-            case "rev":
-                if (list.Count != 2)
-                    return "--Exception: 'rev' requires exactly 1 parameter--";
-
-                var revResult = ParseValue(list[1], context, ref quota);
-                return new string(revResult.Reverse().ToArray());
 
             default:
                 return $"--Exception: Unknown command '{cmd.Value}'--";
@@ -48,7 +47,7 @@ public static class Interpreter
 
     private static string ParseValue(Token t, ZObject context, ref int quota)
     {
-        if (t.IsList) return Evaluate(t, context, ref quota);
+        if (t.TT == TokenType.Code) return Evaluate(t, context, ref quota);
 
         return t.Value;
 
@@ -60,9 +59,10 @@ public static class Interpreter
         // }
     }
 
-    public static string ApplyFormats(string input)
+    public static string GetTagValue(Token t)
     {
         var ret = "";
+        var input = t.Value;
 
         for (var i = 0; i < input.Length; i++)
         {
@@ -100,4 +100,11 @@ public static class Interpreter
 
         return ret;
     }
+
+    internal static string ApplyAllTags(string text, ZObject context)
+    {
+        var res = ZString.ApplyTags(text, context);
+        return res;
+    }
+
 }

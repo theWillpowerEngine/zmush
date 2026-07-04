@@ -282,6 +282,11 @@ public static partial class Engine
                 }
 
                 var attrName = attrParts.Length > 1 ? attrParts[1].ToLowerInvariant() : "";
+                if (string.IsNullOrWhiteSpace(attrName))
+                {
+                    PlayerEmit(session.Key, $"You must specify an attribute name.  Example: @attr object.attribute=value");
+                    break;
+                }
 
                 switch (subCmd)
                 {
@@ -834,7 +839,7 @@ public static partial class Engine
         if (log.Any())
         {
             ret += "<div id='log'>";
-            ret += string.Join("<br />", log) + "<br />";
+            ret += string.Join("<br />", log.Select(s => Interpreter.ApplyAllTags(s, user))) + "<br />";
             ret += "</div>";
         }
         else
@@ -847,8 +852,10 @@ public static partial class Engine
 
     internal static string[] GetLog(SessionModel session)
     {
+        var user = Objects[session.UserId];
+
         var log = Logs.GetOrAdd(session.Key, _ => new List<string>());
-        var ret = log.ToArray();
+        var ret = log.Select(s => Interpreter.ApplyAllTags(s, user)).ToArray();
 
         return ret;
     }

@@ -91,6 +91,15 @@ public class ZString
         return S;
     }
 
+    public ZString()
+    {
+
+    }
+    public ZString(string s)
+    {
+        S = s;
+    }
+
 
     ReaderOutput? ro = null;
 
@@ -111,21 +120,33 @@ public class ZString
             return $"[Errors: {string.Join(", ", ro.Errors)}]";
 
         var evalled = "";
-        foreach (var token in ro.List.Children)
+        foreach (var token in ro.Tokes)
         {
-            if (!token.IsList)
+            switch (token.TT)
             {
-                evalled += token.Value;
-                continue;
+                case TokenType.Text:
+                    evalled += token.Value;
+                    continue;
+
+                case TokenType.Code:
+                    if (quota == 0)
+                        return "[Limit:  Quota exceeded]";
+
+                    evalled += Interpreter.Evaluate(token, context, ref quota) + " ";
+                    break;
+
+                case TokenType.Tag:
+                    evalled += Interpreter.GetTagValue(token) + " ";
+                    continue;
+
+                default:
+                    evalled += token.Value;
+                    continue;
             }
 
-            if (quota == 0)
-                return "[Limit:  Quota exceeded]";
-
-            evalled += Interpreter.Evaluate(token, context, ref quota) + " ";
         }
 
-        return Interpreter.ApplyFormats(evalled.TrimEnd());
+        return evalled.TrimEnd();
     }
 
     internal static string Eval(string s, ZObject context, ref int quota)
@@ -138,5 +159,17 @@ public class ZString
     {
         ZString zs = s;
         return zs.Evaluate(context);
+    }
+
+    internal static string ApplyTags(string text, ZObject user)
+    {
+        var ro = Reader.Read(text);
+        if (!ro.WasSuccessful)
+            return $"--Errors: {string.Join(", ", ro.Errors)}--";
+
+        if (ro.Tokes.Any(t => t.TT == TokenType.Code))
+            return $"--Error: Code blocks are not allowed in ApplyTags--";
+
+        return new ZString(text).Evaluate(user);
     }
 }

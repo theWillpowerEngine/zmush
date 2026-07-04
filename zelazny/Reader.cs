@@ -3,50 +3,97 @@ public class ReaderOutput
     public bool WasSuccessful => Errors.Count == 0;
 
     public List<string> Errors = new();
-    public Token List;
+
+    public List<Token> Tokes = new();
+
+    public ReaderOutput Append(string s, TokenType tt)
+    {
+        Tokes.Add(new Token(s, tt));
+        return this;
+    }
+
+    public ReaderOutput Append(List<Token> tokens)
+    {
+        Tokes.Add(new Token(tokens));
+        return this;
+    }
+}
+
+public enum TokenType
+{
+    Text,
+    Code,
+    Tag,
+
+    Keyword,
+    Number,
+    String,
+    Name,
 }
 
 public class Token
 {
     public string Value = "";
     public List<Token> Children = new();
-    public int Depth = 0;
 
-    public bool IsList => Children.Count > 0;
+    public TokenType TT = TokenType.Text;
 
-    public Token(string toke, int depth)
+    public Token(string toke, TokenType tt)
     {
         Value = toke;
-        Depth = depth;
+        TT = tt;
     }
-    public Token(List<Token> children, int depth)
+    public Token(List<Token> children)
     {
         Children = children;
-        Depth = depth;
+        TT = TokenType.Code;
     }
 }
 
 public static class Reader
 {
-    public static ReaderOutput Read(string code)
+    private static string ScanTo(string s, ref int i, char terminator, char? opener = null)
+    {
+        var depth = 0;
+        var work = "";
+
+        //Skip the opener
+        i += 1;
+
+        for (; i < s.Length; i++)
+        {
+            var c = s[i];
+
+            if (c == terminator && depth == 0)
+                return work;
+
+            if (opener != null && c == opener)
+                depth += 1;
+            else if (c == terminator && depth > 0)
+                depth -= 1;
+
+            work += c;
+        }
+
+        throw new IndexOutOfRangeException($"Unterminated string, missing {terminator} in {work}");
+    }
+
+    private static List<Token> ReadCode(string code, ReaderOutput ro)
     {
         var retVal = new List<Token>();
-        var ro = new ReaderOutput();
-
-        code = code.Trim();
 
         var work = "";
-        var scanToDepth = 0;
-        var scope = 0;
-        char stringDelim = '#';
+        var stringDelim = '#';
 
-        Action appendWork = () =>
+        void addWork()
         {
-            if (!string.IsNullOrEmpty(work))
+            if (!string.IsNullOrWhiteSpace(work))
             {
-                retVal.Add(new Token(work, scanToDepth));
+                var tt = stringDelim != '#' ? TokenType.String : GetTokenType(work);
+                retVal.Add(new Token(work, tt));
+                work = "";
             }
-        };
+        }
 
         for (var i = 0; i < code.Length; i++)
         {
@@ -55,60 +102,44 @@ public static class Reader
             if (i + 1 < code.Length)
                 lookAhead = code[i + 1];
 
-            if (stringDelim != '#' || (scope == 0 && c != '['))
+            //Are we in a string?
+            if (stringDelim != '#')
             {
-                if (c == '%' && lookAhead == stringDelim)
+                //Escape Characters
+                if (c == '%')
                 {
-                    i += 1;
-                    work += stringDelim.ToString();
-                    continue;
-                }
-                else if (c == '%' && lookAhead == 's')
-                {
-                    i += 1;
-                    work += "&nbsp;";
-                    continue;
-                }
-                else if (c == '%' && lookAhead == 't')
-                {
-                    i += 1;
-                    work += "&nbsp;&nbsp;&nbsp;&nbsp;";
-                    continue;
-                }
-                else if (c == '%' && lookAhead == 'n')
-                {
-                    i += 1;
-                    work += "<br />";
-                    continue;
-                }
-                else if (c == '%' && lookAhead == '%')
-                {
-                    i += 1;
-                    work += '%';
-                    continue;
+                    i++;
+                    work += EscapeChar(lookAhead);
                 }
 
-                else if (stringDelim != '#' && c == stringDelim)
+                //End of string?
+                else if (c == stringDelim)
                 {
+                    addWork();
                     stringDelim = '#';
-                    if (scanToDepth > 0)
-                    {
-                        work += stringDelim;
-                        stringDelim = '#';
-                        continue;
-                    }
-                    else
-                        retVal.Add(new Token(work, scope));
-                    continue;
                 }
 
-                work += c;
+                //Carry on
+                else
+                    work += c;
+
                 continue;
             }
 
-            if (scanToDepth > 0)
+            //Comments
+            if (c == ';')
             {
-                if (c == ';')
+                addWork();
+
+                //Commented -out list ;[ blah blah blah ]
+                if (lookAhead == '[')
+                {
+                    i++;
+                    ScanTo(code, ref i, ']', '[');
+                }
+
+                //Regular comment, ; to EOL or ;
+                else
                 {
                     try
                     {
@@ -117,149 +148,143 @@ public static class Reader
                     }
                     catch (IndexOutOfRangeException)
                     { }
-                    continue;
                 }
-                if (c == '"' || c == '`')
-                {
-                    stringDelim = c;
-                    work += c;
-                    continue;
-                }
-                else if (c == '\'')
-                {
-                    if (lookAhead != '[')
-                    {
-                        stringDelim = c;
-                        work += c;
-                        continue;
-                    }
-                    else
-                    {
-                        work += c;
-                        continue;
-                    }
-                }
-                else if (c == '[')
-                    scanToDepth += 1;
-                else if (c == ']')
-                {
-                    if (scanToDepth == 1)
-                    {
-                        scanToDepth = 0;
-
-                        var scanned = Read(work);
-                        retVal.Add(scanned.List);
-                        work = "";
-                        continue;
-                    }
-
-                    scanToDepth -= 1;
-                }
-
-                work += c;
                 continue;
             }
 
+            //Other stuff
             switch (c)
             {
                 case ' ':
                 case '\t':
                 case '\r':
                 case '\n':
-                    appendWork();
-                    work = "";
+                    addWork();
                     break;
 
                 case '[':
-                    appendWork();
-                    work = "";
-                    scanToDepth = 1;
-                    scope += 1;
+                    addWork();
+                    var innerCode = ScanTo(code, ref i, ']', '[');
+                    retVal.Add(new Token(ReadCode(innerCode, ro)));
                     break;
 
                 case ']':
                     ro.Errors.Add("Unmatched end-bracket found");
                     break;
 
-                case ';':
-                    appendWork();
-                    try
-                    {
-                        while (code[++i] != ';' && code[i] != '\r' && code[i] != '\n')
-                        { }
-                    }
-                    catch (IndexOutOfRangeException)
-                    {
-                        //No error, the last syntactical element can be a comment
-                    }
-                    break;
-
                 case '"':
-                    appendWork();
+                    addWork();
                     stringDelim = c;
                     break;
-
-                case '\'':
-                    if (code[i + 1] != '[')
-                    {
-                        //It's a string!
-                        appendWork();
-                        stringDelim = c;
-                    }
-                    else
-                    {
-                        //Quoted list, ie '[1 2 3] => [quote 1 2 3]
-                        appendWork();
-
-                        work = "quote ";
-                        scanToDepth = 1;
-                        i++;
-                    }
-                    break;
-
-                //Reader shortcut:  auto-interpolation
-                case '`':
-                    appendWork();
-                    stringDelim = c;
-                    break;
-
-                // case '$':
-                //     appendWork();
-                //     isAutoV = true;
-                //     break;
-
-                //Reader shortcut:  Arrow Lambdas
-                // case '-':
-                //     if (code[i + 1] == '>')
-                //     {
-                //         appendWork();
-                //         i += 1;
-
-                //         if (!retVal[retVal.Count - 1].IsParent)
-                //             Error("Arrow Lambda shortcut must be preceded by parameter list, not " + retVal[retVal.Count - 1].ToString());
-
-                //         isAutoLambda = true;
-                //     }
-                //     else
-                //         work += c;
-                //     break;
 
                 default:
                     work += c;
                     break;
             }
+
         }
 
         if (stringDelim != '#')
             ro.Errors.Add("Unterminated string value: " + work);
 
-        appendWork();
+        addWork();
 
-        if (scanToDepth > 0)
-            ro.Errors.Add($"Unterminated list (missing {scanToDepth} end-parens)");
+        return retVal;
+    }
 
-        ro.List = new(retVal, 0);
+    private static List<string> KWs = new()
+    {
+        "val", "v"
+    };
+
+    private static TokenType GetTokenType(string work)
+    {
+        if (KWs.Contains(work))
+            return TokenType.Keyword;
+
+        if (decimal.TryParse(work, out _))
+            return TokenType.Number;
+
+        return TokenType.Name;
+    }
+
+    public static ReaderOutput Read(string code)
+    {
+        var workingList = new List<Token>();
+        var ro = new ReaderOutput();
+
+        code = code.Trim();
+
+        var work = "";
+
+        for (var i = 0; i < code.Length; i++)
+        {
+            var c = code[i];
+            char? lookAhead = null;
+            if (i + 1 < code.Length)
+                lookAhead = code[i + 1];
+
+            //Escape characters?
+            if (c == '%')
+            {
+                i++;
+                work += EscapeChar(lookAhead);
+                continue;
+            }
+
+            //Is there a tag?
+            else if (c == '{')
+            {
+                if (!string.IsNullOrWhiteSpace(work))
+                {
+                    ro.Append(work, TokenType.Text);
+                    work = "";
+                }
+
+                var tag = ScanTo(code, ref i, '}');
+
+                ro.Append(tag, TokenType.Tag);
+                continue;
+            }
+
+            //Code?
+            if (c == '[')
+            {
+                if (!string.IsNullOrWhiteSpace(work))
+                {
+                    ro.Append(work, TokenType.Text);
+                    work = "";
+                }
+
+                var codeBlock = ScanTo(code, ref i, ']', '[');
+                ro.Append(ReadCode(codeBlock, ro));
+                continue;
+            }
+
+            work += c;
+        }
+
+        if (!string.IsNullOrWhiteSpace(work))
+            ro.Append(work, TokenType.Text);
 
         return ro;
+    }
+
+    private static string EscapeChar(char? lookAhead)
+    {
+        if (lookAhead == null)
+            return "";
+
+        switch (lookAhead)
+        {
+            case 's':
+                return "&nbsp;";
+            case 't':
+                return "&nbsp;&nbsp;&nbsp;&nbsp;";
+            case 'n':
+                return "<br />";
+            default:
+                return lookAhead.ToString();
+        }
     }
 }
