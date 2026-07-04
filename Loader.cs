@@ -1,3 +1,5 @@
+using System.Text;
+
 public static class Loader
 {
     public static string GetEmbeddedResource(string lastPartOfName)
@@ -52,7 +54,15 @@ public static class Loader
         foreach (var file in files)
         {
             var relativePath = file.Substring(Engine.HTMLRoot.Length).Replace(Path.DirectorySeparatorChar, '/');
-            _cache.Add(relativePath, File.ReadAllBytes(file));
+
+            var content = File.ReadAllBytes(file);
+
+            var contentAsString = Encoding.UTF8.GetString(content);
+            contentAsString = contentAsString.Replace("{ZMVER}", Engine.Version);
+            content = Encoding.UTF8.GetBytes(contentAsString);
+
+            _cache.Add(relativePath, content);
+
             CachedURLs.Add(relativePath);
 
             string mime = "application/octet-stream";
