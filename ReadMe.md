@@ -122,8 +122,8 @@ The locks detailed above are the "access" locks, which can go on any ZObject and
 
 Dark
 Darksight
-User1 - User10
-System1 - System10
+U1 - U10
+S1 - S10
 
 
 ## First Login - Basic Tutorial
@@ -200,9 +200,8 @@ System1 - System10
 
 ## Appendix:  Tutorial-level Snippers
 
-It's {single {v outside} normal} here.
 @attr here.outside=sunny
-
+It's {single {v outside} normal} here.
 
 
 

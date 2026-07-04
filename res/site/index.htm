@@ -55,8 +55,18 @@
     <script>
         var refreshTimer = null;
 
+        function handleResult(res) {
+            Z.frameText = res.text
+            for (var l of res.logs) {
+                if (!l) continue;
+                Z.logs.push(l)
+                $("#log").append(l + "<br />")
+            }
+        }
+
         const Z = {
             frameText: null,
+            logs: [],
 
             post(url, data, callback) {
                 $.post(url, data instanceof Object ? JSON.stringify(data) : data, (res) => {
@@ -88,13 +98,23 @@
                     Z.post("/log", window.sessionId, (suc, res) => {
                         if (suc) {
                             var eles = res.split("\n")
-                            var html = "";
                             for (var i = 0; i < eles.length; i++) {
-                                if (eles[i].trim() != "") {
-                                    html += eles[i] + "<br />"
+                                if (!eles[i]) continue;
+                                var e = eles[i].trim()
+                                if (e != "") {
+                                    Z.logs.push(e)
+                                    $("#log").append(e + "<br />")
                                 }
                             }
-                            $("#log").html(html)
+
+                            var removed = false;
+                            while (Z.logs.length > 20) {
+                                Z.logs.shift()
+                                removed = true;
+                            }
+
+                            if (removed)
+                                $("#log").html(Z.logs.join("<br />"))
 
                         } else {
                             alert("API Error!  " + res.error)
@@ -111,14 +131,21 @@
                 if (!Z.frameText) {
                     Z.post("/frame", window.sessionId, (suc, res) => {
                         if (suc) {
-                            Z.frameText = res
+                            handleResult(res)
                             Z.frame()
                         } else {
                             alert("API Error!  " + res.error)
                         }
                     })
                 } else {
+                    var log = $("#log").html()
+                    if (!log || log == "undefined") log = ""
+
                     $("#authed").html(Z.frameText)
+
+                    var newLog = $("#log").html()
+                    $("#log").html(log + newLog)
+
                     Z.setRefreshTimer()
                 }
             },
@@ -128,7 +155,8 @@
 
                 Z.post("/command", { sessionId: window.sessionId, command: cmd }, (suc, res) => {
                     if (suc) {
-                        Z.frameText = res
+                        handleResult(res)
+
                         Z.frame()
                         $("#cmd").val("")
                         $("#cmd").focus()

@@ -16,11 +16,6 @@ public abstract class BaseModel<T> where T : new()
     }
 }
 
-public class FrameModel : BaseModel<FrameModel>
-{
-    public string text;
-}
-
 public class AuthModel : BaseModel<AuthModel>
 {
     public string u;
@@ -32,6 +27,12 @@ public class CommandModel
 {
     public string sessionId { get; set; }
     public string command { get; set; }
+}
+
+public class FrameModel
+{
+    public string text { get; set; }
+    public string[] logs { get; set; }
 }
 
 public class SessionModel : BaseModel<SessionModel>

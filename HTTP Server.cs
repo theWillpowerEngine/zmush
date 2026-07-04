@@ -14,6 +14,24 @@ class HttpGameSession : HttpSession
 {
     public HttpGameSession(NetCoreServer.HttpServer server) : base(server) { }
 
+    protected FrameModel GetFrame(SessionModel session, string existingText = null)
+    {
+        var text = existingText ?? Engine.RenderFrame(session);
+        var logs = Engine.GetLog(session, true);
+        return new FrameModel
+        {
+            text = text,
+            logs = logs
+        };
+    }
+    protected bool SendFrameResponse(SessionModel session, string existingText = null)
+    {
+        var frame = GetFrame(session, existingText);
+        var json = JsonSerializer.Serialize(frame);
+        return SendResponseAsync(Response.MakeGetResponse(json, "application/json"));
+    }
+
+
     protected override void OnReceivedRequest(HttpRequest request)
     {
         if (Engine.Settings.ShowHttpRequest)
@@ -83,9 +101,7 @@ class HttpGameSession : HttpSession
                         else
                         {
                             frameSession.LastActivity = DateTime.Now;
-                            var text = Engine.RenderFrame(frameSession);
-
-                            SendResponseAsync(Response.MakeGetResponse(text, "text/plain"));
+                            SendFrameResponse(frameSession);
                         }
                         break;
 
@@ -103,7 +119,7 @@ class HttpGameSession : HttpSession
 
                             var result = Engine.Command(commandSession, command.command);
 
-                            SendResponseAsync(Response.MakeGetResponse(result, "text/plain"));
+                            SendFrameResponse(commandSession, result);
                         }
                         break;
 
@@ -116,7 +132,7 @@ class HttpGameSession : HttpSession
                         {
                             //logSession.LastActivity = DateTime.Now;   //I don't *think* this counts as activity, we might want to use this to throttle refresh or timeout or something
 
-                            var items = Engine.GetLog(logSession);
+                            var items = Engine.GetLog(logSession, true);
                             var logString = string.Join("\n", items);
 
                             SendResponseAsync(Response.MakeGetResponse(logString, "text/plain"));

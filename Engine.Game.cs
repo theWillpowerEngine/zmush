@@ -834,28 +834,20 @@ public static partial class Engine
             session.SpecialOutput.Clear();
         }
 
-        var log = Logs.GetOrAdd(session.Key, _ => new List<string>());
-
-        if (log.Any())
-        {
-            ret += "<div id='log'>";
-            ret += string.Join("<br />", log.Select(s => Interpreter.ApplyAllTags(s, user))) + "<br />";
-            ret += "</div>";
-        }
-        else
-        {
-            ret += "<div id='log' style='display:none;'> </div>";
-        }
+        ret += "<div id='log'> </div>";
 
         return ret;
     }
 
-    internal static string[] GetLog(SessionModel session)
+    internal static string[] GetLog(SessionModel session, bool clear = false)
     {
         var user = Objects[session.UserId];
 
         var log = Logs.GetOrAdd(session.Key, _ => new List<string>());
         var ret = log.Select(s => Interpreter.ApplyAllTags(s, user)).ToArray();
+
+        if (clear)
+            log.Clear();
 
         return ret;
     }

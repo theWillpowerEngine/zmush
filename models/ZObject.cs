@@ -13,8 +13,8 @@ public enum Flag
     Dark,
     Darksight,
 
-    User1, User2, User3, User4, User5, User6, User7, User8, User9, User10,
-    System1, System2, System3, System4, System5, System6, System7, System8, System9, System10,
+    U1, U2, U3, U4, U5, U6, U7, U8, U9, U10,
+    S1, S2, S3, S4, S5, S6, S7, S8, S9, S10,
 }
 
 public class ZObject

@@ -1,12 +1,10 @@
-* Fix the log handoff so we can clear it on the server and it stays on the client
-
 * Objects:
   * Custom commands
 
 * Exits
   * Lock and transport messages
 
-* "Special Output" and who as a test for it
+* WHO (use SpecialOutput)
 
 * Implement .z file load on startup
   * A way to set settings in Z
