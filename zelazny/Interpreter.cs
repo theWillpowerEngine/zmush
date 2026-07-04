@@ -19,6 +19,8 @@ public static class Interpreter
         else if (quota > 0)
             quota -= 1;
 
+        string s, s2;
+
         switch (cmd.Value)
         {
             case "val":
@@ -51,6 +53,85 @@ public static class Interpreter
                 }
                 return "";
 
+            case "stg":
+                if (list.Count != 2)
+                    return "--Exception: 'stg' requires exactly 1 parameter--";
+
+                s = ParseValue(list[1], context, ref quota) ?? "";
+                switch (s.ToLower())
+                {
+                    case "showhttp":
+                        return Engine.Settings.ShowHttpRequest ? "1" : "0";
+                    case "logquotaexceeds":
+                        return Engine.Settings.LogQuotaExceeds ? "1" : "0";
+                    case "breakonexception":
+                        return Engine.Settings.BreakOnExceptionDontUseThisUnlessYoureSmart ? "1" : "0";
+                    case "autolinkexits":
+                        return Engine.Settings.AutoLinkExits ? "1" : "0";
+
+                    case "startroom":
+                        return Engine.Settings.NewCharacterStartingRoom.ToString();
+                    case "masterroom":
+                        return Engine.Settings.MasterRoom.ToString();
+                    case "masterpc":
+                        return Engine.Settings.MasterCharacter.ToString();
+                    case "masteritem":
+                        return Engine.Settings.MasterItem.ToString();
+
+                    default:
+                        return $"--Exception: Unknown setting '{s}'--";
+                }
+
+            case "sts":
+                if (context.Id != 0)
+                    return "--Exception: 'sts' can only be used in the context of the main admin user--";
+                if (list.Count != 3)
+                    return "--Exception: 'sts' requires exactly 2 parameters--";
+
+                s = ParseValue(list[1], context, ref quota) ?? "";
+                s2 = ParseValue(list[2], context, ref quota) ?? "";
+                var valIsTruthy = s2 != "0" && s2 != "" && s2.ToLower() != "false" && s2.ToLower() != "no";
+
+                var isANumber = int.TryParse(s2, out var numVal);
+                switch (s.ToLower())
+                {
+                    case "showhttp":
+                        Engine.Settings.ShowHttpRequest = valIsTruthy;
+                        return Engine.Settings.ShowHttpRequest ? "1" : "0";
+                    case "logquotaexceeds":
+                        Engine.Settings.LogQuotaExceeds = valIsTruthy;
+                        return Engine.Settings.LogQuotaExceeds ? "1" : "0";
+                    case "breakonexception":
+                        Engine.Settings.BreakOnExceptionDontUseThisUnlessYoureSmart = valIsTruthy;
+                        return Engine.Settings.BreakOnExceptionDontUseThisUnlessYoureSmart ? "1" : "0";
+                    case "autolinkexits":
+                        Engine.Settings.AutoLinkExits = valIsTruthy;
+                        return Engine.Settings.AutoLinkExits ? "1" : "0";
+
+                    case "startroom":
+                        if (!isANumber)
+                            return "--Exception: 'sts startroom' requires a numeric value--";
+                        Engine.Settings.NewCharacterStartingRoom = numVal;
+                        return Engine.Settings.NewCharacterStartingRoom.ToString();
+                    case "masterroom":
+                        if (!isANumber)
+                            return "--Exception: 'sts masterroom' requires a numeric value--";
+                        Engine.Settings.MasterRoom = numVal;
+                        return Engine.Settings.MasterRoom.ToString();
+                    case "masterpc":
+                        if (!isANumber)
+                            return "--Exception: 'sts masterpc' requires a numeric value--";
+                        Engine.Settings.MasterCharacter = numVal;
+                        return Engine.Settings.MasterCharacter.ToString();
+                    case "masteritem":
+                        if (!isANumber)
+                            return "--Exception: 'sts masteritem' requires a numeric value--";
+                        Engine.Settings.MasterItem = numVal;
+                        return Engine.Settings.MasterItem.ToString();
+
+                    default:
+                        return $"--Exception: Unknown setting '{s}'--";
+                }
 
             default:
                 return $"--Exception: Unknown command '{cmd.Value}'--";

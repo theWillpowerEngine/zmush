@@ -55,6 +55,7 @@ public static class Reader
     private static List<string> KWs = new()
     {
         "single",
+        "stg", "sts",
         "val", "v",
     };
 

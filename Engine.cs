@@ -91,7 +91,7 @@ public static partial class Engine
         var log = Logs.GetOrAdd(sessionId.ToString(), _ => new List<string>());
         log.Add(message);
 
-        while (log.Count > Settings.LogCount)
+        while (log.Count > 100)
             log.RemoveAt(0);
     }
 

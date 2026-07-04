@@ -1,4 +1,4 @@
-# ZMUSH Reference Guide (0.0.1)
+# ZMUSH Reference Guide (0.0.2)
 
 ## Building, Configuring and Running the Server
 
@@ -188,9 +188,16 @@ S1 - S10
 
     single <val>... - Returns the first of the values that follow it that isn't empty.
 
+    stg <setting> - Gets the Engine Setting specified (see "Settings, Roles and Permissions" earlier in this guide for more info on Engine Settings)
+
     val (v) <attr> - Get value of attribute from context
     val (v) <obj> <attr> - Get alue of attribute from object
 
+### Special Zelazny Commands
+
+These can only be evaluated in special contexts, or by particular users
+
+    sts <setting> <val> - Sets the Engine Setting specified (see "Settings, Roles and Permissions" earlier in this guide for more info on Engine Settings)
 
 ## Built in Formatters
 

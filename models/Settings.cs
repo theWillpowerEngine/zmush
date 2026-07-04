@@ -8,8 +8,6 @@ public class Settings : BaseModel<Settings>
 
     public bool LogQuotaExceeds = true;
 
-    public int LogCount = 15;
-
     public int NewCharacterStartingRoom = 1;
     public int MasterRoom = 1;
     public int MasterCharacter = 2;
