@@ -167,8 +167,7 @@ public class ZString
         if (!ro.WasSuccessful)
             return $"--Errors: {string.Join(", ", ro.Errors)}--";
 
-        if (ro.Tokes.Any(t => t.TT == TokenType.Code))
-            return $"--Error: Code blocks are not allowed in ApplyTags--";
+        ro.Tokes.RemoveAll(t => t.TT == TokenType.Code);
 
         return new ZString(text).Evaluate(user);
     }

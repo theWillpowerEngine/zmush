@@ -52,6 +52,12 @@ public class Token
 
 public static class Reader
 {
+    private static List<string> KWs = new()
+    {
+        "single",
+        "val", "v",
+    };
+
     private static string ScanTo(string s, ref int i, char terminator, char? opener = null)
     {
         var depth = 0;
@@ -131,11 +137,11 @@ public static class Reader
             {
                 addWork();
 
-                //Commented -out list ;[ blah blah blah ]
-                if (lookAhead == '[')
+                //Commented -out list ;{blah blah blah }
+                if (lookAhead == '{')
                 {
                     i++;
-                    ScanTo(code, ref i, ']', '[');
+                    ScanTo(code, ref i, '}', '{');
                 }
 
                 //Regular comment, ; to EOL or ;
@@ -162,13 +168,13 @@ public static class Reader
                     addWork();
                     break;
 
-                case '[':
+                case '{':
                     addWork();
-                    var innerCode = ScanTo(code, ref i, ']', '[');
+                    var innerCode = ScanTo(code, ref i, '}', '{');
                     retVal.Add(new Token(ReadCode(innerCode, ro)));
                     break;
 
-                case ']':
+                case '}':
                     ro.Errors.Add("Unmatched end-bracket found");
                     break;
 
@@ -191,11 +197,6 @@ public static class Reader
 
         return retVal;
     }
-
-    private static List<string> KWs = new()
-    {
-        "val", "v"
-    };
 
     private static TokenType GetTokenType(string work)
     {
@@ -233,7 +234,7 @@ public static class Reader
             }
 
             //Is there a tag?
-            else if (c == '{')
+            else if (c == '[')
             {
                 if (!string.IsNullOrWhiteSpace(work))
                 {
@@ -241,14 +242,14 @@ public static class Reader
                     work = "";
                 }
 
-                var tag = ScanTo(code, ref i, '}');
+                var tag = ScanTo(code, ref i, ']');
 
                 ro.Append(tag, TokenType.Tag);
                 continue;
             }
 
             //Code?
-            if (c == '[')
+            if (c == '{')
             {
                 if (!string.IsNullOrWhiteSpace(work))
                 {
@@ -256,7 +257,7 @@ public static class Reader
                     work = "";
                 }
 
-                var codeBlock = ScanTo(code, ref i, ']', '[');
+                var codeBlock = ScanTo(code, ref i, '}', '{');
                 ro.Append(ReadCode(codeBlock, ro));
                 continue;
             }

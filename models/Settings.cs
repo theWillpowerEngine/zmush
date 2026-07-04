@@ -2,6 +2,8 @@ using YamlDotNet.Serialization;
 
 public class Settings : BaseModel<Settings>
 {
+    public bool BreakOnExceptionDontUseThisUnlessYoureSmart = false;
+
     public bool ShowHttpRequest = false;
 
     public bool LogQuotaExceeds = true;

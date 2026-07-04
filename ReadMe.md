@@ -186,6 +186,8 @@ System1 - System10
 
 ## Zelazny Reference
 
+    single <val>... - Returns the first of the values that follow it that isn't empty.
+
     val (v) <attr> - Get value of attribute from context
     val (v) <obj> <attr> - Get alue of attribute from object
 
@@ -195,6 +197,15 @@ System1 - System10
     {blah} - Action link (command = text)
     {blah:cmd} - Action link (text = blah, command = cmd)
     {<c> text} - Color text.  c = red, yellow, green, blue, purple
+
+## Appendix:  Tutorial-level Snippers
+
+It's {single {v outside} normal} here.
+@attr here.outside=sunny
+
+
+
+
 
 ## Appendix:  Common Snippets and Libraries
 

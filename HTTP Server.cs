@@ -90,7 +90,7 @@ class HttpGameSession : HttpSession
                         break;
 
                     case "command":
-                        var commandData = request.Body.TrimStart('"').TrimEnd('"').Replace("\\\"", "\"");
+                        var commandData = request.Body.TrimStart('"').TrimEnd('"');   //.Replace("\\\"", "\"");
                         var command = JsonSerializer.Deserialize<CommandModel>(commandData, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 
                         if (command == null || command.command == null || command.sessionId == null)
@@ -136,6 +136,9 @@ class HttpGameSession : HttpSession
                 Guid corrId = Guid.NewGuid();
                 Engine.Log("ERROR", $"Error in API route {route}: {ex.Message} (Correlation ID: {corrId})");
                 SendResponseAsync(Response.MakeErrorResponse(500, "Correlation ID: " + corrId));
+
+                if (Engine.Settings.BreakOnExceptionDontUseThisUnlessYoureSmart)
+                    throw;
             }
         }
 

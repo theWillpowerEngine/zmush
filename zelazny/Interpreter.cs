@@ -39,6 +39,18 @@ public static class Interpreter
                 else
                     return "--Exception: 'val' requires 1 or 2 parameters--";
 
+            case "single":
+                if (list.Count == 1)
+                    return "--Exception: 'single' requires at least 1 parameter (and really it should be 2 or you're just wasting quota)--";
+
+                for (var i = 1; i < list.Count; i++)
+                {
+                    var val = ParseValue(list[i], context, ref quota);
+                    if (!string.IsNullOrWhiteSpace(val))
+                        return val;
+                }
+                return "";
+
 
             default:
                 return $"--Exception: Unknown command '{cmd.Value}'--";
