@@ -136,7 +136,7 @@ public class ZString
                     break;
 
                 case TokenType.Tag:
-                    evalled += Interpreter.GetTagValue(token) + " ";
+                    evalled += Interpreter.GetTagValue(token);
                     continue;
 
                 default:

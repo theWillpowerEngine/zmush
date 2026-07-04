@@ -795,14 +795,16 @@ public static partial class Engine
         ret += "<br /><br /><table width='99%'><tr><td width='33%' valign='top'>";
         if (exits.Any())
         {
-            ret += "<b>Exits:</b><br />";
+            var exitStr = "<b>Exits:</b><br />";
             foreach (var exit in exits)
             {
                 if (Settings.AutoLinkExits)
-                    ret += "{" + exit.Name + "}<br />";
+                    exitStr += "[" + exit.Name + "]<br />";
                 else
-                    ret += exit.Name + "<br />";
+                    exitStr += exit.Name + "<br />";
             }
+
+            ret += Interpreter.ApplyAllTags(exitStr, loc);
         }
 
         ret += "</td><td width='33%' valign='top'>";

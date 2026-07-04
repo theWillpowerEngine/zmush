@@ -76,39 +76,21 @@ public static class Interpreter
         var ret = "";
         var input = t.Value;
 
-        for (var i = 0; i < input.Length; i++)
+        var kw = input.Split(" ")[0];
+        var rest = input.Substring(kw.Length).Trim();
+
+        if (Engine.Formatters.TryGetValue(kw, out var formatter))
+            ret += formatter(rest);
+        else
         {
-            var c = input[i];
-            if (c == '{')
-            {
-                var end = input.IndexOf('}', i);
-                if (end == -1)
-                    ret += c;
-                else
-                {
-                    var key = input.Substring(i + 1, end - i - 1);
-                    var kw = key.Split(" ")[0];
-
-                    if (Engine.Formatters.TryGetValue(kw, out var formatter))
-                        ret += formatter(key.Substring(kw.Length).Trim());
-                    else
-                    {
-                        if (!key.Contains(":"))
-                            ret += $"<a class='action-link' data-action='{key}'>{key}</a>";
-                        else
-                        {
-                            var parts = key.Split(":", 2);
-                            ret += $"<a class='action-link' data-action='{parts[1]}'>{parts[0]}</a>";
-                        }
-                    }
-
-                    i = end;
-                }
-            }
+            if (!input.Contains(":"))
+                ret += $"<a class='action-link' data-action='{input}'>{input}</a>";
             else
-                ret += c;
+            {
+                var parts = input.Split(":", 2);
+                ret += $"<a class='action-link' data-action='{parts[1]}'>{parts[0]}</a>";
+            }
         }
-
 
         return ret;
     }
