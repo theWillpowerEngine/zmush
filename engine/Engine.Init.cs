@@ -11,6 +11,7 @@ public static partial class Engine
         if (!rootPath.EndsWith(Path.DirectorySeparatorChar))
             rootPath += Path.DirectorySeparatorChar;
 
+        //Create the whole directory if it doesn't exist
         if (!Directory.Exists(rootPath))
         {
             Directory.CreateDirectory(rootPath);
@@ -20,15 +21,17 @@ public static partial class Engine
 
         RootPath = rootPath;
 
+        //Create the driver directory if it doesn't exist
         if (!Directory.Exists(DriverPath))
         {
             Directory.CreateDirectory(DriverPath);
             Log($"No driver directory found.  Initializing to defaults...");
 
-            File.WriteAllText(Path.Combine(DriverPath, "default.z"), Loader.GetEmbeddedResource("default.z"));
-            Log($"Default driver created at '{DriverPath}default.z'.");
+            File.WriteAllText(Path.Combine(DriverPath, "main.z"), Loader.GetEmbeddedResource("default.z"));
+            Log($"Default driver created at '{DriverPath}main.z'.");
         }
 
+        //Seed default settings file if it's not there, otherwise load settings
         if (File.Exists(Path.Combine(RootPath, "Settings")))
         {
             var settings = File.ReadAllText(Path.Combine(RootPath, "Settings"));
@@ -43,9 +46,11 @@ public static partial class Engine
         }
         else
         {
-            File.WriteAllText(Path.Combine(RootPath, "Settings"), Settings.ToYaml());
+            Settings.Save();
+            Log($"No settings file found.  Created default settings at '{Path.Combine(RootPath, "Settings")}'.");
         }
 
+        //If the object directory doesn't exist, create it and seed it with the basic starter items (admin user, master room, etc.)
         if (!Directory.Exists(ObjectPath))
         {
             Directory.CreateDirectory(ObjectPath);
@@ -74,6 +79,7 @@ public static partial class Engine
             mu.Save();
         }
 
+        //If the player path doesn't exist, create it and seed the default admin user (owner/owner)
         if (!Directory.Exists(PlayerPath))
         {
             Directory.CreateDirectory(PlayerPath);
@@ -100,6 +106,7 @@ public static partial class Engine
             Log("CRITICAL", "Created admin user.  login: owner, password: owner");
         }
 
+        //If the HTML/site folder doesn't exist, create it and seed it with the default site files
         if (!Directory.Exists(HTMLRoot))
         {
             Directory.CreateDirectory(HTMLRoot);
@@ -128,9 +135,36 @@ public static partial class Engine
         Formatters.TryAdd("italic", (s) => $"<i>{s}</i>");
     }
 
+    private static void LoadDriver()
+    {
+        var files = Directory.GetFiles(DriverPath, "*.z", SearchOption.AllDirectories).ToList();
+        var entryPoint = files.FirstOrDefault(f => f.EndsWith("main.z", StringComparison.OrdinalIgnoreCase));
+        if (entryPoint == null) entryPoint = files.FirstOrDefault();
+        if (entryPoint == null) return;
+
+        files.Remove(entryPoint);
+
+        var masterUser = Objects[0];
+        if (masterUser == null)
+        {
+            Log("CRITICAL", "No master user found.  This is a fatal error.  Please restore your system from backup.");
+            return;
+        }
+
+        var code = File.ReadAllText(entryPoint);
+        var res = ZString.Eval(code, masterUser);
+
+        foreach (var file in files)
+        {
+            code = File.ReadAllText(file);
+            res = ZString.Eval(code, masterUser);
+        }
+    }
+
     public static void Init()
     {
         Loader.LoadZObjects();
+        LoadDriver();
         CreateDefaultFormatters();
         Log("Initialization complete!  Almost there.");
 

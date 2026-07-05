@@ -1,3 +1,7 @@
+; This file is executed every time zmush starts.
+
 {do
     {sts startroom 1}
+
+    {log "Initialization zelazny has been run successfully"}
 }

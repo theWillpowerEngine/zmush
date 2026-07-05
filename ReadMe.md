@@ -202,6 +202,8 @@ S1 - S10
 
     emit <obj> <message> - Send a message.  Context sensitive (can send to a player, a room or even an item)
 
+    log <val> - Logs a message with the 'zelazny' tag in the zmush log
+
     match <check> (<compare> <val>)... [<val>] - For each pair, if the compare value matches the check value, evaluate and return that pair's value.  The optional final value is if nothing matches
 
     single <val>... - Returns the first of the values that follow it that isn't empty.

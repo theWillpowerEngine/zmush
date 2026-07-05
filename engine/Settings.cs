@@ -42,6 +42,11 @@ public class Settings : BaseModel<Settings>
         return ret;
     }
 
+    public void Save()
+    {
+        File.WriteAllText(Path.Combine(Engine.RootPath, "Settings"), ToYaml());
+    }
+
     public Dictionary<string, HashSet<string>> Roles = new Dictionary<string, HashSet<string>>()
     {
         { "wizard", new HashSet<string>() { "basic", "advanced" } },

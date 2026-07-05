@@ -79,7 +79,14 @@ public static class Interpreter
                 }
                 return emitVal;
 
-            //match <check> (<compare> <val>)... [<val>]
+            case "log":
+                if (list.Count != 2)
+                    return "--Exception: 'log' requires exactly 1 parameter--";
+
+                s = ParseValue(list[1], context, ref quota, registers);
+                Engine.Log("zelazny", s);
+                return s;
+
             case "match":
                 if (list.Count < 4)
                     return "--Exception: 'match' requires at least 3 parameters--";
@@ -163,45 +170,57 @@ public static class Interpreter
                 var valIsTruthy = Matcher.IsTruthy(s2);
                 var isANumber = int.TryParse(s2, out var numVal);
 
+
+                s = "";
                 switch (s.ToLower())
                 {
                     case "showhttp":
                         Engine.Settings.ShowHttpRequest = valIsTruthy;
-                        return Engine.Settings.ShowHttpRequest ? "1" : "0";
+                        s = Engine.Settings.ShowHttpRequest ? "1" : "0";
+                        break;
                     case "logquotaexceeds":
                         Engine.Settings.LogQuotaExceeds = valIsTruthy;
-                        return Engine.Settings.LogQuotaExceeds ? "1" : "0";
+                        s = Engine.Settings.LogQuotaExceeds ? "1" : "0";
+                        break;
                     case "breakonexception":
                         Engine.Settings.BreakOnExceptionDontUseThisUnlessYoureSmart = valIsTruthy;
-                        return Engine.Settings.BreakOnExceptionDontUseThisUnlessYoureSmart ? "1" : "0";
+                        s = Engine.Settings.BreakOnExceptionDontUseThisUnlessYoureSmart ? "1" : "0";
+                        break;
                     case "autolinkexits":
                         Engine.Settings.AutoLinkExits = valIsTruthy;
-                        return Engine.Settings.AutoLinkExits ? "1" : "0";
+                        s = Engine.Settings.AutoLinkExits ? "1" : "0";
+                        break;
 
                     case "startroom":
                         if (!isANumber)
                             return "--Exception: 'sts startroom' requires a numeric value--";
                         Engine.Settings.NewCharacterStartingRoom = numVal;
-                        return Engine.Settings.NewCharacterStartingRoom.ToString();
+                        s = Engine.Settings.NewCharacterStartingRoom.ToString();
+                        break;
                     case "masterroom":
                         if (!isANumber)
                             return "--Exception: 'sts masterroom' requires a numeric value--";
                         Engine.Settings.MasterRoom = numVal;
-                        return Engine.Settings.MasterRoom.ToString();
+                        s = Engine.Settings.MasterRoom.ToString();
+                        break;
                     case "masterpc":
                         if (!isANumber)
                             return "--Exception: 'sts masterpc' requires a numeric value--";
                         Engine.Settings.MasterCharacter = numVal;
-                        return Engine.Settings.MasterCharacter.ToString();
+                        s = Engine.Settings.MasterCharacter.ToString();
+                        break;
                     case "masteritem":
                         if (!isANumber)
                             return "--Exception: 'sts masteritem' requires a numeric value--";
                         Engine.Settings.MasterItem = numVal;
-                        return Engine.Settings.MasterItem.ToString();
+                        s = Engine.Settings.MasterItem.ToString();
+                        break;
 
                     default:
                         return $"--Exception: Unknown setting '{s}'--";
                 }
+                Engine.Settings.Save();
+                return s;
 
             case "val":
             case "v":
