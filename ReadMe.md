@@ -192,6 +192,8 @@ S1 - S10
 
     @tel <room>         Can be #id or name part
 
+    @eval <zelazny code>
+
     !password <current password>=<new password>
 
 ## Zelazny Reference
@@ -222,10 +224,10 @@ And comparison predicates:
 The singleton predicates are:
 
     Predicate       Description
-    ??              if the value is truthy
+    ?=              if the value is truthy
     ?!              if the value is falsey
 
-    ?any            if the value is not empty
+    ??              if the value is not empty
 
 And the comparison predicates are:
 

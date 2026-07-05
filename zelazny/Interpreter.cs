@@ -228,8 +228,8 @@ public static class Interpreter
 
     private static string ParsePredicate(Token cmd, List<Token> rest, ZObject context, ref int quota, List<string>? registers = null)
     {
-        string s, s2;
-        ZObject? o, o2;
+        string s;
+        //ZObject? o, o2;
 
         var checkVal = ParseValue(rest[0], context, ref quota, registers);
         var singletonHasFalse = rest.Count == 3;
@@ -241,15 +241,29 @@ public static class Interpreter
 
         switch (cmd.Value)
         {
-            case "??":
-                return "";
-
+            case "?=":
             case "?!":
-                return "";
+                var isNE = cmd.Value == "?!";
+                if (!isValidComparison)
+                    return $"--Exception: '{cmd.Value}' requires 2-4 parameters--";
+                s = ParseValue(rest[1], context, ref quota, registers);
+                var res = s.ToLower() == checkVal.ToLower();
+                if (isNE) res = !res;
+                if (res)
+                {
+                    if (comparisonIsSimple) return "1";
+                    return ParseValue(rest[2], context, ref quota, registers);
+                }
+                else if (comparisonHasFalse)
+                    return ParseValue(rest[3], context, ref quota, registers);
+                else if (comparisonIsSimple)
+                    return "0";
+                else
+                    return "";
 
-            case "?any":
+            case "??":
                 if (!isValidSingleton)
-                    return $"--Exception: '?any' requires 2 or 3 parameters--";
+                    return $"--Exception: '??' requires 1-3 parameters--";
                 if (Matcher.IsTruthy(checkVal))
                 {
                     if (singletonIsSimple) return "1";
@@ -292,17 +306,6 @@ public static class Interpreter
             default:
                 return t.Value;
         }
-
-        if (t.TT == TokenType.Code) return Evaluate(t, context, ref quota, registers);
-
-        return t.Value;
-
-        // if (t.IsName)
-        // {
-        //     var name = t.Value.ToString().ToLower();
-        //     if (!ro.GlobalVariables.Contains(name) && !ro.LocalsDuringParse.Contains(name))
-        //         ro.Errors.Add(new(ErrorCodes.Undefined, $"{name} is undefined", t, t));
-        // }
     }
 
     public static string GetTagValue(Token t)

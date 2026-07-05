@@ -299,7 +299,7 @@ public static partial class Engine
                     break;
                 }
 
-                Attr attr;
+                Attr? attr;
 
                 switch (subCmd)
                 {
@@ -597,6 +597,14 @@ public static partial class Engine
                 Log("admin", $"User #{session.UserId} updated password for user '{s}'");
                 break;
 
+            case "@eval":
+                if (!rest.StartsWith("{"))
+                    rest = "{" + rest + "}";
+
+                var evaled = ZString.Eval(rest, user, ref user.Quota);
+                PlayerEmit(session.Key, $"Result: {evaled}");
+                break;
+
             case "!password":
                 (s, s2) = GetNamedValue(rest);
                 var dbU2 = User.Load(session.LoginName);
@@ -794,7 +802,7 @@ public static partial class Engine
                                 handlerVal = "{" + handlerVal + "}";
 
                             var registers = Matcher.ExtractCommandHandlerRegisters(command, a.Name.Substring(1));
-                            var evaled = ZString.Eval(handlerVal, h, ref user.Quota, registers);
+                            s = ZString.Eval(handlerVal, h, ref user.Quota, registers);
                             handled = true;
                         }
                     }

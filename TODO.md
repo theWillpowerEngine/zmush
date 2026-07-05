@@ -26,5 +26,5 @@
 * Added custom command handlers, and 'handler' flaG
 * Added 'sts' and 'stg' keywords, and the concept of special zelazny keywords (sts) which can only be used in particular situations
 * Added keywords:  do, emit, match
-* Added singleton predicates:  ?any
-* Added comparison predicates:  ??, ?!
+* Added singleton predicates:  ??
+* Added comparison predicates:  ?=, ?!
