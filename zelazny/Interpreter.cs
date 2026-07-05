@@ -76,23 +76,37 @@ public static class Interpreter
                 }
                 return emitVal;
 
-            case "val":
-            case "v":
-                if (list.Count == 3)
-                {
-                    var oVName = ParseValue(list[1], context, ref quota, registers);
-                    var oV = Engine.Find(context, oVName);
-                    if (oV == null)
-                        return $"--Exception: Object '{oVName}' not found--";
+            //match <check> (<compare> <val>)... [<val>]
+            case "match":
+                if (list.Count < 4)
+                    return "--Exception: 'match' requires at least 3 parameters--";
 
-                    return oV.GetAttrValue(ParseValue(list[2], context, ref quota, registers)) ?? "";
-                }
-                else if (list.Count == 2)
+                //s = check
+                s = ParseValue(list[1], context, ref quota, registers);
+
+                var hasDefault = list.Count % 2 == 1;
+                var caseCount = (hasDefault ? (list.Count - 2) : (list.Count - 1)) / 2;
+                var caseI = 2;
+
+                for (var i = 0; i < caseCount; i++)
                 {
-                    return context.GetAttrValue(ParseValue(list[1], context, ref quota, registers)) ?? "";
+                    var compare = ParseValue(list[caseI], context, ref quota, registers);
+                    if (s == compare)
+                    {
+                        var val = ParseValue(list[caseI + 1], context, ref quota, registers);
+                        return val;
+                    }
+
+                    caseI += 2;
                 }
-                else
-                    return "--Exception: 'val' requires 1 or 2 parameters--";
+
+                if (hasDefault)
+                {
+                    var defaultVal = ParseValue(list[list.Count - 1], context, ref quota, registers);
+                    return defaultVal;
+                }
+
+                return "";
 
             case "single":
                 if (list.Count == 1)
@@ -185,6 +199,24 @@ public static class Interpreter
                     default:
                         return $"--Exception: Unknown setting '{s}'--";
                 }
+
+            case "val":
+            case "v":
+                if (list.Count == 3)
+                {
+                    var oVName = ParseValue(list[1], context, ref quota, registers);
+                    var oV = Engine.Find(context, oVName);
+                    if (oV == null)
+                        return $"--Exception: Object '{oVName}' not found--";
+
+                    return oV.GetAttrValue(ParseValue(list[2], context, ref quota, registers)) ?? "";
+                }
+                else if (list.Count == 2)
+                {
+                    return context.GetAttrValue(ParseValue(list[1], context, ref quota, registers)) ?? "";
+                }
+                else
+                    return "--Exception: 'val' requires 1 or 2 parameters--";
 
             default:
                 return $"--Exception: Unknown command '{cmd.Value}'--";

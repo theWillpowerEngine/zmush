@@ -10,20 +10,6 @@
         #authed {
             padding-bottom: 48px;
         }
-
-        #inputBar {
-            position: fixed;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            padding: 8px;
-            background: #fff;
-        }
-
-        #cmd {
-            width: 100%;
-            box-sizing: border-box;
-        }
     </style>
 
     <script src="https://code.jquery.com/jquery-4.0.0.min.js"
@@ -67,6 +53,9 @@
         const Z = {
             frameText: null,
             logs: [],
+
+            commands: [],
+            commandIdx: -1,
 
             post(url, data, callback) {
                 $.post(url, data instanceof Object ? JSON.stringify(data) : data, (res) => {
@@ -153,6 +142,10 @@
             command(cmd) {
                 Z.setRefreshTimer(true)
 
+                Z.commands.push(cmd)
+                while (Z.commands.length > 20) Z.commands.shift()
+                Z.commandIdx = -1
+
                 Z.post("/command", { sessionId: window.sessionId, command: cmd }, (suc, res) => {
                     if (suc) {
                         handleResult(res)
@@ -211,6 +204,31 @@
                     e.preventDefault()
                     const text = $(this).val()
                     Z.command(text);
+                    return false
+                }
+
+                else if (e.key === 'ArrowUp' || e.keyCode == 38) {
+                    e.preventDefault()
+                    if (Z.commands.length > 0) {
+                        if (Z.commandIdx == -1) Z.commandIdx = Z.commands.length - 1
+                        else if (Z.commandIdx > 0) Z.commandIdx--
+                        $(this).val(Z.commands[Z.commandIdx])
+                    }
+                    return false
+
+                } else if (e.key === 'ArrowDown' || e.keyCode == 40) {
+                    e.preventDefault()
+                    if (Z.commands.length > 0) {
+                        if (Z.commandIdx == -1) Z.commandIdx = Z.commands.length - 1
+                        else if (Z.commandIdx < Z.commands.length - 1) Z.commandIdx++
+                        $(this).val(Z.commands[Z.commandIdx])
+                    }
+                    return false
+
+                } else if (e.key === 'Escape' || e.keyCode == 27) {
+                    e.preventDefault()
+                    $(this).val("")
+                    Z.commandIdx = -1
                     return false
                 }
             })

@@ -49,7 +49,7 @@ Once you've logged in you should see that you're in a place called the Master Ro
 
     say Hello everyone!
 
-And the result will be your character saying "Hello everyone!" to anyone else who is in the same room as you.  In this case that's only you, but you'll see it at least.  If you did the above, you'll see the following in your game screen:
+And then press Enter.  The result will be your character saying "Hello everyone!" to anyone else who is in the same room as you.  In this case that's only you, but you'll see it at least.  If you did the above, you'll see the following in your game screen:
 
     Stimpy says, "Hello everyone!"
 
@@ -66,6 +66,8 @@ Once you do this, you will change the password for the 'owner' user.  Note that 
     @password owner=new password
 
 In this case 'owner' refers to the user whose password is being changed.  Since this command is generally used to help people regain access when they forget their password, it's assumed you don't have acccess to the existing password.
+
+While you're in the client, you can scroll through your past commands with the up and down arrows.  If you want to clear the command text box, press Escape.
 
 ### Understanding the Log
 
@@ -194,6 +196,8 @@ S1 - S10
     do <val>... - Evaluate each value and return the last one
 
     emit <obj> <message> - Send a message.  Context sensitive (can send to a player, a room or even an item)
+
+    match <check> (<compare> <val>)... [<val>] - For each pair, if the compare value matches the check value, evaluate and return that pair's value.  The optional final value is if nothing matches
 
     single <val>... - Returns the first of the values that follow it that isn't empty.
 

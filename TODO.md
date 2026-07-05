@@ -10,9 +10,11 @@
     * Consider just doing this flat out for very chatty objects like PCs
 
 * externalize the HTML rendering to settings (stuff like the nbsps and brs as well as CSS)
+* Attribute locks/flags of some kind (for special and hidden attributes)
 
 * Setting and implementation for multi character per user (will need UI too)
 
+* Add other registers (actor?  location?  The "master room emits in itself" problem)
 
 
 ### Changelogs
@@ -20,5 +22,5 @@
 #### 0.0.1 -> 0.0.2 
 
 * Added 'sts' and 'stg' keywords, and the concept of special zelazny keywords (sts) which can only be used in particular situations
-* Added 'emit' and 'do' keywords
-* Added custom command handlers, and 'handler' flag
+* Added keywords:  do, emit, match
+* Added custom command handlers, and 'handler' flaG

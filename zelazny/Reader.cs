@@ -56,6 +56,7 @@ public static class Reader
     {
         "emit",
         "do",
+        "match",
         "single",
         "stg", "sts",
         "val", "v",
