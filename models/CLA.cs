@@ -10,4 +10,8 @@ public class CLA
 
     [Option('h', "http", Required = false, HelpText = "Show HTTP requests in the console log (spammy)")]
     public bool Http { get; set; }
+
+    [Option('f', "folder", Required = false, HelpText = "Set the folder path")]
+    public string? Folder { get; set; }
+
 }

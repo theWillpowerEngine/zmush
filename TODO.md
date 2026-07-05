@@ -14,7 +14,7 @@
 
 #### 0.0.2 -> 0.0.3 
 
-* Added special registers %a (actor id) and %an (actor name)
+* Added special registers %a (actor id) and %an (actor name) along with numbered registers %1-%9
 * Added custom command handlers, and 'handler' flag
 * Added @eval command
 * Added 'sts' and 'stg' keywords, and the concept of special zelazny keywords (sts) which can only be used in particular situations

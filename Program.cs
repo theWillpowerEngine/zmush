@@ -1,6 +1,6 @@
 ﻿using CommandLine;
 
-var serverRoot = "/home/malf/z";
+var serverRoot = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "/z";
 //Engine.Settings.OverrideSiteDirectory = "/home/malf/code/zmush/res/site";     //Uncomment this when editing site files for testing, it makes reloading ez.
 
 CLA? opts = null;
@@ -8,6 +8,8 @@ CLA? opts = null;
 Parser.Default.ParseArguments<CLA>(args).WithParsed<CLA>(o => { opts = o; });
 
 if (opts == null) return;
+
+serverRoot = opts.Folder ?? serverRoot;
 if (opts.Reset)
 {
     if (Directory.Exists(serverRoot))

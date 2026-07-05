@@ -66,17 +66,6 @@ public static partial class Engine
             };
 
             room.Save();
-
-            var mu = new ZObject
-            {
-                Id = 2,
-                ZOT = ZObType.Character,
-                Name = "Master Character",
-                Desc = "A formless blob",
-                Owner = 0
-            };
-
-            mu.Save();
         }
 
         //If the player path doesn't exist, create it and seed the default admin user (owner/owner)
@@ -93,7 +82,7 @@ public static partial class Engine
                 Desc = "The default admin character.  Very powerful.  Also adorable.",
                 Owner = 0,
                 Location = 1,
-                Parent = 2
+                Parent = -1
             };
 
             wizard.Save();

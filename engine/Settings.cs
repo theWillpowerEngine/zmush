@@ -10,7 +10,7 @@ public class Settings : BaseModel<Settings>
 
     public int NewCharacterStartingRoom = 1;
     public int MasterRoom = 1;
-    public int MasterCharacter = 2;
+    public int MasterCharacter = -1;
     public int MasterItem = -1;
 
     public bool AutoLinkExits = true;

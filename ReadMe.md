@@ -18,6 +18,7 @@ The server is now running.  You can shut it down by pressing 'x', or shut it dow
 The server supports several command line arguments (CLAs).  You can add --help when running the server to see a full list of them.  The most important ones are:
 
 * -p, --port : Set the port number (default 4676)
+* -f, --folder : Set the root folder for the data files (will be created and seeded if it doesn't exist).  Default (home)/z
 * -r, --reset : reset all data files (back them up or they're gone forever!)
 
 While the server is running you will see a running log, resembling the following:
@@ -71,21 +72,100 @@ While you're in the client, you can scroll through your past commands with the u
 
 ### Understanding the Log
 
-CRITICAL
-hax
-WARN
-net
-quota
+Here, again, are some example log messages that you'd see in the zmush terminal window (or the log file if you're logging it to a file):
 
+    [2334]  Load Complete.  Total ZObjects loaded: 3 in 18.3483 ms.
+    [2334]  Initialization complete!  Almost there.
+    [2334:net]  Starting server on port 4676 in working directory '/home/malf/z/'...
 
-### Settings, Roles and Permissions
+We've already explained the timestamp in square brackets, but what about the different subsystems (the bit that sometimes appears after the time with ':' separating them)?  You don't generally have to memorize these, but some of them can be important:
 
-...
+    * CRITICAL:  Something VERY IMPORTANT happening.  Generally only used for unusual errors that are not expected and don't have known remediations.  Also used in very specific cases (like creating the default admin user) to let you know of a potential security or access issue.
 
+    * WARN:  Something quite important happening, but not something that implies the game itself is damaged or compromised.  These are things you should fix, but which won't ruin the player experience (for example, a ZObject having an invalid parent)
+
+    * hax:  Security/Access Control prevented something from happening.  Could just be something messing around with commands, could be an attempt to break something or hack the game
+
+    * net:  Related to the network server/HTTP layer
+
+    * quota:  If the 'LogQuotaExceeds' setting is true, this will log any time something exceeds its quota, with tracing information to help you identify poorly optimized scripts or runaway ZObjects
+
+    * zelazny:  Created from the 'log' keyword in Zelazny. 
+
+### Settings, Roles and the File System
+
+You generally won't have to edit game files directly, but it can be helpful to understand the file structure...  especially for power users.  The files and folders are:
+
+    -root (either (home)/z or whatever you set with --folder when starting the server)
+        -drv : "driver files".  Zelazny source code which runs on init.  main.z is the entry point
+        -obj : All the ZObjects saved in YAML by Id
+        -site : Any content put in this folder will be hosted by the HTTP server.  index.htm is the default page
+        -usr : User/Login records saved in YAML by login name
+        
+        Version : Text file containing the version that created the folder structure
+        Settings : YAML file containing the settings -- loaded on initialization, but may be overridden in the driver files if settings are sts-ed
+
+If you want to back up your game files, the obj and usr folders are the important ones.  You can move these to a fresh ZMUSH server and basically pick up where you left off.  The entire code for the front end (HTML, JS and CSS) are freely editable in the site folder, allowing you to make any kind of UI you can think of as long as you understand the core, fairly simple, mechanism by which the front end talks to the server.  This is beyond the scope of this guide for now, but it's just basic jquery/ajax.
+
+There are some server-level settings which you might occassionally have to modify.  The Admin user (#0) can use the 'sts' zelazny keyword to interact with these settings, which is most commonly done in the main.z file in the "driver files" directory.  Here is a very simple version of main.z from 0.0.2:
+
+    ; This file is executed every time zmush starts.
+    {do
+        {sts startroom 1}
+        {log "Initialization zelazny has been run successfully"}
+    }
+
+Don't worry if the syntax doesn't make sense, we'll explain it later, but in particular the line:
+
+    {sts startroom 1}
+
+is an example of interacting with a setting.  In this case we're setting the StartRoom setting (where new PCs start the game) to #1, which is also the Master Room.  In a real game you wouldn't want to do this most of the time, but don't worry about that for now.  The settings you can interact with in this way are:
+
+    Name                Type        Action
+    AutoLinkExits       bool        If true, exits will automatically be turned into Action Links, allowing them to be clicked on
+    BreakOnException    bool        If true, the server will crash if an exception occurs.  You should basically never set this unless working on the C# code
+    LogQuotaExceeds     bool        If true, any time a Zelazny evaluation is stopped because of quota it will log some useful tracing information
+    MasterItem          int         ID of the Master Item, which is the default parent of every newly-created Item (default -1)
+    MasterPC            int         ID of the Master PC, which is the default parent of every newly-created PC (default -1)
+    MasterRoom          int         ID of the Master Room, which is the default parent of every newly-created room (default #1)
+    ShowHTTP            bool        If true, will show all HTTP requests in the log (VERY spammy, but can be useful for debugging)
+    StartRoom           int         ID of the room new PCs are created in
+
+#### RBAC
+
+ZMUSH has "Role-Based Access Control", also known as RBAC.  This allows you to finely control access to particular commands by creating your own system of user powers and entitlements.  As of the current version, this can only be modified by editing the Settings file, which is located in the root of your game directory.  This system will be expanded over time to include new functionality, but for now it is primarily used to control access to commands that can be run, and Flags that can be set.
+
+Here is the RBAC section from the default Settings file as of 0.0.2:
+
+    CommandPerms:
+      ? - '@create'
+        - '@cr'
+        - '@dig'
+      : - advanced
+      ? - '@tel'
+        - '@password'
+      : - basic
+    FlagPerms:
+      ? - Darksight
+      : - basic
+      ? - Dark
+      : - advanced
+    Roles:
+      wizard:
+      - basic
+      - advanced
+      moderatus:
+      - basic
+
+If you don't know YAML don't mess with this, but if you do the structure is fairly discoverable.  "CommandPerms" and "FlagPerms" determine which commands and flags require special permissions to access.  By default, every command is open, so as you add them to these collections you're restricting them to particular permissions.  The two permissions in this example are 'advanced' and 'basic'.
+
+The Roles collection determines which roles have which permissions (which in turn determines what they can do).  There is one special role, called "Admin", that can do EVERYTHING.  Stimpy, user #0, is an admin.  In general it's best to create a few other Admins as possible (ideally none), and to grant access to other functionality using this RBAC system.
+
+I intend to add commands to make RBAC easier in the future, so stay tuned.
 
 ## Rooms, Items, Characters and ZObjects in general
 
-Everything in ZMUSH is a ZObject, which is a fancy way of saying "a thing in the game world".  Rooms, items, exits and characters are all ZObjects.  
+Everything in ZMUSH is a ZObject, which is a fancy way of saying "a thing in the game world".  Rooms, items, exits and characters are all ZObjects.
 
 ...
 
@@ -274,6 +354,10 @@ It's {single {v outside} normal} here.
 @flag here=handler
 @attr here.$echo *=emit this %1
 @attr here.$1 *:*=do {emit here %2} {emit here %1}
+
+This is for the master room (using %a emits to the right person, not to the room itself):
+@flag here=handler
+@attr here.$test=emit %a "The test worked"
 
 
 ## Appendix:  Common Snippets and Libraries
