@@ -210,6 +210,11 @@ public static partial class Engine
                     return obj;
             }
         }
+        else if (int.TryParse(name, out var id))
+        {
+            if (Objects.TryGetValue(id, out var obj))
+                return obj;
+        }
 
         if (name == "this" || name == "self" || name == "me")
             return context;
@@ -241,6 +246,11 @@ public static partial class Engine
                 if (Objects.TryGetValue(id, out var obj))
                     return obj;
             }
+        }
+        else if (int.TryParse(name, out var id))
+        {
+            if (Objects.TryGetValue(id, out var obj))
+                return obj;
         }
 
         if (name == "this" || name == "self" || name == "me" || name == "here")

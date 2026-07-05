@@ -18,7 +18,7 @@ public class ZString
         }
     }
 
-    public List<string>? Registers = null;
+    public Registers? Registers = null;
 
     public static ZString operator +(ZString a, ZString b)
     {
@@ -156,7 +156,7 @@ public class ZString
         return evalled.TrimEnd();
     }
 
-    internal static string Eval(string s, ZObject context, ref int quota, List<string> registers)
+    internal static string Eval(string s, ZObject context, ref int quota, Registers? registers)
     {
         ZString zs = s;
         zs.Registers = registers;
@@ -169,7 +169,7 @@ public class ZString
         return zs.Evaluate(context, ref quota);
     }
 
-    internal static string Eval(string s, ZObject context, List<string> registers)
+    internal static string Eval(string s, ZObject context, Registers? registers)
     {
         ZString zs = s;
         zs.Registers = registers;

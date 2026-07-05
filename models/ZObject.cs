@@ -199,5 +199,33 @@ public class ZObject
 
         return null;
     }
+
+    internal string? GetAndEvalAttrValue(string name, Registers? registers = null, bool excludeParent = false)
+    {
+        int quota = -1;
+        return GetAndEvalAttrValue(name, ref quota, registers, excludeParent);
+    }
+
+    internal string? GetAndEvalAttrValue(string name, ref int quota, Registers? registers = null, bool excludeParent = false)
+    {
+        name = name.ToLowerInvariant();
+
+        var attr = Attrs.FirstOrDefault(a => a.Name.ToLowerInvariant() == name);
+        if (attr != null)
+            return ZString.Eval(attr.Value, this, ref quota, registers);
+
+        if (excludeParent)
+            return null;
+
+        var parentage = GetCompleteParentage();
+        foreach (var parent in parentage)
+        {
+            attr = parent.Attrs.FirstOrDefault(a => a.Name.ToLowerInvariant() == name);
+            if (attr != null)
+                return ZString.Eval(attr.Value, this, ref quota, registers);
+        }
+
+        return null;
+    }
 }
 

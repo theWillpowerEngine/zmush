@@ -132,6 +132,14 @@ U1 - U10
 S1 - S10
 
 
+### Special Attributes
+
+#### Exits
+
+    arriveMsg    Special Message to show when arriving (special registers:   %a %an)
+    leaveMsg     Special Message to show when leaving (special registers:   %a %an)
+    lockMsg      Special Message to show if the exit is locked to the person (private emit) (special registers:   %a %an)
+
 ### Handlers and Listeners
 
 ...
@@ -246,6 +254,17 @@ These can only be evaluated in special contexts, or by particular users
     {blah} - Action link (command = text)
     {blah:cmd} - Action link (text = blah, command = cmd)
     {<c> text} - Color text.  c = red, yellow, green, blue, purple
+
+### Special Escape Characters
+
+    %n    Newline
+    %s    Non-breaking space
+    %t    "tab" (4 spaces)
+    %%    % as a printable character
+
+    %1-9  Register value
+    %a    Actor's object id
+    %an   Actor's name
 
 ## Appendix:  Tutorial-level Snippers
 

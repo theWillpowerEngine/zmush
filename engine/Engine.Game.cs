@@ -757,27 +757,33 @@ public static partial class Engine
                 var exit = Objects.Values.FirstOrDefault(o => o.ZOT == ZObType.Exit && o.Location == user.Location && o.Name.ToLowerInvariant().Contains(kw));
                 if (exit != null)
                 {
+                    var registers = new Registers(user);
+
+                    var lockedMessage = exit.GetAttrValue("lockMsg") ?? "It's locked!";
+                    var dest = Objects.GetValueOrDefault(exit.Parent);
+                    var leaveMessage = exit.GetAttrValue("leaveMsg") ?? $"{user.Name} leaves, heading toward {dest?.Name ?? "somewhere"}.";
+                    var arriveMessage = exit.GetAttrValue("arriveMsg") ?? $"{user.Name} arrives from {Objects[user.Location].Name}.";
+
                     if (exit.Locks.Any(l => l.Item1 == "allow"))
                     {
                         if (!exit.Locks.Any(l => l.Item1 == "allow" && l.Item2 == "#" + session.UserId.ToString()))
                         {
-                            PlayerEmit(session.Key, $"It's locked!");
+                            PlayerEmit(session.Key, registers.ApplyToString(lockedMessage));
                             break;
                         }
                     }
                     else if (exit.Locks.Any(l => l.Item1 == "deny" && l.Item2 == "#" + session.UserId.ToString()))
                     {
-                        PlayerEmit(session.Key, $"It's locked!");
+                        PlayerEmit(session.Key, registers.ApplyToString(lockedMessage));
                         break;
                     }
 
-                    var dest = Objects.GetValueOrDefault(exit.Parent);
                     if (dest != null)
                     {
-                        RoomEmit(user.Location, $"{user.Name} leaves, heading toward {dest.Name}.");
+                        RoomEmit(user.Location, registers.ApplyToString(leaveMessage));
                         user.Location = dest.Id;
                         user.Save();
-                        RoomEmit(user.Location, $"{user.Name} arrives.");
+                        RoomEmit(user.Location, registers.ApplyToString(arriveMessage));
                     }
                     else
                     {
@@ -802,7 +808,7 @@ public static partial class Engine
                                 handlerVal = "{" + handlerVal + "}";
 
                             var registers = Matcher.ExtractCommandHandlerRegisters(command, a.Name.Substring(1));
-                            s = ZString.Eval(handlerVal, h, ref user.Quota, registers);
+                            s = ZString.Eval(handlerVal, h, ref user.Quota, new Registers(registers, user));
                             handled = true;
                         }
                     }

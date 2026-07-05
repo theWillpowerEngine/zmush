@@ -1,6 +1,6 @@
 public static class Interpreter
 {
-    internal static string Evaluate(Token toke, ZObject context, ref int quota, List<string>? registers = null)
+    internal static string Evaluate(Token toke, ZObject context, ref int quota, Registers? registers = null)
     {
         var list = toke.Children;
 
@@ -245,7 +245,7 @@ public static class Interpreter
         }
     }
 
-    private static string ParsePredicate(Token cmd, List<Token> rest, ZObject context, ref int quota, List<string>? registers = null)
+    private static string ParsePredicate(Token cmd, List<Token> rest, ZObject context, ref int quota, Registers? registers = null)
     {
         string s;
         //ZObject? o, o2;
@@ -300,9 +300,7 @@ public static class Interpreter
         }
     }
 
-    private static string[] RegisterNameIndexes = new string[] { "%1", "%2", "%3", "%4", "%5" };
-
-    private static string ParseValue(Token t, ZObject context, ref int quota, List<string>? registers = null)
+    private static string ParseValue(Token t, ZObject context, ref int quota, Registers? registers = null)
     {
         switch (t.TT)
         {
@@ -315,9 +313,21 @@ public static class Interpreter
             case TokenType.Name:
                 if (t.Value.StartsWith("%"))
                 {
-                    var idx = Array.IndexOf(RegisterNameIndexes, t.Value);
-                    if (idx >= 0 && registers != null && idx < registers.Count)
-                        return registers[idx];
+                    if (registers == null) return "";
+
+                    var registerName = t.Value.Substring(1);
+                    if (int.TryParse(registerName, out var idx) && registers != null && idx < registers.Numbered.Length)
+                        return registers.Numbered[idx];
+
+                    switch (registerName.ToLower())
+                    {
+                        case "a":
+                            return registers?.ActorId.ToString() ?? "";
+                        case "an":
+                            return registers?.ActorName ?? "";
+                        default:
+                            return "";
+                    }
                 }
 
                 return t.Value;

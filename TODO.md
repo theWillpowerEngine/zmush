@@ -1,6 +1,3 @@
-* Exits
-  * Lock and transport messages
-
 * WHO (use SpecialOutput)
 
 * A setting to turn off object auto-persistence and a timed save and @save command
@@ -13,16 +10,14 @@
 
 * Setting and implementation for multi character per user (will need UI too)
 
-* Add other registers (actor?  location?  The "master room emits in itself" problem)
-
-
 ### Changelogs
 
-#### 0.0.1 -> 0.0.2 
+#### 0.0.2 -> 0.0.3 
 
+* Added special registers %a (actor id) and %an (actor name)
 * Added custom command handlers, and 'handler' flag
 * Added @eval command
 * Added 'sts' and 'stg' keywords, and the concept of special zelazny keywords (sts) which can only be used in particular situations
-* Added keywords:  do, emit, match
+* Added keywords:  do, emit, log, match
 * Added singleton predicates:  ??
 * Added comparison predicates:  ?=, ?!
