@@ -281,6 +281,17 @@ public static partial class Engine
                     break;
                 }
 
+                if (subCmd == "list" || subCmd == "l")
+                {
+                    var attrList = "{bold Attributes for #" + o.Id + ":}%n";
+                    foreach (var a in o.Attrs)
+                    {
+                        attrList += $"%t{a.Name} = {a.Value}%n";
+                    }
+                    session.SpecialOutput.AppendLine(attrList.Replace("{", "%{").Replace("}", "%}"));
+                    break;
+                }
+
                 var attrName = attrParts.Length > 1 ? attrParts[1].ToLowerInvariant() : "";
                 if (string.IsNullOrWhiteSpace(attrName))
                 {
@@ -288,13 +299,16 @@ public static partial class Engine
                     break;
                 }
 
+                Attr attr;
+
                 switch (subCmd)
                 {
                     case "val":
                     case "v":
-                        if (o.Attrs.ContainsKey(attrName))
+                        attr = o.Attrs.FirstOrDefault(attr => attr.Name == attrName);
+                        if (attr != null)
                         {
-                            PlayerEmit(session.Key, $"#{o.Id} attribute '{attrName}' = '{o.Attrs[attrName]}'");
+                            PlayerEmit(session.Key, $"#{o.Id} attribute '{attrName}' = '{attr.Value}'");
                         }
                         else
                         {
@@ -302,30 +316,21 @@ public static partial class Engine
                         }
                         break;
 
-                    case "list":
-                    case "l":
-                        var attrList = "{bold Attributes for #" + o.Id + ":}%n";
-                        foreach (var kvp in o.Attrs)
-                        {
-                            attrList += $"%t{kvp.Key} = {kvp.Value}%n";
-                        }
-                        session.SpecialOutput.AppendLine(attrList);
-                        break;
-
                     case "clear":
                     case "c":
                     default:
-                        if (o.Attrs.ContainsKey(attrName))
+                        attr = o.Attrs.FirstOrDefault(a => a.Name == attrName);
+                        if (attr != null)
                         {
                             if (clear)
                             {
-                                o.Attrs.Remove(attrName);
+                                o.Attrs.Remove(attr);
                                 o.Save();
                                 PlayerEmit(session.Key, $"Removed '{attrName}' attribute from #{o.Id}");
                             }
                             else
                             {
-                                o.Attrs[attrName] = s2;
+                                attr.Value = s2;
                                 o.Save();
                                 PlayerEmit(session.Key, $"Set '{attrName}' attribute on #{o.Id} to '{s2}'");
                             }
@@ -338,7 +343,8 @@ public static partial class Engine
                             }
                             else
                             {
-                                o.Attrs[attrName] = s2;
+                                var newAttr = new Attr { Name = attrName, Value = s2 };
+                                o.Attrs.Add(newAttr);
                                 o.Save();
                                 PlayerEmit(session.Key, $"Set '{attrName}' attribute on #{o.Id} to '{s2}'");
                             }
@@ -739,6 +745,7 @@ public static partial class Engine
                 break;
 
             default:
+                //Exits name?
                 var exit = Objects.Values.FirstOrDefault(o => o.ZOT == ZObType.Exit && o.Location == user.Location && o.Name.ToLowerInvariant().Contains(kw));
                 if (exit != null)
                 {
@@ -770,13 +777,33 @@ public static partial class Engine
                     }
                     break;
                 }
-                else
-                {
-                    Log("hax", $"User #{session.UserId} attempted unknown command '{kw}'");
-                }
 
-                PlayerEmit(session.Key, $"Unknown command '{kw}'");
+                //Custom Command Handlers
+                var potentialHandlers = GetObjectsInScope(user, true).Where(z => z.HasFlag(Flag.Handler)).ToList();
+                bool handled = false;
+
+                foreach (var h in potentialHandlers)
+                {
+                    var attrs = h.Attrs.Where(nvp => nvp.Name.StartsWith("$") && Matcher.DoesInputMatchCommandHandler(command, nvp.Name.Substring(1))).ToList();
+                    if (attrs.Any())
+                    {
+                        foreach (var a in attrs)
+                        {
+                            var handlerVal = a.Value;
+                            if (!handlerVal.StartsWith("{"))
+                                handlerVal = "{" + handlerVal + "}";
+
+                            var registers = Matcher.ExtractCommandHandlerRegisters(command, a.Name.Substring(1));
+                            var evaled = ZString.Eval(handlerVal, h, ref user.Quota, registers);
+                            handled = true;
+                        }
+                    }
+                }
+                if (handled) break;
+
+                PlayerEmit(session.Key, $"I don't know how to '{command}'");
                 break;
+
         }
 
         return RenderFrame(session);

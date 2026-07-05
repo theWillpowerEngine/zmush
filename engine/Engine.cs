@@ -140,10 +140,10 @@ public static partial class Engine
     public static List<ZObject> GetObjectsInScope(ZObject scope, bool includeRoomHierarchy = false)
     {
         var ret = new List<ZObject>();
+        ret.Add(scope);
 
         List<int> locationsInScope = new List<int>() { scope.Id };
 
-        locationsInScope.Add(scope.Id);
         switch (scope.ZOT)
         {
             case ZObType.Room:
@@ -182,7 +182,7 @@ public static partial class Engine
                 throw new Exception($"Unknown ZObType {scope.ZOT} for object {scope.Id} in GetObjectsInScope");
         }
 
-        ret.AddRange(Objects.Values.Where(o => locationsInScope.Contains(o.Location)));
+        ret.AddRange(Objects.Values.Where(o => locationsInScope.Contains(o.Id) || locationsInScope.Contains(o.Location)));
         return ret;
     }
 
@@ -243,7 +243,7 @@ public static partial class Engine
             }
         }
 
-        if (name == "this" || name == "self" || name == "me")
+        if (name == "this" || name == "self" || name == "me" || name == "here")
             return context;
 
         var found = Objects.Values.FirstOrDefault(o => o.Name.ToLower() == name);

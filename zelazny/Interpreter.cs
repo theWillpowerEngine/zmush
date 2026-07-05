@@ -1,6 +1,6 @@
 public static class Interpreter
 {
-    internal static string Evaluate(Token toke, ZObject context, ref int quota)
+    internal static string Evaluate(Token toke, ZObject context, ref int quota, List<string>? registers = null)
     {
         var list = toke.Children;
 
@@ -31,7 +31,7 @@ public static class Interpreter
                 var ret = "";
                 for (var i = 1; i < list.Count; i++)
                 {
-                    ret = ParseValue(list[i], context, ref quota);
+                    ret = ParseValue(list[i], context, ref quota, registers);
                 }
                 return ret;
 
@@ -39,12 +39,12 @@ public static class Interpreter
                 if (list.Count != 3)
                     return "--Exception: 'emit' requires exactly 2 parameters--";
 
-                s = ParseValue(list[1], context, ref quota);
+                s = ParseValue(list[1], context, ref quota, registers);
                 o = Engine.GlobalFind(context, s);
                 if (o == null)
                     return $"--Exception: Object '{s}' not found--";
 
-                var emitVal = ParseValue(list[2], context, ref quota);
+                var emitVal = ParseValue(list[2], context, ref quota, registers);
 
                 switch (o.ZOT)
                 {
@@ -80,16 +80,16 @@ public static class Interpreter
             case "v":
                 if (list.Count == 3)
                 {
-                    var oVName = ParseValue(list[1], context, ref quota);
+                    var oVName = ParseValue(list[1], context, ref quota, registers);
                     var oV = Engine.Find(context, oVName);
                     if (oV == null)
                         return $"--Exception: Object '{oVName}' not found--";
 
-                    return oV.GetAttrValue(ParseValue(list[2], context, ref quota)) ?? "";
+                    return oV.GetAttrValue(ParseValue(list[2], context, ref quota, registers)) ?? "";
                 }
                 else if (list.Count == 2)
                 {
-                    return context.GetAttrValue(ParseValue(list[1], context, ref quota)) ?? "";
+                    return context.GetAttrValue(ParseValue(list[1], context, ref quota, registers)) ?? "";
                 }
                 else
                     return "--Exception: 'val' requires 1 or 2 parameters--";
@@ -100,7 +100,7 @@ public static class Interpreter
 
                 for (var i = 1; i < list.Count; i++)
                 {
-                    var val = ParseValue(list[i], context, ref quota);
+                    var val = ParseValue(list[i], context, ref quota, registers);
                     if (!string.IsNullOrWhiteSpace(val))
                         return val;
                 }
@@ -110,7 +110,7 @@ public static class Interpreter
                 if (list.Count != 2)
                     return "--Exception: 'stg' requires exactly 1 parameter--";
 
-                s = ParseValue(list[1], context, ref quota) ?? "";
+                s = ParseValue(list[1], context, ref quota, registers) ?? "";
                 switch (s.ToLower())
                 {
                     case "showhttp":
@@ -141,8 +141,8 @@ public static class Interpreter
                 if (list.Count != 3)
                     return "--Exception: 'sts' requires exactly 2 parameters--";
 
-                s = ParseValue(list[1], context, ref quota) ?? "";
-                s2 = ParseValue(list[2], context, ref quota) ?? "";
+                s = ParseValue(list[1], context, ref quota, registers) ?? "";
+                s2 = ParseValue(list[2], context, ref quota, registers) ?? "";
                 var valIsTruthy = s2 != "0" && s2 != "" && s2.ToLower() != "false" && s2.ToLower() != "no";
 
                 var isANumber = int.TryParse(s2, out var numVal);
@@ -191,9 +191,33 @@ public static class Interpreter
         }
     }
 
-    private static string ParseValue(Token t, ZObject context, ref int quota)
+    private static string[] RegisterNameIndexes = new string[] { "%1", "%2", "%3", "%4", "%5" };
+
+    private static string ParseValue(Token t, ZObject context, ref int quota, List<string>? registers = null)
     {
-        if (t.TT == TokenType.Code) return Evaluate(t, context, ref quota);
+        switch (t.TT)
+        {
+            case TokenType.Code:
+                return Evaluate(t, context, ref quota, registers);
+
+            case TokenType.Tag:
+                return GetTagValue(t);
+
+            case TokenType.Name:
+                if (t.Value.StartsWith("%"))
+                {
+                    var idx = Array.IndexOf(RegisterNameIndexes, t.Value);
+                    if (idx >= 0 && registers != null && idx < registers.Count)
+                        return registers[idx];
+                }
+
+                return t.Value;
+
+            default:
+                return t.Value;
+        }
+
+        if (t.TT == TokenType.Code) return Evaluate(t, context, ref quota, registers);
 
         return t.Value;
 

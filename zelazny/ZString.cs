@@ -18,6 +18,8 @@ public class ZString
         }
     }
 
+    public List<string>? Registers = null;
+
     public static ZString operator +(ZString a, ZString b)
     {
         return new ZString { S = a.S + b.S };
@@ -137,7 +139,7 @@ public class ZString
                     if (quota == 0)
                         return "[Limit:  Quota exceeded]";
 
-                    evalled += Interpreter.Evaluate(token, context, ref quota) + " ";
+                    evalled += Interpreter.Evaluate(token, context, ref quota, Registers) + " ";
                     break;
 
                 case TokenType.Tag:
@@ -154,12 +156,25 @@ public class ZString
         return evalled.TrimEnd();
     }
 
+    internal static string Eval(string s, ZObject context, ref int quota, List<string> registers)
+    {
+        ZString zs = s;
+        zs.Registers = registers;
+        return zs.Evaluate(context, ref quota);
+    }
+
     internal static string Eval(string s, ZObject context, ref int quota)
     {
         ZString zs = s;
         return zs.Evaluate(context, ref quota);
     }
 
+    internal static string Eval(string s, ZObject context, List<string> registers)
+    {
+        ZString zs = s;
+        zs.Registers = registers;
+        return zs.Evaluate(context);
+    }
     internal static string Eval(string s, ZObject context)
     {
         ZString zs = s;

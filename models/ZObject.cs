@@ -12,9 +12,16 @@ public enum Flag
 {
     Dark,
     Darksight,
+    Handler,
 
     U1, U2, U3, U4, U5, U6, U7, U8, U9, U10,
     S1, S2, S3, S4, S5, S6, S7, S8, S9, S10,
+}
+
+public class Attr
+{
+    public string Name = "";
+    public string Value = "";
 }
 
 public class ZObject
@@ -27,7 +34,7 @@ public class ZObject
     public int Quota = -1;
 
     public HashSet<Flag> Flags = new();
-    public Dictionary<string, string> Attrs = new();
+    public List<Attr> Attrs = new();
 
     public int Owner;
     public List<(string, string)> Locks = new();
@@ -41,8 +48,17 @@ public class ZObject
     public static ZObject FromYaml(string yaml)
     {
         var deserializer = new YamlDotNet.Serialization.Deserializer();
-        var obj = deserializer.Deserialize<ZObject>(yaml);
-        return obj;
+        try
+        {
+            var obj = deserializer.Deserialize<ZObject>(yaml);
+            return obj;
+        }
+        catch (Exception ex)
+        {
+            Engine.Log("CRITICAL", $"Failed to deserialize ZObject from YAML: {ex.Message}");
+            Engine.Log("CRITICAL", $"YAML Content: {yaml}");
+            throw;
+        }
     }
 
     public string ToYaml()
@@ -165,8 +181,10 @@ public class ZObject
     internal string? GetAttrValue(string name, bool excludeParent = false)
     {
         name = name.ToLowerInvariant();
-        if (Attrs.ContainsKey(name))
-            return Attrs[name];
+
+        var attr = Attrs.FirstOrDefault(a => a.Name.ToLowerInvariant() == name);
+        if (attr != null)
+            return attr.Value;
 
         if (excludeParent)
             return null;
@@ -174,8 +192,9 @@ public class ZObject
         var parentage = GetCompleteParentage();
         foreach (var parent in parentage)
         {
-            if (parent.Attrs.ContainsKey(name))
-                return parent.Attrs[name];
+            attr = parent.Attrs.FirstOrDefault(a => a.Name.ToLowerInvariant() == name);
+            if (attr != null)
+                return attr.Value;
         }
 
         return null;

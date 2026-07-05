@@ -113,7 +113,7 @@ The locks detailed above are the "access" locks, which can go on any ZObject and
 
     fixed       -           Item        Item        Only those with access to the ZObject can pick it up or drop it
     static      -           Item        Item        Cannot be picked up or dropped (the static lock has to be removed first)
-
+ 
     allow       Id          Exit        Exit        Allow certain people (locked otherwise.  Can't combine with deny)
     deny        Id          Exit        Exit        Deny certain people (unlocked otherwise.  Can't combine with allow)
 
@@ -122,9 +122,14 @@ The locks detailed above are the "access" locks, which can go on any ZObject and
 
 Dark
 Darksight
+Handler (enables command handlers)
 U1 - U10
 S1 - S10
 
+
+### Handlers and Listeners
+
+...
 
 ## First Login - Basic Tutorial
 
@@ -214,7 +219,9 @@ These can only be evaluated in special contexts, or by particular users
 @attr here.outside=sunny
 It's {single {v outside} normal} here.
 
-
+@flag here=handler
+@attr here.$echo *=emit this %1
+@attr here.$1 *:*=do {emit here %2} {emit here %1}
 
 
 ## Appendix:  Common Snippets and Libraries

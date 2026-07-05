@@ -1,6 +1,3 @@
-* Objects:
-  * Custom commands
-
 * Exits
   * Lock and transport messages
 
@@ -24,3 +21,4 @@
 
 * Added 'sts' and 'stg' keywords, and the concept of special zelazny keywords (sts) which can only be used in particular situations
 * Added 'emit' and 'do' keywords
+* Added custom command handlers, and 'handler' flag
