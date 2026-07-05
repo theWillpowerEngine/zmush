@@ -14,7 +14,7 @@ class HttpGameSession : HttpSession
 {
     public HttpGameSession(NetCoreServer.HttpServer server) : base(server) { }
 
-    protected FrameModel GetFrame(SessionModel session, string existingText = null)
+    protected FrameModel GetFrame(SessionModel session, string? existingText = null)
     {
         var text = existingText ?? Engine.RenderFrame(session);
         var logs = Engine.GetLog(session, true);
@@ -24,7 +24,7 @@ class HttpGameSession : HttpSession
             logs = logs
         };
     }
-    protected bool SendFrameResponse(SessionModel session, string existingText = null)
+    protected bool SendFrameResponse(SessionModel session, string? existingText = null)
     {
         var frame = GetFrame(session, existingText);
         var json = JsonSerializer.Serialize(frame);

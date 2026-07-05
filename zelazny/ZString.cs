@@ -77,13 +77,18 @@ public class ZString
         return z?.S ?? "";
     }
 
-    public override bool Equals(object obj)
+    public override bool Equals(object? obj)
     {
         if (obj is ZString zs)
             return S == zs.S;
         if (obj is string s)
             return S == s;
         return false;
+    }
+
+    public override int GetHashCode()
+    {
+        return S.GetHashCode();
     }
 
     public override string ToString()

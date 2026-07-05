@@ -23,3 +23,4 @@
 #### 0.0.1 -> 0.0.2 
 
 * Added 'sts' and 'stg' keywords, and the concept of special zelazny keywords (sts) which can only be used in particular situations
+* Added 'emit' and 'do' keywords

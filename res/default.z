@@ -1,1 +1,3 @@
-Hello Nurse!
+{do
+    {sts startroom 1}
+}

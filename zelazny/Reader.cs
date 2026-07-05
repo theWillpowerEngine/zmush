@@ -54,6 +54,8 @@ public static class Reader
 {
     private static List<string> KWs = new()
     {
+        "emit",
+        "do",
         "single",
         "stg", "sts",
         "val", "v",
@@ -286,7 +288,7 @@ public static class Reader
             case 'n':
                 return "<br />";
             default:
-                return lookAhead.ToString();
+                return lookAhead?.ToString() ?? "";
         }
     }
 }

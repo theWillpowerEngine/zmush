@@ -18,28 +18,28 @@ public abstract class BaseModel<T> where T : new()
 
 public class AuthModel : BaseModel<AuthModel>
 {
-    public string u;
-    public string p;
+    public string u = "";
+    public string p = "";
 }
 
 //Not a BaseModel (this one gets JSON deserialized, not YAMLfied)
 public class CommandModel
 {
-    public string sessionId { get; set; }
-    public string command { get; set; }
+    public string sessionId { get; set; } = "";
+    public string command { get; set; } = "";
 }
 
 public class FrameModel
 {
-    public string text { get; set; }
-    public string[] logs { get; set; }
+    public string text { get; set; } = "";
+    public string[] logs { get; set; } = [];
 }
 
 public class SessionModel : BaseModel<SessionModel>
 {
-    public string Key;
+    public string Key = "";
     public int UserId;
-    public string LoginName;
+    public string LoginName = "";
     public HashSet<string> Roles = new HashSet<string>();
 
     public StringBuilder SpecialOutput = new();

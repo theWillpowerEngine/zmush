@@ -186,6 +186,10 @@ S1 - S10
 
 ## Zelazny Reference
 
+    do <val>... - Evaluate each value and return the last one
+
+    emit <obj> <message> - Send a message.  Context sensitive (can send to a player, a room or even an item)
+
     single <val>... - Returns the first of the values that follow it that isn't empty.
 
     stg <setting> - Gets the Engine Setting specified (see "Settings, Roles and Permissions" earlier in this guide for more info on Engine Settings)

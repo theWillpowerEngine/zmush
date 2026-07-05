@@ -48,7 +48,7 @@ public class Settings : BaseModel<Settings>
         { "moderatus", new HashSet<string>() { "basic" } }
     };
 
-    private List<string> _protectedCommands = null;
+    private List<string>? _protectedCommands = null;
     [YamlIgnore]
     public List<string> ProtectedCommands => _protectedCommands ??= CommandPerms.Keys.SelectMany(k => k).ToList();
 }

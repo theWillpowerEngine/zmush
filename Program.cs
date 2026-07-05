@@ -3,7 +3,7 @@
 var serverRoot = "/home/malf/z";
 //Engine.Settings.OverrideSiteDirectory = "/home/malf/code/zmush/res/site";     //Uncomment this when editing site files for testing, it makes reloading ez.
 
-CLA opts = null;
+CLA? opts = null;
 
 Parser.Default.ParseArguments<CLA>(args).WithParsed<CLA>(o => { opts = o; });
 

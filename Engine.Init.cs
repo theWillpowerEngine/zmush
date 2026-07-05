@@ -1,6 +1,6 @@
 public static partial class Engine
 {
-    public static string RootPath { get; private set; }
+    public static string RootPath { get; private set; } = "";
     public static string DriverPath => Path.Combine(RootPath, "drv") + Path.DirectorySeparatorChar;
     public static string PlayerPath => Path.Combine(RootPath, "usr") + Path.DirectorySeparatorChar;
     public static string ObjectPath => Path.Combine(RootPath, "obj") + Path.DirectorySeparatorChar;

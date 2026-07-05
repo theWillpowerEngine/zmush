@@ -94,6 +94,24 @@ public static partial class Engine
         while (log.Count > 100)
             log.RemoveAt(0);
     }
+    public static void PlayerEmit(ZObject pc, string message)
+    {
+        if (pc.ZOT != ZObType.Character)
+            throw new Exception($"PlayerEmit called with non-PC object {pc.Id} of type {pc.ZOT}");
+
+        var session = Sessions.Values.FirstOrDefault(s => s.UserId == pc.Id);
+        if (session == null)
+        {
+            Log("dev", $"PlayerEmit called for PC {pc.Id} but no session was found for that user.");
+            return;
+        }
+
+        var log = Logs.GetOrAdd(session.Key, _ => new List<string>());
+        log.Add(message);
+
+        while (log.Count > 100)
+            log.RemoveAt(0);
+    }
 
     public static void RoomEmit(int roomId, string message)
     {
@@ -168,7 +186,7 @@ public static partial class Engine
         return ret;
     }
 
-    public static ZObject Find(int userId, string name, bool localRoomOnly = false)
+    public static ZObject? Find(int userId, string name, bool localRoomOnly = false)
     {
         if (!Objects.TryGetValue(userId, out var user))
             return null;
@@ -202,12 +220,33 @@ public static partial class Engine
         if (room != null && room.Name.ToLowerInvariant().StartsWith(name))
             return room;
 
-        name = name.ToLowerInvariant();
         var found = Objects.Values.FirstOrDefault(o => o.Location == location && o.Name.ToLower().StartsWith(name));
         if (found != null) return found;
 
         var inScope = GetObjectsInScope(context, !localRoomOnly);
         found = inScope.FirstOrDefault(o => o.Name.ToLower().StartsWith(name));
+        if (found != null) return found;
+
+        return null;
+    }
+
+    public static ZObject? GlobalFind(ZObject context, string name)
+    {
+        name = name.ToLower().Trim();
+
+        if (name.StartsWith("#"))
+        {
+            if (int.TryParse(name.Substring(1), out var id))
+            {
+                if (Objects.TryGetValue(id, out var obj))
+                    return obj;
+            }
+        }
+
+        if (name == "this" || name == "self" || name == "me")
+            return context;
+
+        var found = Objects.Values.FirstOrDefault(o => o.Name.ToLower() == name);
         if (found != null) return found;
 
         return null;

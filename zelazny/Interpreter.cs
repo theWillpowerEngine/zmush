@@ -20,9 +20,62 @@ public static class Interpreter
             quota -= 1;
 
         string s, s2;
+        ZObject? o, o2;
 
         switch (cmd.Value)
         {
+            case "do":
+                if (list.Count < 2)
+                    return "--Exception: 'do' requires at least 1 parameter--";
+
+                var ret = "";
+                for (var i = 1; i < list.Count; i++)
+                {
+                    ret = ParseValue(list[i], context, ref quota);
+                }
+                return ret;
+
+            case "emit":
+                if (list.Count != 3)
+                    return "--Exception: 'emit' requires exactly 2 parameters--";
+
+                s = ParseValue(list[1], context, ref quota);
+                o = Engine.GlobalFind(context, s);
+                if (o == null)
+                    return $"--Exception: Object '{s}' not found--";
+
+                var emitVal = ParseValue(list[2], context, ref quota);
+
+                switch (o.ZOT)
+                {
+                    case ZObType.Room:
+                        Engine.RoomEmit(o.Id, emitVal);
+                        break;
+
+                    case ZObType.Character:
+                        Engine.PlayerEmit(o, emitVal);
+                        break;
+
+                    case ZObType.Item:
+                        o2 = Engine.Objects[o.Location];
+                        switch (o2.ZOT)
+                        {
+                            case ZObType.Room:
+                                Engine.RoomEmit(o2.Id, emitVal);
+                                break;
+                            case ZObType.Character:
+                                Engine.PlayerEmit(o2, emitVal);
+                                break;
+                            default:
+                                return $"--Exception: Cannot emit to item located in object type {o2.ZOT}--";
+                        }
+                        break;
+
+                    default:
+                        return $"--Exception: Cannot emit to object type {o.ZOT}--";
+                }
+                return emitVal;
+
             case "val":
             case "v":
                 if (list.Count == 3)

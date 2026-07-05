@@ -36,7 +36,7 @@ public static partial class Engine
         }
 
         var isAdmin = session.Roles.Contains("admin");
-        ZObject o, o2;
+        ZObject? o, o2;
         string s, s2;
 
         string? subCmd = null;
@@ -594,6 +594,12 @@ public static partial class Engine
             case "!password":
                 (s, s2) = GetNamedValue(rest);
                 var dbU2 = User.Load(session.LoginName);
+                if (dbU2 == null)
+                {
+                    PlayerEmit(session.Key, $"I can't find your user record.  This should never happen.");
+                    Log("CRITICAL", $"User #{session.UserId} has no user record.  This should never happen.");
+                    break;
+                }
                 if (!dbU2.IsPasswordValid(s))
                 {
                     PlayerEmit(session.Key, $"Current password is incorrect.");

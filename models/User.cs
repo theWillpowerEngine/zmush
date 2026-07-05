@@ -1,14 +1,14 @@
-using DevOne.Security.Cryptography.BCrypt;
+using BC = BCrypt.Net.BCrypt;
 
 public class User
 {
-    public string Name;
+    public string Name = "";
     public int Id;
 
-    public string HashedPW;
-    public string Salt;
+    public string HashedPW = "";
+    public string Salt = "";
 
-    public string Version;
+    public string Version = "";
 
     public HashSet<string> Roles = new();
 
@@ -24,13 +24,13 @@ public class User
 
     public void SetPassword(string password)
     {
-        Salt = BCryptHelper.GenerateSalt();
-        HashedPW = BCryptHelper.HashPassword(password, Salt);
+        Salt = BC.GenerateSalt();
+        HashedPW = BC.HashPassword(password, Salt);
     }
 
     public bool IsPasswordValid(string password)
     {
-        var hashed = BCryptHelper.HashPassword(password, Salt);
+        var hashed = BC.HashPassword(password, Salt);
         return hashed == HashedPW;
     }
 
