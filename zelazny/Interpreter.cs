@@ -22,6 +22,9 @@ public static class Interpreter
         string s, s2;
         ZObject? o, o2;
 
+        if (cmd.Value.StartsWith("?"))
+            return ParsePredicate(cmd, list.Skip(1).ToList(), context, ref quota, registers);
+
         switch (cmd.Value)
         {
             case "do":
@@ -157,9 +160,9 @@ public static class Interpreter
 
                 s = ParseValue(list[1], context, ref quota, registers) ?? "";
                 s2 = ParseValue(list[2], context, ref quota, registers) ?? "";
-                var valIsTruthy = s2 != "0" && s2 != "" && s2.ToLower() != "false" && s2.ToLower() != "no";
-
+                var valIsTruthy = Matcher.IsTruthy(s2);
                 var isANumber = int.TryParse(s2, out var numVal);
+
                 switch (s.ToLower())
                 {
                     case "showhttp":
@@ -217,6 +220,47 @@ public static class Interpreter
                 }
                 else
                     return "--Exception: 'val' requires 1 or 2 parameters--";
+
+            default:
+                return $"--Exception: Unknown command '{cmd.Value}'--";
+        }
+    }
+
+    private static string ParsePredicate(Token cmd, List<Token> rest, ZObject context, ref int quota, List<string>? registers = null)
+    {
+        string s, s2;
+        ZObject? o, o2;
+
+        var checkVal = ParseValue(rest[0], context, ref quota, registers);
+        var singletonHasFalse = rest.Count == 3;
+        var singletonIsSimple = rest.Count == 1;
+        var comparisonHasFalse = rest.Count == 4;
+        var comparisonIsSimple = rest.Count == 2;
+        var isValidSingleton = singletonHasFalse || singletonIsSimple || rest.Count == 2;
+        var isValidComparison = comparisonHasFalse || comparisonIsSimple || rest.Count == 3;
+
+        switch (cmd.Value)
+        {
+            case "??":
+                return "";
+
+            case "?!":
+                return "";
+
+            case "?any":
+                if (!isValidSingleton)
+                    return $"--Exception: '?any' requires 2 or 3 parameters--";
+                if (Matcher.IsTruthy(checkVal))
+                {
+                    if (singletonIsSimple) return "1";
+                    return ParseValue(rest[1], context, ref quota, registers);
+                }
+                else if (singletonHasFalse)
+                    return ParseValue(rest[2], context, ref quota, registers);
+                else if (singletonIsSimple)
+                    return "0";
+                else
+                    return "";
 
             default:
                 return $"--Exception: Unknown command '{cmd.Value}'--";

@@ -71,4 +71,10 @@ public static class Matcher
         }
         return ret;
     }
+
+    public static bool IsTruthy(string val)
+    {
+        var valIsTruthy = val != "0" && val != "" && val.ToLower() != "false" && val.ToLower() != "no";
+        return valIsTruthy;
+    }
 }

@@ -74,6 +74,9 @@ While you're in the client, you can scroll through your past commands with the u
 CRITICAL
 hax
 WARN
+net
+quota
+
 
 ### Settings, Roles and Permissions
 
@@ -205,6 +208,28 @@ S1 - S10
 
     val (v) <attr> - Get value of attribute from context
     val (v) <obj> <attr> - Get alue of attribute from object
+
+### Predicates
+
+There are two formats a predicate can appear in.  They are, singleton predicates:
+
+    <pred> <val> [<true> [<false>]]
+
+And comparison predicates:
+
+    <pred> <val1> <val2> [<true> [<false>]]
+
+The singleton predicates are:
+
+    Predicate       Description
+    ??              if the value is truthy
+    ?!              if the value is falsey
+
+    ?any            if the value is not empty
+
+And the comparison predicates are:
+
+     Predicate       Description
 
 ### Special Zelazny Commands
 

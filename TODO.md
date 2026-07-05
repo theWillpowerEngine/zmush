@@ -1,3 +1,5 @@
+* ?? and ?! preds
+
 * Exits
   * Lock and transport messages
 
@@ -21,6 +23,8 @@
 
 #### 0.0.1 -> 0.0.2 
 
+* Added custom command handlers, and 'handler' flaG
 * Added 'sts' and 'stg' keywords, and the concept of special zelazny keywords (sts) which can only be used in particular situations
 * Added keywords:  do, emit, match
-* Added custom command handlers, and 'handler' flaG
+* Added singleton predicates:  ?any
+* Added comparison predicates:  ??, ?!

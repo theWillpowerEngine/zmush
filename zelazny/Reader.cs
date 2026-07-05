@@ -54,6 +54,7 @@ public static class Reader
 {
     private static List<string> KWs = new()
     {
+        "??", "?!", "?any",
         "emit",
         "do",
         "match",
