@@ -28,6 +28,31 @@ public class Registers
         s = s.Replace("%an", ActorName);
         s = s.Replace("%a", ActorId.ToString());
 
+        var actor = Engine.Objects[ActorId];
+        var pronoun = actor.Male switch
+        {
+            true => "he",
+            false => "she",
+            null => "it"
+        };
+        s = s.Replace("%as", pronoun);
+
+        pronoun = actor.Male switch
+        {
+            true => "him",
+            false => "her",
+            null => "it"
+        };
+        s = s.Replace("%ao", pronoun);
+
+        pronoun = actor.Male switch
+        {
+            true => "his",
+            false => "hers",
+            null => "its"
+        };
+        s = s.Replace("%ap", pronoun);
+
         return s;
     }
 }

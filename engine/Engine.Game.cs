@@ -224,6 +224,25 @@ public static partial class Engine
 
                 if (!Enum.TryParse<Flag>(s2, true, out var flag))
                 {
+                    if (s2.ToLowerInvariant() == "male" || s2.ToLowerInvariant() == "m")
+                    {
+                        o.Male = true;
+                        PlayerEmit(session.Key, $"#{o.Id} is now male.");
+                        break;
+                    }
+                    else if (s2.ToLowerInvariant() == "female" || s2.ToLowerInvariant() == "f")
+                    {
+                        o.Male = false;
+                        PlayerEmit(session.Key, $"#{o.Id} is now female.");
+                        break;
+                    }
+                    else if (s2.ToLowerInvariant() == "neuter" || s2.ToLowerInvariant() == "n")
+                    {
+                        o.Male = null;
+                        PlayerEmit(session.Key, $"#{o.Id} is now neuter.");
+                        break;
+                    }
+
                     PlayerEmit(session.Key, $"'{s2}' is not a valid flag.");
                     break;
                 }

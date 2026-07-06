@@ -211,6 +211,10 @@ Handler (enables command handlers)
 U1 - U10
 S1 - S10
 
+Male
+Female
+Neuter
+
 
 ### Special Attributes
 
@@ -343,8 +347,12 @@ These can only be evaluated in special contexts, or by particular users
     %%    % as a printable character
 
     %1-9  Register value
+
     %a    Actor's object id
     %an   Actor's name
+    %as   Subjective pronoun (he/she/it) %As to capitalize it
+    %ao   Objective pronoun (him/her/it) %Ao to capitalize it
+    %ap   Possessive pronoun (his/hers/its) %Ap to capitalize it
 
 ## Appendix:  Tutorial-level Snippers
 

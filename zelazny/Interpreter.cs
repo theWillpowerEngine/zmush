@@ -319,17 +319,69 @@ public static class Interpreter
                     if (int.TryParse(registerName, out var idx) && registers != null && idx < registers.Numbered.Length)
                         return registers.Numbered[idx];
 
-                    switch (registerName.ToLower())
+                    ZObject? actor;
+                    switch (registerName)
                     {
                         case "a":
                             return registers?.ActorId.ToString() ?? "";
                         case "an":
                             return registers?.ActorName ?? "";
+
+                        case "as":
+                            actor = Engine.Objects[registers.ActorId];
+                            return actor.Male switch
+                            {
+                                true => "he",
+                                false => "she",
+                                null => "it"
+                            };
+                        case "As":
+                            actor = Engine.Objects[registers.ActorId];
+                            return actor.Male switch
+                            {
+                                true => "He",
+                                false => "She",
+                                null => "It"
+                            };
+
+                        case "ao":
+                            actor = Engine.Objects[registers.ActorId];
+                            return actor.Male switch
+                            {
+                                true => "him",
+                                false => "her",
+                                null => "it"
+                            };
+                        case "Ao":
+                            actor = Engine.Objects[registers.ActorId];
+                            return actor.Male switch
+                            {
+                                true => "Him",
+                                false => "Her",
+                                null => "It"
+                            };
+
+                        case "ap":
+                            actor = Engine.Objects[registers.ActorId];
+                            return actor.Male switch
+                            {
+                                true => "his",
+                                false => "hers",
+                                null => "its"
+                            };
+                        case "Ap":
+                            actor = Engine.Objects[registers.ActorId];
+                            return actor.Male switch
+                            {
+                                true => "His",
+                                false => "Hers",
+                                null => "Its"
+                            };
+
                         default:
                             return "";
                     }
                 }
-
                 return t.Value;
 
             default:

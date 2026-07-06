@@ -29,6 +29,8 @@ public class ZObject
     public int Id;
     public ZObType ZOT;
 
+    public bool? Male = null;       //null = it
+
     public int Parent = -1;
     public int Location = -1;
     public int Quota = -1;
