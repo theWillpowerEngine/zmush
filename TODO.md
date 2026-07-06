@@ -1,3 +1,6 @@
+* Ways to create strings in Zelazny (concat being the basic one)
+* @decompile
+
 * WHO (use SpecialOutput)
 
 * A setting to turn off object auto-persistence and a timed save and @save command
@@ -14,7 +17,7 @@
 
 #### 0.0.2 -> 0.0.3 
 
-* Added special registers %a (actor id) and %an (actor name) along with numbered registers %1-%9
+* Added special registers like %a (actor id), %an (actor name) and the various pronouns (%as, %ao, %ap) along with numbered registers %1-%9
 * Added custom command handlers, and 'handler' flag
 * Added @eval command
 * Added 'sts' and 'stg' keywords, and the concept of special zelazny keywords (sts) which can only be used in particular situations

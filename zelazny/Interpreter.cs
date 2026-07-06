@@ -327,6 +327,10 @@ public static class Interpreter
                         case "an":
                             return registers?.ActorName ?? "";
 
+                        case "l":
+                            actor = Engine.Objects[registers.ActorId];
+                            return actor.Location.ToString();
+
                         case "as":
                             actor = Engine.Objects[registers.ActorId];
                             return actor.Male switch

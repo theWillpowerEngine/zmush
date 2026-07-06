@@ -29,6 +29,8 @@ public class Registers
         s = s.Replace("%a", ActorId.ToString());
 
         var actor = Engine.Objects[ActorId];
+        s = s.Replace("%l", actor.Location.ToString());
+
         var pronoun = actor.Male switch
         {
             true => "he",

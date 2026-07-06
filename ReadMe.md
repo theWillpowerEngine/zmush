@@ -353,6 +353,7 @@ These can only be evaluated in special contexts, or by particular users
     %as   Subjective pronoun (he/she/it) %As to capitalize it
     %ao   Objective pronoun (him/her/it) %Ao to capitalize it
     %ap   Possessive pronoun (his/hers/its) %Ap to capitalize it
+    %l    Actor's location
 
 ## Appendix:  Tutorial-level Snippers
 
