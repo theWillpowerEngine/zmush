@@ -369,6 +369,8 @@ public static class Interpreter
                 {
                     if (registers == null) return "";
 
+                    var actorId = registers.ActorId;
+
                     var registerName = t.Value.Substring(1);
                     if (int.TryParse(registerName, out var idx) && registers != null && idx < registers.Numbered.Length)
                         return registers.Numbered[idx];
@@ -382,11 +384,11 @@ public static class Interpreter
                             return registers?.ActorName ?? "";
 
                         case "l":
-                            actor = Engine.Objects[registers.ActorId];
+                            actor = Engine.Objects[actorId];
                             return actor.Location.ToString();
 
                         case "as":
-                            actor = Engine.Objects[registers.ActorId];
+                            actor = Engine.Objects[actorId];
                             return actor.Male switch
                             {
                                 true => "he",
@@ -394,7 +396,7 @@ public static class Interpreter
                                 null => "it"
                             };
                         case "As":
-                            actor = Engine.Objects[registers.ActorId];
+                            actor = Engine.Objects[actorId];
                             return actor.Male switch
                             {
                                 true => "He",
@@ -403,7 +405,7 @@ public static class Interpreter
                             };
 
                         case "ao":
-                            actor = Engine.Objects[registers.ActorId];
+                            actor = Engine.Objects[actorId];
                             return actor.Male switch
                             {
                                 true => "him",
@@ -411,7 +413,7 @@ public static class Interpreter
                                 null => "it"
                             };
                         case "Ao":
-                            actor = Engine.Objects[registers.ActorId];
+                            actor = Engine.Objects[actorId];
                             return actor.Male switch
                             {
                                 true => "Him",
@@ -420,7 +422,7 @@ public static class Interpreter
                             };
 
                         case "ap":
-                            actor = Engine.Objects[registers.ActorId];
+                            actor = Engine.Objects[actorId];
                             return actor.Male switch
                             {
                                 true => "his",
@@ -428,7 +430,7 @@ public static class Interpreter
                                 null => "its"
                             };
                         case "Ap":
-                            actor = Engine.Objects[registers.ActorId];
+                            actor = Engine.Objects[actorId];
                             return actor.Male switch
                             {
                                 true => "His",

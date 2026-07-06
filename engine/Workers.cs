@@ -40,6 +40,9 @@ public static class Workers
             return;
         }
 
+        //Deep copy to avoid concurrency issues
+        toSave = toSave.Select(z => ZObject.FromYaml(z.ToYaml())).ToList();
+
         Engine.Log($"Saving {toSave.Count} dirty objects...");
         var start = DateTime.Now;
         foreach (var z in toSave)
