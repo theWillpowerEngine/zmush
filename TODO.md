@@ -1,4 +1,3 @@
-* Ways to create strings in Zelazny (concat being the basic one)
 * @decompile
 
 * WHO (use SpecialOutput)
@@ -13,6 +12,9 @@
 
 * Setting and implementation for multi character per user (will need UI too)
 
+* Consider a queueing system for commands to avoid speed-spamming the endpoint
+  * Take this chance to actually hook up quota too?
+
 ### Changelogs
 
 #### 0.0.2 -> 0.0.3 
@@ -21,6 +23,7 @@
 * Added custom command handlers, and 'handler' flag
 * Added @eval command
 * Added 'sts' and 'stg' keywords, and the concept of special zelazny keywords (sts) which can only be used in particular situations
-* Added keywords:  do, emit, log, match
+* Added keywords:  concat, do, emit, log, match, string
 * Added singleton predicates:  ??
 * Added comparison predicates:  ?=, ?!
+* Added reader shortcut for 'string' keyword (ticks as string delimiters)

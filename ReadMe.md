@@ -290,6 +290,8 @@ Neuter
 
 ## Zelazny Reference
 
+    concat <val> <val>... - Combine into a single string
+
     do <val>... - Evaluate each value and return the last one
 
     emit <obj> <message> - Send a message.  Context sensitive (can send to a player, a room or even an item)
@@ -301,6 +303,8 @@ Neuter
     single <val>... - Returns the first of the values that follow it that isn't empty.
 
     stg <setting> - Gets the Engine Setting specified (see "Settings, Roles and Permissions" earlier in this guide for more info on Engine Settings)
+
+    string (str) <interpolated string> - Anything in [] will be evaluated as code.  For example:  @eval str "The attr is: [v here a]"
 
     val (v) <attr> - Get value of attribute from context
     val (v) <obj> <attr> - Get alue of attribute from object
@@ -326,6 +330,16 @@ The singleton predicates are:
 And the comparison predicates are:
 
      Predicate       Description
+
+### Reader Shortcuts
+
+Auto-Interpolation:
+
+    @eval emit here `The attr is: [v here a]`
+    ;translates to:
+    @eval emit here {str "The attr is: [v here a]"}
+
+
 
 ### Special Zelazny Commands
 

@@ -1,3 +1,5 @@
+using System.Text;
+
 public static class Interpreter
 {
     internal static string Evaluate(Token toke, ZObject context, ref int quota, Registers? registers = null)
@@ -21,18 +23,30 @@ public static class Interpreter
 
         string s, s2;
         ZObject? o, o2;
+        int i = 0;
 
         if (cmd.Value.StartsWith("?"))
             return ParsePredicate(cmd, list.Skip(1).ToList(), context, ref quota, registers);
 
         switch (cmd.Value)
         {
+            case "concat":
+                if (list.Count < 3)
+                    return "--Exception: 'concat' requires at least 2 parameters--";
+
+                s = "";
+                for (i = 1; i < list.Count; i++)
+                {
+                    s += ParseValue(list[i], context, ref quota, registers);
+                }
+                return s;
+
             case "do":
                 if (list.Count < 2)
                     return "--Exception: 'do' requires at least 1 parameter--";
 
                 var ret = "";
-                for (var i = 1; i < list.Count; i++)
+                for (i = 1; i < list.Count; i++)
                 {
                     ret = ParseValue(list[i], context, ref quota, registers);
                 }
@@ -98,7 +112,7 @@ public static class Interpreter
                 var caseCount = (hasDefault ? (list.Count - 2) : (list.Count - 1)) / 2;
                 var caseI = 2;
 
-                for (var i = 0; i < caseCount; i++)
+                for (i = 0; i < caseCount; i++)
                 {
                     var compare = ParseValue(list[caseI], context, ref quota, registers);
                     if (s == compare)
@@ -122,7 +136,7 @@ public static class Interpreter
                 if (list.Count == 1)
                     return "--Exception: 'single' requires at least 1 parameter (and really it should be 2 or you're just wasting quota)--";
 
-                for (var i = 1; i < list.Count; i++)
+                for (i = 1; i < list.Count; i++)
                 {
                     var val = ParseValue(list[i], context, ref quota, registers);
                     if (!string.IsNullOrWhiteSpace(val))
@@ -158,6 +172,34 @@ public static class Interpreter
                     default:
                         return $"--Exception: Unknown setting '{s}'--";
                 }
+
+            case "string":
+            case "str":
+                if (list.Count != 2)
+                    return "--Exception: 'string' requires exactly 1 parameter--";
+
+                s = ParseValue(list[1], context, ref quota, registers);
+
+                //foreach [...] in the string, replace the value inside the brackets with the evaluated value
+                var sb = new StringBuilder();
+                i = 0;
+                while (i < s.Length)
+                {
+                    var c = s[i];
+                    if (c == '[')
+                    {
+                        var inner = Reader.ScanTo(s, ref i, ']', '[');
+                        inner = "{" + inner + "}";
+                        var res = ZString.Eval(inner, context, ref quota, registers);
+                        sb.Append(res);
+                    }
+                    else
+                    {
+                        sb.Append(c);
+                    }
+                    i++;
+                }
+                return sb.ToString();
 
             case "sts":
                 if (context.Id != 0)

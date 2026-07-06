@@ -55,16 +55,18 @@ public static class Reader
     private static List<string> KWs = new()
     {
         "?=", "?!", "??",
+        "concat",
         "emit",
         "do",
         "log",
         "match",
         "single",
         "stg", "sts",
+        "string", "str",
         "val", "v",
     };
 
-    private static string ScanTo(string s, ref int i, char terminator, char? opener = null)
+    public static string ScanTo(string s, ref int i, char terminator, char? opener = null)
     {
         var depth = 0;
         var work = "";
@@ -127,7 +129,13 @@ public static class Reader
                 //End of string?
                 else if (c == stringDelim)
                 {
-                    addWork();
+                    if (stringDelim != '`')
+                        addWork();
+                    else
+                    {
+                        retVal.Add(new Token(new List<Token> { new Token("str", TokenType.Keyword), new Token(work, TokenType.String) }));
+                        work = "";
+                    }
                     stringDelim = '#';
                 }
 
@@ -185,6 +193,11 @@ public static class Reader
                     break;
 
                 case '"':
+                    addWork();
+                    stringDelim = c;
+                    break;
+
+                case '`':
                     addWork();
                     stringDelim = c;
                     break;
