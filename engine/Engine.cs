@@ -13,6 +13,8 @@ public static partial class Engine
 
     public static Settings Settings { get; private set; } = new();
 
+    public static Scheduler Scheduler { get; private set; } = new();
+
     public static bool Running { get; private set; }
 
     public static ConcurrentDictionary<string, SessionModel> Sessions { get; private set; } = new();
@@ -36,6 +38,9 @@ public static partial class Engine
         // Create a new HTTP server
         var server = new HttpGameServer(IPAddress.Any, port);
         server.AddStaticContent(HTMLRoot);
+
+        Workers.RegisterInitialWorkers(Scheduler);
+        Scheduler.Start();
 
         server.Start();
         Log("net", "Server running!  You can now access the server at http://localhost:" + port);
@@ -71,10 +76,19 @@ public static partial class Engine
             }
         }
 
-        Log("net", "Server stopping...");
+        Log("WARN", "zmush is shutting down!");
+        Log("net", "HTTP Server stopping...");
         server.Stop();
 
-        Log("ZMush has shut down safely, good night!");
+        Scheduler.Stop(true, true);
+
+        if (Settings.AutoSaveEnabled)
+        {
+            Log("Performing final AutoSave");
+            Workers.AutoSave();
+        }
+
+        Log("zmush has shut down safely, good night!");
     }
 
     public static void Log(string message)

@@ -69,13 +69,18 @@ public class ZObject
         return yaml;
     }
 
-    public void Save()
+    public void Save(bool force = false)
     {
         if (!Engine.Objects.ContainsKey(Id))
             Engine.Objects.AddOrUpdate(Id, this, (key, oldValue) => this);
 
-        var path = Path.Combine(Engine.ObjectPath, $"{Id}.zo");
-        File.WriteAllText(path, ToYaml());
+        if (force || !Engine.Settings.AutoSaveEnabled)
+        {
+            var path = Path.Combine(Engine.ObjectPath, $"{Id}.zo");
+            File.WriteAllText(path, ToYaml());
+        }
+        else
+            Workers.QueueForSave(this);
     }
 
     public bool CheckPermissions(int userId)

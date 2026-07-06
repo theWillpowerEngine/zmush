@@ -8,6 +8,10 @@ public class Settings : BaseModel<Settings>
 
     public bool LogQuotaExceeds = true;
 
+    public int AutoSaveMinutes = 1;     //0 = save in real time
+    [YamlIgnore]
+    public bool AutoSaveEnabled => AutoSaveMinutes > 0;
+
     public int NewCharacterStartingRoom = 1;
     public int MasterRoom = 1;
     public int MasterCharacter = -1;

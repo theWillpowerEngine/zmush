@@ -169,6 +169,10 @@ public static class Interpreter
                     case "masteritem":
                         return Engine.Settings.MasterItem.ToString();
 
+                    case "autosaveminutes":
+                    case "autosavemins":
+                        return Engine.Settings.AutoSaveMinutes.ToString();
+
                     default:
                         return $"--Exception: Unknown setting '{s}'--";
                 }
@@ -256,6 +260,14 @@ public static class Interpreter
                             return "--Exception: 'sts masteritem' requires a numeric value--";
                         Engine.Settings.MasterItem = numVal;
                         s = Engine.Settings.MasterItem.ToString();
+                        break;
+
+                    case "autosaveminutes":
+                    case "autosavemins":
+                        if (!isANumber)
+                            return "--Exception: 'sts autosaveminutes' requires a numeric value--";
+                        Engine.Settings.AutoSaveMinutes = numVal;
+                        s = Engine.Settings.AutoSaveMinutes.ToString();
                         break;
 
                     default:

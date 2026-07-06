@@ -92,6 +92,8 @@ We've already explained the timestamp in square brackets, but what about the dif
 
     * zelazny:  Created from the 'log' keyword in Zelazny. 
 
+    * cron:  Related to the scheduler (the thing that does work in the background)
+
 ### Settings, Roles and the File System
 
 You generally won't have to edit game files directly, but it can be helpful to understand the file structure...  especially for power users.  The files and folders are:
@@ -123,6 +125,7 @@ is an example of interacting with a setting.  In this case we're setting the Sta
 
     Name                Type        Action
     AutoLinkExits       bool        If true, exits will automatically be turned into Action Links, allowing them to be clicked on
+    AutoSaveMinutes     int         Number of minutes between automatic ZObject save.  If 0 or less, ZObjects will save every time, which could impact disk life and performance under heavy use
     BreakOnException    bool        If true, the server will crash if an exception occurs.  You should basically never set this unless working on the C# code
     LogQuotaExceeds     bool        If true, any time a Zelazny evaluation is stopped because of quota it will log some useful tracing information
     MasterItem          int         ID of the Master Item, which is the default parent of every newly-created Item (default -1)

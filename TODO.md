@@ -2,9 +2,6 @@
 
 * WHO (use SpecialOutput)
 
-* A setting to turn off object auto-persistence and a timed save and @save command
-    * Consider just doing this flat out for very chatty objects like PCs
-
 * A way to add formatters in zelazny
 * externalize the HTML rendering to settings (stuff like the nbsps and brs as well as CSS)
 
