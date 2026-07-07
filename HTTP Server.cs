@@ -145,7 +145,13 @@ class HttpGameSession : HttpSession
                         break;
                 }
 
-                SendResponseAsync(Response.MakeErrorResponse(404, "This shit don't work yet, chill."));
+                if (Loader.CachedURLs.Contains(""))
+                {
+                    var (content, mime) = Loader.GetContentAndMime("");
+                    SendResponseAsync(Response.MakeGetResponse(content, mime));
+                }
+                else
+                    SendResponseAsync(Response.MakeErrorResponse(404, "This shit don't work yet, chill."));
             }
             catch (Exception ex)
             {

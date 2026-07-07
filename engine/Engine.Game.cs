@@ -561,33 +561,59 @@ public static partial class Engine
                     PlayerEmit(session.Key, $"Created new room #{newRoomId} named '{rest}' with exit from #{user.Location}");
                 break;
 
-            case "@tel":
-                if (rest.StartsWith("#"))
+            case "@nuke":
+                o = subCmd == "global" || subCmd == "g" ? GlobalFind(user, rest) : Find(user, rest);
+                if (o == null)
                 {
-                    if (int.TryParse(rest.Substring(1), out var id))
-                    {
-                        o = Objects.GetValueOrDefault(id);
-                        if (o == null)
+                    PlayerEmit(session.Key, $"I can't find '{rest}'");
+                    break;
+                }
+
+                if (!isAdmin && !o.CheckPermissions(session.UserId))
+                {
+                    PlayerEmit(session.Key, $"You don't have permission to nuke #{o.Id}");
+                    Log("hax", $"User #{session.UserId} attempted to nuke #{o.Id} without permission.");
+                    break;
+                }
+
+                if (o.HasFlag(Flag.NukeSafe))
+                {
+                    PlayerEmit(session.Key, $"#{o.Id} is marked as nuke-safe.");
+                    break;
+                }
+
+                DeleteObject(o.Id);
+                PlayerEmit(session.Key, $"Nuked #{o.Id} '{o.Name}'");
+                Log($"User #{session.UserId} nuked {o.ZOT} #{o.Id}, '{o.Name}'");
+                break;
+
+            case "@tel":
+                int telId = int.MinValue;
+                if (rest.StartsWith("#") || int.TryParse(rest, out telId))
+                {
+                    if (telId == int.MinValue)
+                        if (!int.TryParse(rest.Substring(1), out telId))
                         {
-                            PlayerEmit(session.Key, $"I can't find #{id} to teleport to.");
+                            PlayerEmit(session.Key, $"Invalid Id:  {rest}");
                             break;
                         }
 
-                        if (o.ZOT != ZObType.Room)
-                        {
-                            PlayerEmit(session.Key, $"You can only teleport to rooms.");
-                            break;
-                        }
-                    }
-                    else
+                    o = Objects.GetValueOrDefault(telId);
+                    if (o == null)
                     {
-                        PlayerEmit(session.Key, $"Invalid teleport target '{rest}'");
+                        PlayerEmit(session.Key, $"I can't find #{telId} to teleport to.");
+                        break;
+                    }
+
+                    if (o.ZOT != ZObType.Room)
+                    {
+                        PlayerEmit(session.Key, $"You can only teleport to rooms.");
                         break;
                     }
                 }
                 else
                 {
-                    o = Objects.Values.FirstOrDefault(z => z.ZOT == ZObType.Room && z.Name.ToLowerInvariant().Contains(rest));
+                    o = Objects.Values.FirstOrDefault(z => z.ZOT == ZObType.Room && z.Name.ToLowerInvariant().Contains(rest.ToLowerInvariant()));
                     if (o == null)
                     {
                         PlayerEmit(session.Key, $"I can't find '{rest}' to teleport to.");
@@ -747,6 +773,27 @@ public static partial class Engine
 
                 var evaled = ZString.Eval(rest, user, ref user.Quota);
                 PlayerEmit(session.Key, $"Result: {evaled}");
+                break;
+
+            case "@examine":
+            case "@ex":
+                o = Find(user, rest);
+                if (o == null)
+                    o = GlobalFind(user, rest);
+
+                if (o == null)
+                {
+                    PlayerEmit(session.Key, $"I can't find '{rest}'");
+                    break;
+                }
+
+                session.SpecialOutput.AppendLine($"[bold {o.Name} (#{o.Id})]%n");
+                session.SpecialOutput.AppendLine(o.Desc + "%n");
+                if (o.Parent >= 0)
+                    session.SpecialOutput.AppendLine($"%t[bold Parent:] #{o.Parent}%n");
+                session.SpecialOutput.AppendLine($"%t[bold Owner:] #{o.Owner}%n");
+                if (o.Flags.Any())
+                    session.SpecialOutput.AppendLine($"%t[bold Flags:] {string.Join(", ", o.Flags)}%n");
                 break;
 
             case "!password":
@@ -930,10 +977,13 @@ public static partial class Engine
 
                     if (dest != null)
                     {
-                        RoomEmit(user.Location, registers.ApplyToString(leaveMessage));
+                        var oldLoc = user.Location;
+
+                        //The emits are backwards so we don't spam the user, don't worry about it, lol.
+                        RoomEmit(dest.Id, registers.ApplyToString(arriveMessage));
                         user.Location = dest.Id;
+                        RoomEmit(oldLoc, registers.ApplyToString(leaveMessage));
                         user.Save();
-                        RoomEmit(user.Location, registers.ApplyToString(arriveMessage));
                     }
                     else
                     {

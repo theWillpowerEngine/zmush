@@ -45,6 +45,8 @@ public static partial class Engine
         server.Start();
         Log("net", "Server running!  You can now access the server at http://localhost:" + port);
 
+        var deleted = false;
+
         for (; ; )
         {
             Log("Press 'X' to stop the server, or 'R' to restart it.  'L' will reload the site content without disrupting the server.  '\\' will shut down AND delete all your files so don't press that unless you really want to.");
@@ -72,6 +74,7 @@ public static partial class Engine
             {
                 Log("dev", "Deleting driver directory before shutting down...");
                 Directory.Delete(RootPath, true);
+                deleted = true;
                 break;
             }
         }
@@ -82,7 +85,7 @@ public static partial class Engine
 
         Scheduler.Stop(true, true);
 
-        if (Settings.AutoSaveEnabled)
+        if (!deleted && Settings.AutoSaveEnabled)
         {
             Log("Performing final AutoSave");
             Workers.AutoSave();
@@ -148,6 +151,19 @@ public static partial class Engine
             {
                 return NextId++;
             }
+        }
+    }
+    public static void DeleteObject(int id)
+    {
+        lock (IdLock)
+        {
+            if (Objects.TryRemove(id, out var obj))
+            {
+                File.Delete(Path.Combine(Engine.ObjectPath, $"{id}.zo"));
+                FreeIds.Add(id);
+            }
+            else
+                Log("WARN", $"Failed to delete object {id}.");
         }
     }
 

@@ -37,6 +37,7 @@ public class Settings : BaseModel<Settings>
         { new HashSet<Flag>() { Flag.Darksight }, new HashSet<string>() { "basic" } },
         { new HashSet<Flag>() { Flag.Dark }, new HashSet<string>() { "advanced" } },
         { new HashSet<Flag>() { Flag.CanForce }, new HashSet<string>() { "advanced" } },
+        { new HashSet<Flag>() { Flag.ForceMajeure }, new HashSet<string>() { "admin" } },
     };
 
     public HashSet<string>? RolesRequiredForFlag(Flag flag)

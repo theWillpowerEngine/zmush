@@ -120,10 +120,11 @@
                 }, 5000);
             },
 
-            frame() {
+            frame(force) {
                 Z.setRefreshTimer(true)
 
-                if (!Z.frameText) {
+                if (!Z.frameText || force) {
+                    Z.frameText = null
                     Z.post("/frame", window.sessionId, (suc, res) => {
                         if (suc) {
                             handleResult(res)
@@ -151,6 +152,13 @@
                 Z.commands.push(cmd)
                 while (Z.commands.length > 20) Z.commands.shift()
                 Z.commandIdx = -1
+
+                if (cmd.toLowerCase() == "clear") {
+                    $("#log").html("")
+                    Z.logs = []
+                    Z.frame(true)
+                    return
+                }
 
                 Z.post("/command", { sessionId: window.sessionId, command: cmd }, (suc, res) => {
                     if (suc) {

@@ -213,8 +213,11 @@ Darksight
 Handler (enables command handlers)
 CanForce
 ForceMajeure (ignores unforceable commands from Settings file)
+NukeSafe
+
 U1 - U10
 S1 - S10
+
 
 Male
 Female
@@ -257,6 +260,8 @@ Neuter
     @name <obj>=<name>
     @desc <obj>=<name>
 
+    @examine (@ex) <obj>
+
     @password <user name>=<new password>
     
     @user <user name>=<pwd>
@@ -286,6 +291,9 @@ Neuter
 
         @cr/user (@cr/u) <name>[:<pwd>]=#<character id>         If no password the user name is used
 
+    @nuke <obj>
+    @nuke/global (@nuke/g) <obj>    - Global nuke.  Be careful with partial names, you should generally only use ids, lol
+
     @dig <name>
     @dig/1 <name>
     @dig/t <name>
@@ -297,6 +305,8 @@ Neuter
 
     !exit (!ex)
     !password <current password>=<new password>
+
+    clear
 
 ## Zelazny Reference
 
