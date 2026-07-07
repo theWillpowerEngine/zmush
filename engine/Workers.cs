@@ -29,15 +29,12 @@ public static class Workers
         lock (_lock)
         {
             if (!_dirtyZObs.Any())
+            {
+                Engine.Log("Nothing to autosave.");
                 return;
+            }
 
             toSave = _dirtyZObs.ToList();
-        }
-
-        if (toSave.Count == 0)
-        {
-            Engine.Log("Nothing to autosave.");
-            return;
         }
 
         //Deep copy to avoid concurrency issues

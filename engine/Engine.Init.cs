@@ -65,7 +65,7 @@ public static partial class Engine
                 Owner = 0
             };
 
-            room.Save();
+            room.Save(true);
         }
 
         //If the player path doesn't exist, create it and seed the default admin user (owner/owner)
@@ -85,7 +85,7 @@ public static partial class Engine
                 Parent = -1
             };
 
-            wizard.Save();
+            wizard.Save(true);
 
             var wizUser = new User(0, "owner", Version);
             wizUser.Roles.Add("admin");

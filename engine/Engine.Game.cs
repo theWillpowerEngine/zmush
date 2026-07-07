@@ -1004,7 +1004,8 @@ public static partial class Engine
             ret += "<b>Players:</b><br />";
             foreach (var pc in pcs)
             {
-                ret += pc.Name + "<br />";
+                if (Sessions.Values.Any(s => s.UserId == pc.Id))
+                    ret += "<b>" + pc.Name + "</b><br />";
             }
         }
 
