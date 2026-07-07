@@ -1,4 +1,4 @@
-* Note:  Test the command RBAC (specifically for sub commands), I'm not sure it's working (in fact I'm pretty sure subcommands aren't working)
+* Make offline characters not appear
 
 * @decompile
 

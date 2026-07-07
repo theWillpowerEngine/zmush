@@ -211,13 +211,14 @@ The locks detailed above are the "access" locks, which can go on any ZObject and
 Dark
 Darksight
 Handler (enables command handlers)
+CanForce
+ForceMajeure (ignores unforceable commands from Settings file)
 U1 - U10
 S1 - S10
 
 Male
 Female
 Neuter
-
 
 ### Special Attributes
 

@@ -21,6 +21,11 @@ public class Settings : BaseModel<Settings>
 
     public string? OverrideSiteDirectory = null;
 
+    public HashSet<string> UnforceableCommands = new HashSet<string>()
+    {
+        "@eval", "@server", "@password", "!password", "@lock", "@unlock"
+    };
+
     public Dictionary<HashSet<string>, HashSet<string>> CommandPerms = new Dictionary<HashSet<string>, HashSet<string>>()
     {
         { new HashSet<string>() { "@create", "@cr", "@dig" }, new HashSet<string>() { "advanced" } },
@@ -31,6 +36,7 @@ public class Settings : BaseModel<Settings>
     {
         { new HashSet<Flag>() { Flag.Darksight }, new HashSet<string>() { "basic" } },
         { new HashSet<Flag>() { Flag.Dark }, new HashSet<string>() { "advanced" } },
+        { new HashSet<Flag>() { Flag.CanForce }, new HashSet<string>() { "advanced" } },
     };
 
     public HashSet<string>? RolesRequiredForFlag(Flag flag)

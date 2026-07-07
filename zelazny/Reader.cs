@@ -57,6 +57,7 @@ public static class Reader
         "?=", "?!", "??",
         "concat",
         "emit",
+        "force",
         "do",
         "log",
         "match",

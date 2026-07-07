@@ -93,6 +93,32 @@ public static class Interpreter
                 }
                 return emitVal;
 
+            case "force":
+                if (list.Count != 3)
+                    return "--Exception: 'force' requires exactly 2 parameters--";
+
+                s = ParseValue(list[1], context, ref quota, registers);
+                o = Engine.GlobalFind(context, s);
+                if (o == null)
+                    return $"--Exception: Object '{s}' not found--";
+
+                if (!o.HasFlag(Flag.CanForce))
+                    return $"--Exception: Object '{s}' does not have the CanForce flag--";
+
+                var fakeSession = new SessionModel
+                {
+                    Key = $"force-{o.Id}-{DateTime.UtcNow.Ticks}",
+                    UserId = o.Id,
+                    Roles = new HashSet<string> { }
+                };
+
+                var forceVal = ParseValue(list[2], context, ref quota, registers);
+                s = forceVal.Split(' ', '/', '\\')[0].ToLower();
+                if (Engine.Settings.UnforceableCommands.Contains(s) && !o.HasFlag(Flag.ForceMajeure))
+                    return $"--Exception: Command '{s}' is not allowed to be forced--";
+
+                return Engine.Command(fakeSession, forceVal);
+
             case "log":
                 if (list.Count != 2)
                     return "--Exception: 'log' requires exactly 1 parameter--";
