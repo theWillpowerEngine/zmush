@@ -196,14 +196,15 @@ The locks detailed above are the "access" locks, which can go on any ZObject and
 
     Lock        Arg        Type(s)      Category    Function
     public      -           -           Access      Disable normal security, anyone can edit
-    pc          Id          -           Access      Allow certain characters access to the ZObject
+    pc          Id List     -           Access      Allow certain characters access to the ZObject.  Space delimited
     full        -           -           Access      Overrides any other acccess-level locks and returns to default (only owner + admins)
 
     fixed       -           Item        Item        Only those with access to the ZObject can pick it up or drop it
     static      -           Item        Item        Cannot be picked up or dropped (the static lock has to be removed first)
  
-    allow       Id          Exit        Exit        Allow certain people (locked otherwise.  Can't combine with deny)
-    deny        Id          Exit        Exit        Deny certain people (unlocked otherwise.  Can't combine with allow)
+    allow       Id List     Exit        Exit        Allow certain people (locked otherwise.  Can't combine with deny).  Space delimited
+    deny        Id List     Exit        Exit        Deny certain people (unlocked otherwise.  Can't combine with allow).  Space delimited
+    check       Code        Exit        Exit        Run Zelazny, can pass if it returns a truthy value.  If there are multiple checks only one has to pass.  if none pass, allow/deny run as normal
 
 
 ### Flags
@@ -316,7 +317,7 @@ Neuter
 
     emit <obj> <message> - Send a message.  Context sensitive (can send to a player, a room or even an item)
 
-    force <obj> <command> - Force <object> to run command.  May fail with an exception due to permissions.
+    force <obj> <command> - Force <object> to run command
 
     log <val> - Logs a message with the 'zelazny' tag in the zmush log
 

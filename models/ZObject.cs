@@ -98,7 +98,7 @@ public class ZObject
             if (Locks.Any(l => l.Item1 == "public"))
                 return true;
 
-            if (Locks.Any(l => l.Item1 == "pc" && l.Item2 == $"#{userId}"))
+            if (Locks.Any(l => l.Item1 == "pc" && l.Item2.Split(" ").Any(s => s.TrimStart("#").ToString() == userId.ToString())))
                 return true;
         }
 

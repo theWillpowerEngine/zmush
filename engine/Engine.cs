@@ -252,14 +252,14 @@ public static partial class Engine
         if (name == "here")
             return room;
 
-        if (room != null && room.Name.ToLowerInvariant().StartsWith(name))
+        if (room != null && room.Name.ToLowerInvariant().Contains(name))
             return room;
 
-        var found = Objects.Values.FirstOrDefault(o => o.Location == location && o.Name.ToLower().StartsWith(name));
+        var found = Objects.Values.FirstOrDefault(o => o.Location == location && o.Name.ToLower().Contains(name));
         if (found != null) return found;
 
         var inScope = GetObjectsInScope(context, !localRoomOnly);
-        found = inScope.FirstOrDefault(o => o.Name.ToLower().StartsWith(name));
+        found = inScope.FirstOrDefault(o => o.Name.ToLower().Contains(name));
         if (found != null) return found;
 
         return null;

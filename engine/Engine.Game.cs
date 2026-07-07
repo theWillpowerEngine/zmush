@@ -621,10 +621,12 @@ public static partial class Engine
                     }
                 }
 
-                RoomEmit(user.Location, $"{user.Name} disappears in a puff of smoke.");
+                RoomEmit(o.Id, $"{user.Name} appears in a puff of smoke.");
+                var oldLoc = user.Location;
                 user.Location = o.Id;
+                RoomEmit(oldLoc, $"{user.Name} disappears in a puff of smoke.");
+
                 user.Save();
-                RoomEmit(user.Location, $"{user.Name} appears in a puff of smoke.");
                 Log("admin", $"{user.Name} (#{user.Id}) teleported to #{o.Id} '{o.Name}'");
                 break;
 
@@ -949,6 +951,7 @@ public static partial class Engine
                     RoomEmit(user.Location, $"{user.Name} {rest}");
                 break;
 
+            //Exits, custom commands
             default:
                 //Exits name?
                 var exit = Objects.Values.FirstOrDefault(o => o.ZOT == ZObType.Exit && o.Location == user.Location && o.Name.ToLowerInvariant().Contains(kw));
@@ -961,28 +964,56 @@ public static partial class Engine
                     var leaveMessage = exit.GetAttrValue("leaveMsg") ?? $"{user.Name} leaves, heading toward {dest?.Name ?? "somewhere"}.";
                     var arriveMessage = exit.GetAttrValue("arriveMsg") ?? $"{user.Name} arrives from {Objects[user.Location].Name}.";
 
-                    if (exit.Locks.Any(l => l.Item1 == "allow"))
+                    //Locks
+                    var exitChecks = exit.Locks.Where(l => l.Item1 == "check").ToList();
+                    bool? passed = null;    //If null, there are no checks, if true, at least one check passed, if false, all checks failed
+
+                    if (exitChecks.Any())
                     {
-                        if (!exit.Locks.Any(l => l.Item1 == "allow" && l.Item2 == "#" + session.UserId.ToString()))
+                        passed = false;
+                        foreach (var check in exitChecks)
+                        {
+                            var checkAttr = exit.Attrs.FirstOrDefault(a => a.Name == check.Item2);
+                            if (checkAttr != null)
+                            {
+                                var checkResult = ZString.Eval(checkAttr.Value, exit, ref user.Quota, registers);
+                                if (Matcher.IsTruthy(checkResult))
+                                {
+                                    passed = true;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+
+                    if (passed != true)
+                    {
+                        if (exit.Locks.Any(l => l.Item1 == "allow"))
+                        {
+                            if (!exit.Locks.Any(l => l.Item1 == "allow" && l.Item2.Split(" ").Any(s => s.TrimStart("#").ToString() == session.UserId.ToString())))
+                            {
+                                PlayerEmit(session.Key, registers.ApplyToString(lockedMessage));
+                                break;
+                            }
+                        }
+                    }
+                    if (passed != false)
+                    {
+                        if (exit.Locks.Any(l => l.Item1 == "deny" && l.Item2.Split(" ").Any(s => s.TrimStart("#").ToString() == session.UserId.ToString())))
                         {
                             PlayerEmit(session.Key, registers.ApplyToString(lockedMessage));
                             break;
                         }
                     }
-                    else if (exit.Locks.Any(l => l.Item1 == "deny" && l.Item2 == "#" + session.UserId.ToString()))
-                    {
-                        PlayerEmit(session.Key, registers.ApplyToString(lockedMessage));
-                        break;
-                    }
 
                     if (dest != null)
                     {
-                        var oldLoc = user.Location;
+                        var prevLoc = user.Location;
 
                         //The emits are backwards so we don't spam the user, don't worry about it, lol.
                         RoomEmit(dest.Id, registers.ApplyToString(arriveMessage));
                         user.Location = dest.Id;
-                        RoomEmit(oldLoc, registers.ApplyToString(leaveMessage));
+                        RoomEmit(prevLoc, registers.ApplyToString(leaveMessage));
                         user.Save();
                     }
                     else

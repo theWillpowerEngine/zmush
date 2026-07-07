@@ -1,7 +1,8 @@
 ; This file is executed every time zmush starts.
+; Settings set in this file with sts may override what's in the SETTINGS file, which can be confusing if you're editing that file instead of this one.  Sorry!
 
 {do
-    {sts startroom 1}
+    {sts startroom 2}
 
-    {log "Initialization zelazny has been run successfully"}
+    {log "Driver initialized"}
 }
