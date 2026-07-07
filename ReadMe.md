@@ -295,6 +295,7 @@ Neuter
 
     @eval <zelazny code>
 
+    !exit (!ex)
     !password <current password>=<new password>
 
 ## Zelazny Reference

@@ -1,5 +1,3 @@
-* Make offline characters not appear
-
 * @decompile
 
 * WHO (use SpecialOutput)

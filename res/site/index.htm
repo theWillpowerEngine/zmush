@@ -61,6 +61,12 @@
                 $.post(url, data instanceof Object ? JSON.stringify(data) : data, (res) => {
                     callback(1, res)
                 }).fail((xhr, status, error) => {
+                    if (xhr.status == 403) {
+                        Cookies.remove("ZSession")
+                        location.reload()
+                        return
+                    }
+
                     callback(0, { status: xhr.status, statusMsg: error, error: xhr.responseText })
                 })
             },

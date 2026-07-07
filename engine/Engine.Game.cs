@@ -769,6 +769,12 @@ public static partial class Engine
                 PlayerEmit(session.Key, $"Updated your password");
                 break;
 
+            case "!exit":
+            case "!ex":
+                PlayerEmit(session.Key, $"Signed out!  The screen will refresh in a moment...");
+                Sessions.TryRemove(session.Key, out _);
+                break;
+
             case "look":
             case "l":
                 if (string.IsNullOrEmpty(rest))
@@ -1005,7 +1011,7 @@ public static partial class Engine
             foreach (var pc in pcs)
             {
                 if (Sessions.Values.Any(s => s.UserId == pc.Id))
-                    ret += "<b>" + pc.Name + "</b><br />";
+                    ret += pc.Name + "<br />";
             }
         }
 
