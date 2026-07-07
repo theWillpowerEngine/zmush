@@ -31,7 +31,6 @@ class HttpGameSession : HttpSession
         return SendResponseAsync(Response.MakeGetResponse(json, "application/json"));
     }
 
-
     protected override void OnReceivedRequest(HttpRequest request)
     {
         if (Engine.Settings.ShowHttpRequest)

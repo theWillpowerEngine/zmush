@@ -242,6 +242,18 @@ Neuter
 
 ## Admin/Mod/Wizard Guide
 
+### Incantation Before Mucking with the Server or File System
+
+@srv/backup and record the number
+@srv/shutdown
+
+Do your business
+
+Re-run the server
+
+If your business included resetting the main game directory, run @srv/restore #
+Where the # is obviously the number you recorded from the backup command
+
 ## Command Reference
 
     look (l) [<obj>]

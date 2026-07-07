@@ -726,6 +726,7 @@ public static partial class Engine
                             var yaml = File.ReadAllText(file);
                             var obj = ZObject.FromYaml(yaml);
                             Objects.AddOrUpdate(obj.Id, obj, (key, oldValue) => obj);
+                            obj.Save(true);
                             restoreCount++;
                         }
                         Log($"Restored {restoreCount} objects from backup.");
@@ -748,7 +749,6 @@ public static partial class Engine
                         break;
                 }
                 break;
-
 
             case "@user":
                 (s, s2) = GetNamedValue(rest);
@@ -903,8 +903,6 @@ public static partial class Engine
                 if (o.Flags.Any())
                     session.SpecialOutput.AppendLine($"%t[bold Flags:] {string.Join(", ", o.Flags)}%n");
                 break;
-
-
 
             case "!password":
                 (s, s2) = GetNamedValue(rest);

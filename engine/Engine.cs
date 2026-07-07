@@ -39,7 +39,6 @@ public static partial class Engine
 
         // Create a new HTTP server
         var server = new HttpGameServer(IPAddress.Any, port);
-        server.AddStaticContent(HTMLRoot);
 
         Workers.RegisterInitialWorkers(Scheduler);
         Scheduler.Start();
@@ -49,9 +48,12 @@ public static partial class Engine
 
         var deleted = false;
 
+        Log("Press 'X' to stop the server, or 'R' to restart it.  'L' will reload the site content without disrupting the server.  '\\' will shut down AND delete all your files so don't press that unless you really want to.");
         while (!Stop)
         {
-            Log("Press 'X' to stop the server, or 'R' to restart it.  'L' will reload the site content without disrupting the server.  '\\' will shut down AND delete all your files so don't press that unless you really want to.");
+            Thread.Sleep(250);
+            if (!Console.KeyAvailable)
+                continue;
 
             string cmd = Console.ReadKey(true).KeyChar.ToString().ToUpperInvariant();
 
