@@ -257,6 +257,11 @@ Neuter
     @desc <obj>=<name>
 
     @password <user name>=<new password>
+    
+    @user <user name>=<pwd>
+    @user/roles <user name>
+    @user/enrole <username>=<role>
+    @user/unrole <username>=<role>
 
     @lock <obj>=<lock>[:<lock argument>]
     @lock/list (@lock/l) <obj>
@@ -298,6 +303,8 @@ Neuter
     do <val>... - Evaluate each value and return the last one
 
     emit <obj> <message> - Send a message.  Context sensitive (can send to a player, a room or even an item)
+
+    force <obj> <command> - Force <object> to run command.  May fail with an exception due to permissions.
 
     log <val> - Logs a message with the 'zelazny' tag in the zmush log
 

@@ -616,6 +616,131 @@ public static partial class Engine
                 Log("admin", $"User #{session.UserId} updated password for user '{s}'");
                 break;
 
+            case "@user":
+                (s, s2) = GetNamedValue(rest);
+                var dbU3 = User.Load(s);
+
+                //Creating a user?
+                if (string.IsNullOrEmpty(subCmd))
+                {
+                    if (dbU3 != null)
+                    {
+                        PlayerEmit(session.Key, $"A user with the name '{s}' already exists.");
+                        break;
+                    }
+
+                    var newPC = new ZObject
+                    {
+                        Id = GetNextId(),
+                        ZOT = ZObType.Character,
+                        Name = s,
+                        Desc = "A brand new character, be nice to them!",
+                        Owner = session.UserId,
+                        Location = Settings.NewCharacterStartingRoom,
+                        Parent = Settings.MasterCharacter
+                    };
+
+                    newPC.Owner = newPC.Id;  //Owner is self for new characters
+                    newPC.Save(true);
+
+                    dbU3 = new User(newPC.Id, s, Version);
+                    dbU3.SetPassword(s2);
+                    dbU3.Save();
+                    PlayerEmit(session.Key, $"Created new user '{s}' with character #{newPC.Id}, password: '{s2}'");
+                    Log($"User #{session.UserId} created new user '{s}' with character #{newPC.Id}");
+                    break;
+                }
+
+                if (dbU3 == null && subCmd != "list" && subCmd != "l")
+                {
+                    PlayerEmit(session.Key, $"I can't find user '{s}'.  Try @user/list [<search>]");
+                    break;
+                }
+
+                switch (subCmd)
+                {
+                    case "roles":
+                    case "r":
+                        PlayerEmit(session.Key, $"User '{s}' has roles: {string.Join(", ", dbU3.Roles)}");
+                        break;
+
+                    case "enrole":
+                    case "en":
+                        if (string.IsNullOrEmpty(s2))
+                        {
+                            PlayerEmit(session.Key, $"You must specify a role to add.  Example: @user/en <name>=<role>");
+                            break;
+                        }
+
+                        if (!Settings.Roles.ContainsKey(s2))
+                        {
+                            PlayerEmit(session.Key, $"Role '{s2}' does not exist.");
+                            break;
+                        }
+
+                        if (!isAdmin && !session.Roles.Contains(s2))
+                        {
+                            PlayerEmit(session.Key, $"You don't have permission to add the '{s2}' role to other users.");
+                            Log("hax", $"User #{session.UserId} attempted to add the '{s2}' role to user '{s}' without permission.");
+                            break;
+                        }
+
+                        dbU3.Roles.Add(s2);
+                        dbU3.Save();
+                        PlayerEmit(session.Key, $"Added role '{s2}' to user '{s}'");
+                        Log($"User #{session.UserId} added role '{s2}' to user '{s}'");
+                        break;
+
+                    case "derole":
+                    case "unrole":
+                    case "un":
+                    case "de":
+                        if (string.IsNullOrEmpty(s2))
+                        {
+                            PlayerEmit(session.Key, $"You must specify a role to remove.  Example: @user/un <name>=<role>");
+                            break;
+                        }
+
+                        if (!Settings.Roles.ContainsKey(s2))
+                        {
+                            PlayerEmit(session.Key, $"Role '{s2}' does not exist.");
+                            break;
+                        }
+
+                        if (!isAdmin && !session.Roles.Contains(s2))
+                        {
+                            PlayerEmit(session.Key, $"You don't have permission to remove the '{s2}' role from other users.");
+                            Log("hax", $"User #{session.UserId} attempted to remove the '{s2}' role from user '{s}' without permission.");
+                            break;
+                        }
+
+                        if (!dbU3.Roles.Contains(s2))
+                        {
+                            PlayerEmit(session.Key, $"User '{s}' does not have the '{s2}' role.");
+                            break;
+                        }
+
+                        dbU3.Roles.Remove(s2);
+                        dbU3.Save();
+                        PlayerEmit(session.Key, $"Removed role '{s2}' from user '{s}'");
+                        Log($"User #{session.UserId} removed role '{s2}' from user '{s}'");
+                        break;
+
+                    case "list":
+                    case "l":
+                        var users = Directory.GetFiles(Engine.PlayerPath, "*.zpc").Select(f => Path.GetFileNameWithoutExtension(f)).OrderBy(f => f).ToList();
+                        if (!string.IsNullOrEmpty(s))
+                            users = users.Where(u => u.ToLowerInvariant().Contains(s.ToLowerInvariant())).ToList();
+                        PlayerEmit(session.Key, $"Users: {string.Join(", ", users)}");
+                        break;
+
+                    default:
+                        PlayerEmit(session.Key, $"Unknown subcommand '{subCmd}'.  Valid subcommands: roles, enrole, derole, list");
+                        break;
+                }
+
+                break;
+
             case "@eval":
                 if (!rest.StartsWith("{"))
                     rest = "{" + rest + "}";
