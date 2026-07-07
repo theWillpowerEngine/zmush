@@ -47,6 +47,8 @@ class HttpGameSession : HttpSession
             }
             else
                 SendResponseAsync(Response.MakeErrorResponse(404, "Requested resource not found: /" + route));
+
+            return;
         }
 
         //Endpoints
@@ -144,13 +146,7 @@ class HttpGameSession : HttpSession
                         break;
                 }
 
-                if (Loader.CachedURLs.Contains(""))
-                {
-                    var (content, mime) = Loader.GetContentAndMime("");
-                    SendResponseAsync(Response.MakeGetResponse(content, mime));
-                }
-                else
-                    SendResponseAsync(Response.MakeErrorResponse(404, "This shit don't work yet, chill."));
+                return;
             }
             catch (Exception ex)
             {
@@ -160,6 +156,8 @@ class HttpGameSession : HttpSession
 
                 if (Engine.Settings.BreakOnExceptionDontUseThisUnlessYoureSmart)
                     throw;
+
+                return;
             }
         }
 
