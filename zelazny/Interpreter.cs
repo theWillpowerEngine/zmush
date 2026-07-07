@@ -242,8 +242,6 @@ public static class Interpreter
                 var valIsTruthy = Matcher.IsTruthy(s2);
                 var isANumber = int.TryParse(s2, out var numVal);
 
-
-                s = "";
                 switch (s.ToLower())
                 {
                     case "showhttp":

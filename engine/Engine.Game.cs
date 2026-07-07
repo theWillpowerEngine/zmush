@@ -644,6 +644,112 @@ public static partial class Engine
                 Log("admin", $"User #{session.UserId} updated password for user '{s}'");
                 break;
 
+            case "@server":
+            case "@srv":
+                if (!isAdmin && !session.Roles.Contains("server"))
+                {
+                    PlayerEmit(session.Key, $"You don't have permission to use the '{kw}' command.");
+                    Log("hax", $"User #{session.UserId} attempted to use protected command '{kw}' without permission.");
+                    return RenderFrame(session);
+                }
+
+                if (string.IsNullOrEmpty(subCmd))
+                {
+                    PlayerEmit(session.Key, $"You must specify a subcommand.  Valid subcommands: shutdown, backup, restore [#]");
+                    break;
+                }
+
+                switch (subCmd)
+                {
+                    case "shutdown":
+                    case "sd":
+                        PlayerEmit(session.Key, $"Shutting down server...");
+                        Log("WARN", $"User #{session.UserId} initiated server shutdown.");
+                        Stop = true;
+                        break;
+
+                    case "backup":
+                    case "b":
+                        Log($"User #{session.UserId} initiated server backup.");
+
+                        var dirBaseName = RootPath.TrimEnd('/', '\\') + "backup";
+
+                        var backupDir = dirBaseName;
+                        var backupNum = 0;
+                        while (Directory.Exists(backupDir))
+                        {
+                            backupNum++;
+                            backupDir = $"{dirBaseName}-{backupNum:D2}";
+                        }
+
+                        Log($"Backing up server to '{backupDir}'...");
+                        Directory.CreateDirectory(Path.Combine(backupDir, "obj"));
+                        Directory.CreateDirectory(Path.Combine(backupDir, "usr"));
+
+                        foreach (var file in Directory.GetFiles(ObjectPath, "*.zo"))
+                        {
+                            var destFile = Path.Combine(backupDir, "obj", Path.GetFileName(file));
+                            File.Copy(file, destFile);
+                        }
+
+                        foreach (var file in Directory.GetFiles(PlayerPath, "*.zpc"))
+                        {
+                            var destFile = Path.Combine(backupDir, "usr", Path.GetFileName(file));
+                            File.Copy(file, destFile);
+                        }
+
+                        PlayerEmit(session.Key, $"Backup number {backupNum} created.");
+                        break;
+
+                    case "restore":
+                    case "r":
+                        var restoreDir = RootPath.TrimEnd('/', '\\') + "backup";
+                        if (string.IsNullOrEmpty(rest) || !int.TryParse(rest, out var restoreNum))
+                        {
+                            PlayerEmit(session.Key, "Which backup do you want to load (the one without a number is '0')?  Example: @server/restore 2");
+                            break;
+                        }
+
+                        if (restoreNum > 0)
+                            restoreDir += $"-{restoreNum:D2}";
+
+                        if (!Directory.Exists(restoreDir))
+                        {
+                            PlayerEmit(session.Key, $"Backup number {restoreNum} does not exist.");
+                            break;
+                        }
+
+                        Log($"Restoring server from backup '{restoreDir}'...");
+                        var restoreCount = 0;
+                        foreach (var file in Directory.GetFiles(Path.Combine(restoreDir, "obj"), "*.zo"))
+                        {
+                            var yaml = File.ReadAllText(file);
+                            var obj = ZObject.FromYaml(yaml);
+                            Objects.AddOrUpdate(obj.Id, obj, (key, oldValue) => obj);
+                            restoreCount++;
+                        }
+                        Log($"Restored {restoreCount} objects from backup.");
+
+                        restoreCount = 0;
+                        var deserializer = new YamlDotNet.Serialization.Deserializer();
+                        foreach (var file in Directory.GetFiles(Path.Combine(restoreDir, "usr"), "*.zpc"))
+                        {
+                            var yaml = File.ReadAllText(file);
+                            var restoredUser = deserializer.Deserialize<User>(yaml);
+                            restoredUser.Save();
+                            restoreCount++;
+                        }
+                        Log($"Restored {restoreCount} users from backup.");
+                        PlayerEmit(session.Key, $"Restored backup number {restoreNum}.  Good luck!");
+                        break;
+
+                    default:
+                        PlayerEmit(session.Key, $"Unknown subcommand '{subCmd}'.  Valid subcommands: shutdown, backup, restore [#]");
+                        break;
+                }
+                break;
+
+
             case "@user":
                 (s, s2) = GetNamedValue(rest);
                 var dbU3 = User.Load(s);
@@ -689,7 +795,7 @@ public static partial class Engine
                 {
                     case "roles":
                     case "r":
-                        PlayerEmit(session.Key, $"User '{s}' has roles: {string.Join(", ", dbU3.Roles)}");
+                        PlayerEmit(session.Key, $"User '{s}' has roles: {string.Join(", ", dbU3?.Roles ?? Enumerable.Empty<string>())}");
                         break;
 
                     case "enrole":
@@ -713,8 +819,8 @@ public static partial class Engine
                             break;
                         }
 
-                        dbU3.Roles.Add(s2);
-                        dbU3.Save();
+                        dbU3?.Roles.Add(s2);
+                        dbU3?.Save();
                         PlayerEmit(session.Key, $"Added role '{s2}' to user '{s}'");
                         Log($"User #{session.UserId} added role '{s2}' to user '{s}'");
                         break;
@@ -742,7 +848,7 @@ public static partial class Engine
                             break;
                         }
 
-                        if (!dbU3.Roles.Contains(s2))
+                        if (!dbU3?.Roles.Contains(s2) ?? true)
                         {
                             PlayerEmit(session.Key, $"User '{s}' does not have the '{s2}' role.");
                             break;
@@ -797,6 +903,8 @@ public static partial class Engine
                 if (o.Flags.Any())
                     session.SpecialOutput.AppendLine($"%t[bold Flags:] {string.Join(", ", o.Flags)}%n");
                 break;
+
+
 
             case "!password":
                 (s, s2) = GetNamedValue(rest);

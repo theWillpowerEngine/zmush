@@ -160,6 +160,8 @@ Here is the RBAC section from the default Settings file as of 0.0.2:
       moderatus:
       - basic
 
+There is a built in role (admin) that can do anything.  There is also a built in role (server), to allow access to the @server commands, which are otherwise totally admin limited for safety.
+
 If you don't know YAML don't mess with this, but if you do the structure is fairly discoverable.  "CommandPerms" and "FlagPerms" determine which commands and flags require special permissions to access.  By default, every command is open, so as you add them to these collections you're restricting them to particular permissions.  The two permissions in this example are 'advanced' and 'basic'.
 
 The Roles collection determines which roles have which permissions (which in turn determines what they can do).  There is one special role, called "Admin", that can do EVERYTHING.  Stimpy, user #0, is an admin.  In general it's best to create a few other Admins as possible (ideally none), and to grant access to other functionality using this RBAC system.
@@ -303,6 +305,11 @@ Neuter
     @tel <room>         Can be #id or name part
 
     @eval <zelazny code>
+
+    @server (@srv) subcommands:
+        shutdown (sd)
+        backup (b)
+        restore (r) #   - the first backup is 0
 
     !exit (!ex)
     !password <current password>=<new password>

@@ -19,6 +19,7 @@
 #### 0.0.2 -> 0.0.3 
 
 * Changed ZObjects to (by default) dirty themselves and save on a timer.  Can still be switched to saving in real time with AutoSaveMins setting.
+* Added check locks for exits, and refined allow/deny/pc locks to run on space-delimited lists and handle both #N and N formats
 * Added custom command handlers, and 'handler' flag
 * Added special registers like %a (actor id), %an (actor name) and the various pronouns (%as, %ao, %ap) along with numbered registers %1-%9
 * Added commands:  @eval, @user (and various subcommands for user management), !exit

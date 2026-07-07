@@ -28,6 +28,8 @@ public static partial class Engine
     private static HashSet<int> FreeIds = new();
     private static int NextId;
 
+    public static bool Stop = false;
+
     public static void Run(int port)
     {
         if (string.IsNullOrEmpty(RootPath))
@@ -47,7 +49,7 @@ public static partial class Engine
 
         var deleted = false;
 
-        for (; ; )
+        while (!Stop)
         {
             Log("Press 'X' to stop the server, or 'R' to restart it.  'L' will reload the site content without disrupting the server.  '\\' will shut down AND delete all your files so don't press that unless you really want to.");
 
@@ -78,6 +80,8 @@ public static partial class Engine
                 break;
             }
         }
+
+        Stop = false;
 
         Log("WARN", "zmush is shutting down!");
         Log("net", "HTTP Server stopping...");
