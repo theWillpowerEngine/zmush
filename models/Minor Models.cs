@@ -42,7 +42,19 @@ public class SessionModel : BaseModel<SessionModel>
     public string LoginName = "";
     public HashSet<string> Roles = new HashSet<string>();
 
-    public StringBuilder SpecialOutput = new();
+    private StringBuilder so = new();
+
+    public void SpecialOutput(string s)
+    {
+        so.Append(s);
+    }
+
+    public string GetSpecialOutput()
+    {
+        var ret = so.ToString();
+        so.Clear();
+        return Matcher.Escape(ret);
+    }
 
     public DateTime LastActivity = DateTime.Now;
 }

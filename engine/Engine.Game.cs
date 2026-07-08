@@ -325,7 +325,7 @@ public static partial class Engine
                     {
                         attrList += $"%t{a.Name} = {a.Value}%n";
                     }
-                    session.SpecialOutput.AppendLine(attrList.Replace("{", "%{").Replace("}", "%}"));
+                    session.SpecialOutput(attrList.Replace("{", "%{").Replace("}", "%}"));
                     break;
                 }
 
@@ -913,19 +913,19 @@ public static partial class Engine
                     break;
                 }
 
-                session.SpecialOutput.AppendLine($"[bold {o.Name} (#{o.Id})]%n");
-                session.SpecialOutput.AppendLine(o.Desc + "%n");
+                session.SpecialOutput($"[bold {o.Name} (#{o.Id})]%n");
+                session.SpecialOutput(o.Desc + "%n");
                 if (o.Parent >= 0)
-                    session.SpecialOutput.AppendLine($"%t[bold Parent:] #{o.Parent}%n");
-                session.SpecialOutput.AppendLine($"%t[bold Owner:] #{o.Owner}%n");
+                    session.SpecialOutput($"%t[bold Parent:] #{o.Parent}%n");
+                session.SpecialOutput($"%t[bold Owner:] #{o.Owner}%n");
                 if (o.Flags.Any())
-                    session.SpecialOutput.AppendLine($"%t[bold Flags:] {string.Join(", ", o.Flags)}%n");
+                    session.SpecialOutput($"%t[bold Flags:] {string.Join(", ", o.Flags)}%n");
                 if (o.Attrs.Any())
                 {
-                    session.SpecialOutput.AppendLine($"%t[bold Attributes:]%n");
+                    session.SpecialOutput($"%t[bold Attributes:]%n");
                     foreach (var a in o.Attrs)
                     {
-                        session.SpecialOutput.AppendLine($"%t{a.Name} = {a.Value}%n");
+                        session.SpecialOutput($"%t{a.Name} = {a.Value}%n");
                     }
                 }
                 break;
@@ -1171,6 +1171,8 @@ public static partial class Engine
 
                             var registers = Matcher.ExtractCommandHandlerRegisters(command, a.Name.Substring(1));
                             s = ZString.Eval(handlerVal, h, ref user.Quota, new Registers(registers, user));
+                            if (s.StartsWith("--Exception:"))
+                                PlayerEmit(session.Key, $"Error in command handler: {s}");
                             handled = true;
                         }
                     }
@@ -1238,12 +1240,12 @@ public static partial class Engine
         }
         ret += "</td></tr></table><br />";
 
-        if (session.SpecialOutput.Length > 0)
+        var so = session.GetSpecialOutput();
+        if (!string.IsNullOrWhiteSpace(so))
         {
             ret += "<div id='specialOutput'>";
-            ret += ZString.Eval(session.SpecialOutput.ToString(), loc);
-            ret += "</div>";
-            session.SpecialOutput.Clear();
+            ret += ZString.Eval(so, loc);
+            ret += "<br /></div>";
         }
 
         ret += "<div id='log'> </div>";

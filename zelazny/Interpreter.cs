@@ -119,6 +119,49 @@ public static class Interpreter
 
                 return Engine.Command(fakeSession, forceVal);
 
+            case "list-add":
+                if (list.Count != 3)
+                    return "--Exception: 'list-add' requires exactly 2 parameters--";
+
+                s = ParseValue(list[1], context, ref quota, registers);
+                s2 = ParseValue(list[2], context, ref quota, registers);
+
+                s = PDL.Add(s, s2);
+                return s;
+
+            case "list-index":
+                if (list.Count != 3)
+                    return "--Exception: 'list-index' requires exactly 2 parameters--";
+
+                s = ParseValue(list[1], context, ref quota, registers);
+                s2 = ParseValue(list[2], context, ref quota, registers);
+
+                var idx = PDL.FindIndex(s, s2);
+                return idx.ToString();
+
+            case "list-remove":
+                if (list.Count != 3)
+                    return "--Exception: 'list-remove' requires exactly 2 parameters--";
+
+                s = ParseValue(list[1], context, ref quota, registers);
+                s2 = ParseValue(list[2], context, ref quota, registers);
+
+                if (!int.TryParse(s2, out var idx2))
+                    return "--Exception: 'list-remove' requires the second parameter to be a numeric index (1-based)--";
+
+                s = PDL.RemoveAtIndex(s, idx2);
+                return s;
+
+            case "list-remove-all":
+                if (list.Count != 3)
+                    return "--Exception: 'list-remove-all' requires exactly 2 parameters--";
+
+                s = ParseValue(list[1], context, ref quota, registers);
+                s2 = ParseValue(list[2], context, ref quota, registers);
+
+                s = PDL.RemoveAll(s, s2);
+                return s;
+
             case "log":
                 if (list.Count != 2)
                     return "--Exception: 'log' requires exactly 1 parameter--";
@@ -157,6 +200,24 @@ public static class Interpreter
                 }
 
                 return "";
+
+            case "set":
+                if (list.Count != 3 && list.Count != 4)
+                    return "--Exception: 'set' requires 2 or 3 parameters--";
+                if (list.Count == 3)
+                    list.Insert(1, new Token("this", TokenType.Name));
+
+                s = ParseValue(list[1], context, ref quota, registers);
+                o = Engine.Find(context, s);
+                if (o == null)
+                    return $"--Exception: Object '{s}' not found--";
+
+                s2 = ParseValue(list[2], context, ref quota, registers);
+
+                s = ParseValue(list[3], context, ref quota, registers);
+                o.SetAttrValue(s2, s);
+                o.Save();
+                return s2;
 
             case "single":
                 if (list.Count == 1)
@@ -418,8 +479,8 @@ public static class Interpreter
                     var actorId = registers.ActorId;
 
                     var registerName = t.Value.Substring(1);
-                    if (int.TryParse(registerName, out var idx) && registers != null && idx < registers.Numbered.Length)
-                        return registers.Numbered[idx];
+                    if (int.TryParse(registerName, out var idx) && registers != null && idx > 0 && idx <= registers.Numbered.Length)
+                        return registers.Numbered[idx - 1];
 
                     ZObject? actor;
                     switch (registerName)

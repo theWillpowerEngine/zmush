@@ -346,6 +346,8 @@ Where the # is obviously the number you recorded from the backup command
 
     match <check> (<compare> <val>)... [<val>] - For each pair, if the compare value matches the check value, evaluate and return that pair's value.  The optional final value is if nothing matches
 
+    set [<obj>] <attr> <val> - Set attribute value on obj, or the context
+
     single <val>... - Returns the first of the values that follow it that isn't empty.
 
     stg <setting> - Gets the Engine Setting specified (see "Settings, Roles and Permissions" earlier in this guide for more info on Engine Settings)
@@ -378,8 +380,6 @@ And the comparison predicates are:
 
     ?contains       if the first value contains the second.  First value can be a list, or a string
 
-
-
 ### Reader Shortcuts
 
 Auto-Interpolation:
@@ -388,7 +388,9 @@ Auto-Interpolation:
     ;translates to:
     @eval emit here {str "The attr is: [v here a]"}
 
+### PDLs (Pipe-Delimited Lists)
 
+Strings that start with a | can be treated in certain contexts as lists.  the list-* commands are the most obvious example, but this concept appears throughout zmush.
 
 ### Special Zelazny Commands
 
@@ -398,9 +400,9 @@ These can only be evaluated in special contexts, or by particular users
 
 ## Built in Formatters
 
-    {blah} - Action link (command = text)
-    {blah:cmd} - Action link (text = blah, command = cmd)
-    {<c> text} - Color text.  c = red, yellow, green, blue, purple
+    [blah] - Action link (command = text)
+    [blah:cmd] - Action link (text = blah, command = cmd)
+    [<c> text] - Color text.  c = red, yellow, green, blue, purple
 
 ### Special Escape Characters
 
@@ -431,6 +433,13 @@ This is for the master room (using %a emits to the right person, not to the room
 @flag here=handler
 @attr here.$test=emit %a "The test worked"
 
+@cr List Demo Object (LDO)
+@flag LDO=Handler
+@attr LDO.$add *=set list {list-add {v list} %1}
+add 1
+add 2
+add I was here
+@ex LDO
 
 ## Appendix:  Common Snippets and Libraries
 

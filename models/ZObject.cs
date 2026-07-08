@@ -237,5 +237,14 @@ public class ZObject
 
         return null;
     }
+
+    internal void SetAttrValue(string name, string value)
+    {
+        var attr = Attrs.FirstOrDefault(a => a.Name.ToLowerInvariant() == name.ToLowerInvariant());
+        if (attr != null)
+            attr.Value = value;
+        else
+            Attrs.Add(new Attr { Name = name, Value = value });
+    }
 }
 
