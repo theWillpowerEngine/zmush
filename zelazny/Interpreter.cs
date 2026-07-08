@@ -456,6 +456,36 @@ public static class Interpreter
                 else
                     return "";
 
+            case "?num":
+                if (!isValidSingleton)
+                    return $"--Exception: '?num' requires 1-3 parameters--";
+                if (int.TryParse(checkVal, out var numVal))
+                {
+                    if (singletonIsSimple) return "1";
+                    return ParseValue(rest[1], context, ref quota, registers);
+                }
+                else if (singletonHasFalse)
+                    return ParseValue(rest[2], context, ref quota, registers);
+                else if (singletonIsSimple)
+                    return "0";
+                else
+                    return "";
+
+            case "?oid":
+                if (!isValidSingleton)
+                    return $"--Exception: '?oid' requires 1-3 parameters--";
+                if (int.TryParse(checkVal, out var oidVal) && Engine.Objects.ContainsKey(oidVal))
+                {
+                    if (singletonIsSimple) return "1";
+                    return ParseValue(rest[1], context, ref quota, registers);
+                }
+                else if (singletonHasFalse)
+                    return ParseValue(rest[2], context, ref quota, registers);
+                else if (singletonIsSimple)
+                    return "0";
+                else
+                    return "";
+
             default:
                 return $"--Exception: Unknown command '{cmd.Value}'--";
         }

@@ -38,7 +38,7 @@ While the server is running you will see a running log, resembling the following
     [2334:net]  Server running!  You can now access the server at http://localhost:4676
     [2334]  Press 'X' to stop the server, or 'R' to restart it.  'L' will reload the site content without disrupting the server.  '\' will shut down AND delete all your files so don't press that unless you really want to.
 
-The thing in brackets is a time stamp (hour and then minute in 24h time).  This log will get very int over time and consistent use, but it can be very helpful when troubleshooting things or trying to figure out something that happened on the server.  There are extra levels of detail you can turn on with CLA, including HTTP requests (some nerd shit, don't worry about it if you don't know what it is), etc.
+The thing in brackets is a time stamp (hour and then minute in 24h time).  This log will get very long over time and consistent use, but it can be very helpful when troubleshooting things or trying to figure out something that happened on the server.  There are extra levels of detail you can turn on with CLA, including HTTP requests (some nerd shit, don't worry about it if you don't know what it is), etc.
 
 This output can be logged to a file using your terminal system.  This has high utility value of course, allowing you to reference logs and deal with troublesome scenarios, but it can consume a lot of disk space and may require periodic cleanup.  I recommend avoiding this until you're a power user, and then using it selectively as needed.  
 
@@ -175,6 +175,12 @@ Everything in ZMUSH is a ZObject, which is a fancy way of saying "a thing in the
 ...
 
 ### Anatomy of a ZObject
+
+Id, Name, Desc, Parent, Owner, 
+
+Flags, Attrs, Locks, Subrealities
+
+Quota
 
 #### Inheritance / Master ZObjects
 
@@ -363,22 +369,25 @@ There are two formats a predicate can appear in.  They are, singleton predicates
 
     <pred> <val> [<true> [<false>]]
 
-And comparison predicates:
+And dual predicates:
 
     <pred> <val1> <val2> [<true> [<false>]]
 
 The singleton predicates are:
 
-    Predicate       Description
-    ??              if the value is not empty
+     Predicate       Description
+    ??              if the value is truthy
+    ?num            if the value is numeric
+    ?oid            If the value is a valid object id
 
-And the comparison predicates are:
+And the dual predicates are:
 
      Predicate       Description
     ?=              if the values are equal
     ?!              if the values are not equal
 
     ?contains       if the first value contains the second.  First value can be a list, or a string
+
 
 ### Reader Shortcuts
 

@@ -1,4 +1,4 @@
-* Add the 4 list- commands
+* Finish let scopes
 
 * @decompile
 
