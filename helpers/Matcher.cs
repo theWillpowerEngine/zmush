@@ -77,4 +77,9 @@ public static class Matcher
         var valIsTruthy = val != "0" && val != "" && val.ToLower() != "false" && val.ToLower() != "no";
         return valIsTruthy;
     }
+
+    internal static string Escape(string message)
+    {
+        return message.Replace("{", "%{").Replace("}", "%}");
+    }
 }

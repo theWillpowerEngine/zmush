@@ -112,7 +112,7 @@ public static partial class Engine
     public static void PlayerEmit(string sessionId, string message)
     {
         var log = Logs.GetOrAdd(sessionId.ToString(), _ => new List<string>());
-        log.Add(message);
+        log.Add(Matcher.Escape(message));
 
         while (log.Count > 100)
             log.RemoveAt(0);
@@ -130,7 +130,7 @@ public static partial class Engine
         }
 
         var log = Logs.GetOrAdd(session.Key, _ => new List<string>());
-        log.Add(message);
+        log.Add(Matcher.Escape(message));
 
         while (log.Count > 100)
             log.RemoveAt(0);

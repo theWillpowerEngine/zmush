@@ -206,7 +206,7 @@ The locks detailed above are the "access" locks, which can go on any ZObject and
  
     allow       Id List     Exit        Exit        Allow certain people (locked otherwise.  Can't combine with deny).  Space delimited
     deny        Id List     Exit        Exit        Deny certain people (unlocked otherwise.  Can't combine with allow).  Space delimited
-    check       Code        Exit        Exit        Run Zelazny, can pass if it returns a truthy value.  If there are multiple checks only one has to pass.  if none pass, allow/deny run as normal
+    check       Code        Exit        Exit        Run Zelazny, can pass if it returns a truthy value.  If there are multiple checks only one has to pass.  Allow/Deny only matter if there are no checks
 
 
 ### Flags
@@ -220,7 +220,6 @@ NukeSafe
 
 U1 - U10
 S1 - S10
-
 
 Male
 Female
@@ -338,6 +337,11 @@ Where the # is obviously the number you recorded from the backup command
 
     force <obj> <command> - Force <object> to run command
 
+    list-add <string> <val> - Return a new stringified list adding <val>.  String can be either a string or a list itself
+    list-remove <string> <index> - Remove item from stringified list
+    list-remove-all <string> <val> - Remove all val from list.  Returns count, or 0 if none
+    list-index <list> <val> - Return index of item in list (1 based).  0 if not found
+
     log <val> - Logs a message with the 'zelazny' tag in the zmush log
 
     match <check> (<compare> <val>)... [<val>] - For each pair, if the compare value matches the check value, evaluate and return that pair's value.  The optional final value is if nothing matches
@@ -364,14 +368,17 @@ And comparison predicates:
 The singleton predicates are:
 
     Predicate       Description
-    ?=              if the value is truthy
-    ?!              if the value is falsey
-
     ??              if the value is not empty
 
 And the comparison predicates are:
 
      Predicate       Description
+    ?=              if the values are equal
+    ?!              if the values are not equal
+
+    ?contains       if the first value contains the second.  First value can be a list, or a string
+
+
 
 ### Reader Shortcuts
 

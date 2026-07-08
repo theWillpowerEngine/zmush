@@ -158,7 +158,9 @@ public static partial class Engine
                             PlayerEmit(session.Key, $"No locks on #{o.Id}");
                             break;
                         }
-                        PlayerEmit(session.Key, $"Locks on #{o.Id}: {string.Join(", ", o.Locks.Select(l => string.IsNullOrEmpty(l.Item2) ? l.Item1 : $"{l.Item1}:{l.Item2}"))}");
+                        PlayerEmit(session.Key, "Locks on #{o.Id}:");
+                        var i = 1;
+                        o.Locks.ForEach(l => PlayerEmit(session.Key, $"%t{i++}) %s{(string.IsNullOrEmpty(l.Item2) ? l.Item1 : $"{l.Item1}:{l.Item2}")}"));
                         break;
                 }
 
@@ -189,6 +191,22 @@ public static partial class Engine
                     PlayerEmit(session.Key, $"You must specify a lock to remove.");
                     break;
                 }
+
+                if (int.TryParse(s2, out var lockIndex))
+                {
+                    if (lockIndex < 1 || lockIndex > o.Locks.Count)
+                    {
+                        PlayerEmit(session.Key, $"Lock index {lockIndex} is out of range.  Use @unlock/list to see the locks on #{o.Id}");
+                        break;
+                    }
+
+                    var indexedLock = o.Locks[lockIndex - 1];
+                    o.Locks.RemoveAt(lockIndex - 1);
+                    o.Save();
+                    PlayerEmit(session.Key, $"Removed lock '{(string.IsNullOrEmpty(indexedLock.Item2) ? indexedLock.Item1 : $"{indexedLock.Item1}:{indexedLock.Item2}")}' from #{o.Id}");
+                    break;
+                }
+
 
                 var lockToRemove = o.Locks.FirstOrDefault(l => l.Item1 == up1 && l.Item2 == up2);
                 if (lockToRemove == default)
@@ -902,6 +920,14 @@ public static partial class Engine
                 session.SpecialOutput.AppendLine($"%t[bold Owner:] #{o.Owner}%n");
                 if (o.Flags.Any())
                     session.SpecialOutput.AppendLine($"%t[bold Flags:] {string.Join(", ", o.Flags)}%n");
+                if (o.Attrs.Any())
+                {
+                    session.SpecialOutput.AppendLine($"%t[bold Attributes:]%n");
+                    foreach (var a in o.Attrs)
+                    {
+                        session.SpecialOutput.AppendLine($"%t{a.Name} = {a.Value}%n");
+                    }
+                }
                 break;
 
             case "!password":
@@ -1079,37 +1105,36 @@ public static partial class Engine
                         passed = false;
                         foreach (var check in exitChecks)
                         {
-                            var checkAttr = exit.Attrs.FirstOrDefault(a => a.Name == check.Item2);
-                            if (checkAttr != null)
-                            {
-                                var checkResult = ZString.Eval(checkAttr.Value, exit, ref user.Quota, registers);
-                                if (Matcher.IsTruthy(checkResult))
-                                {
-                                    passed = true;
-                                    break;
-                                }
-                            }
-                        }
-                    }
+                            var checkCode = check.Item2;
+                            if (!checkCode.StartsWith("{"))
+                                checkCode = "{" + checkCode + "}";
 
-                    if (passed != true)
-                    {
-                        if (exit.Locks.Any(l => l.Item1 == "allow"))
-                        {
-                            if (!exit.Locks.Any(l => l.Item1 == "allow" && l.Item2.Split(" ").Any(s => s.TrimStart("#").ToString() == session.UserId.ToString())))
+                            var checkResult = ZString.Eval(checkCode, exit, ref user.Quota, registers);
+                            if (Matcher.IsTruthy(checkResult))
                             {
-                                PlayerEmit(session.Key, registers.ApplyToString(lockedMessage));
+                                passed = true;
                                 break;
                             }
                         }
                     }
-                    if (passed != false)
+
+                    if (passed == null && exit.Locks.Any(l => l.Item1 == "allow" || l.Item1 == "deny"))
                     {
-                        if (exit.Locks.Any(l => l.Item1 == "deny" && l.Item2.Split(" ").Any(s => s.TrimStart("#").ToString() == session.UserId.ToString())))
+                        if (!exit.Locks.Any(l => l.Item1 == "allow" && l.Item2.Split('|', ' ').Any(s => s.TrimStart("#").ToString() == session.UserId.ToString())))
                         {
                             PlayerEmit(session.Key, registers.ApplyToString(lockedMessage));
                             break;
                         }
+                        else if (exit.Locks.Any(l => l.Item1 == "deny" && l.Item2.Split('|', ' ').Any(s => s.TrimStart("#").ToString() == session.UserId.ToString())))
+                        {
+                            PlayerEmit(session.Key, registers.ApplyToString(lockedMessage));
+                            break;
+                        }
+                    }
+                    else if (passed == false)
+                    {
+                        PlayerEmit(session.Key, registers.ApplyToString(lockedMessage));
+                        break;
                     }
 
                     if (dest != null)

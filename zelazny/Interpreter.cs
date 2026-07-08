@@ -358,6 +358,28 @@ public static class Interpreter
                 else
                     return "";
 
+            case "?contains":
+                if (!isValidComparison)
+                    return $"--Exception: '?contains' requires 2-4 parameters--";
+                s = ParseValue(rest[1], context, ref quota, registers);
+
+                if (checkVal.StartsWith("|"))
+                    res = checkVal.Contains("|" + s + "|");
+                else
+                    res = (checkVal + " ").Contains(s);
+
+                if (res)
+                {
+                    if (comparisonIsSimple) return "1";
+                    return ParseValue(rest[2], context, ref quota, registers);
+                }
+                else if (comparisonHasFalse)
+                    return ParseValue(rest[3], context, ref quota, registers);
+                else if (comparisonIsSimple)
+                    return "0";
+                else
+                    return "";
+
             case "??":
                 if (!isValidSingleton)
                     return $"--Exception: '??' requires 1-3 parameters--";
