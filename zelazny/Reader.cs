@@ -59,6 +59,7 @@ public static class Reader
         "emit",
         "force",
         "do",
+        "let",
         "list-add", "list-index", "list-remove", "list-remove-all",
         "log",
         "match",

@@ -8,9 +8,6 @@ public static class Interpreter
 
         var cmd = list[0];
 
-        if (cmd.TT != TokenType.Keyword)
-            return "--Exception: First token must be a keyword--";
-
         if (quota == 0)
         {
             if (Engine.Settings.LogQuotaExceeds)
@@ -25,8 +22,14 @@ public static class Interpreter
         ZObject? o, o2;
         int i = 0;
 
+        if (cmd.TT == TokenType.Name && list.Count == 1)
+            return ParseValue(cmd, context, ref quota, registers);
+
         if (cmd.Value.StartsWith("?"))
             return ParsePredicate(cmd, list.Skip(1).ToList(), context, ref quota, registers);
+
+        if (cmd.TT != TokenType.Keyword)
+            return "--Exception: First token must be a keyword--";
 
         switch (cmd.Value)
         {
@@ -118,6 +121,33 @@ public static class Interpreter
                     return $"--Exception: Command '{s}' is not allowed to be forced--";
 
                 return Engine.Command(fakeSession, forceVal);
+
+            case "let":
+                if (list.Count < 4)
+                    return "--Exception: 'let' requires at least 3 parameters--";
+                if (list.Count % 2 != 0)
+                    return "--Exception: 'let' requires an odd number of parameters--";
+
+                Dictionary<string, string> scopeVars = new();
+
+                for (i = 1; i < list.Count - 1; i += 2)
+                {
+                    if (list[i].TT != TokenType.Name)
+                        return $"--Exception: '{list[i].Value}' is not a name in let--";
+                    s = list[i].Value;
+                    s2 = ParseValue(list[i + 1], context, ref quota, registers);
+                    scopeVars.Add(s, s2);
+                }
+
+                if (registers == null) registers = new Registers(context);
+                registers.AdvanceLetScope();
+                foreach (var key in scopeVars.Keys)
+                    registers.Let(key, scopeVars[key]);
+
+                s = ParseValue(list[list.Count - 1], context, ref quota, registers);
+                registers.EndLetScope();
+
+                return s;
 
             case "list-add":
                 if (list.Count != 3)
@@ -578,6 +608,14 @@ public static class Interpreter
                         default:
                             return "";
                     }
+                }
+
+                else
+                {
+                    var checkName = t.Value.ToLower();
+                    var letVar = registers?.LetScope.FirstOrDefault(l => l.Name.ToLower() == checkName);
+                    if (letVar != null)
+                        return letVar.Value;
                 }
                 return t.Value;
 
