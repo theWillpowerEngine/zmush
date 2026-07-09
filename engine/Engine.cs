@@ -52,7 +52,7 @@ public static partial class Engine
         while (!Stop)
         {
             Thread.Sleep(250);
-            if (!Console.KeyAvailable)
+            if (CLA.Headless || !Console.KeyAvailable)
                 continue;
 
             string cmd = Console.ReadKey(true).KeyChar.ToString().ToUpperInvariant();

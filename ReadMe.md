@@ -2,7 +2,9 @@
 
 ## Building, Configuring and Running the Server
 
-Make sure you have git installed, and the ability to build .net core 10.0 applications (you'll need dotnet itself, and the 10.0 SDK).
+Make sure you have git installed, and the ability to build .net core 10.0 applications (you'll need dotnet itself, and the 10.0 SDK).  An example of installing the appropriate .net stuff (adapt for your operating system) is:
+
+    sudo dnf install dotnet-sdk-10.0
 
 Run the following commands:
 
@@ -11,7 +13,7 @@ Run the following commands:
     dotnet build
 
     cd bin/Debug
-    ./zmush
+    ./zmush > ../../../log &
 
 The server is now running.  You can shut it down by pressing 'x', or shut it down and delete all data (which will cause it to restore the defaults) by pressing '\'.
 
@@ -20,6 +22,7 @@ The server supports several command line arguments (CLAs).  You can add --help w
 * -p, --port : Set the port number (default 4676)
 * -f, --folder : Set the root folder for the data files (will be created and seeded if it doesn't exist).  Default (home)/z
 * -r, --reset : reset all data files (back them up or they're gone forever!)
+* -h, --headless : Don't listen for any terminal input (useful when hosting in systemctl and whatnot)
 
 While the server is running you will see a running log, resembling the following:
 
