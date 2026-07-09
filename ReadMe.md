@@ -13,7 +13,7 @@ Run the following commands:
     dotnet build
 
     cd bin/Debug
-    ./zmush > ../../../log &
+    ./zmush
 
 The server is now running.  You can shut it down by pressing 'x', or shut it down and delete all data (which will cause it to restore the defaults) by pressing '\'.
 
@@ -44,6 +44,63 @@ While the server is running you will see a running log, resembling the following
 The thing in brackets is a time stamp (hour and then minute in 24h time).  This log will get very long over time and consistent use, but it can be very helpful when troubleshooting things or trying to figure out something that happened on the server.  There are extra levels of detail you can turn on with CLA, including HTTP requests (some nerd shit, don't worry about it if you don't know what it is), etc.
 
 This output can be logged to a file using your terminal system.  This has high utility value of course, allowing you to reference logs and deal with troublesome scenarios, but it can consume a lot of disk space and may require periodic cleanup.  I recommend avoiding this until you're a power user, and then using it selectively as needed.  
+
+### Setting up on Linux the Right Way
+
+This approach will setup zmush as a systemctl daemon, meaning it will always quietly run in the background and not be bothersome.  This also gives you access to the awesome journalctl.  If you're on windows idk try WSL or something.
+
+    sudo dnf install git dotnet-sdk-10.0
+
+    cd ~
+    git clone https://github.com/theWillpowerEngine/zmush.git
+    cd zmush
+    dotnet build
+
+    cd /etc/systemd/system
+    nano zmush.service
+
+Now in nano, paste/type the following:
+
+    [Unit]
+    Description=zmush
+    After=network.target
+
+    [Service]
+    Type=simple
+    ExecStart=/root/zmush/bin/Debug/zmush -h
+    Restart=always
+    User=youruser
+    WorkingDirectory=/root/z
+    StandardInput=null
+
+    [Install]
+    WantedBy=multi-user.target 
+
+Note that you should make sure ExecStart is the correct path.  The WorkingDirectory doesn't really matter.
+
+Next let's have systemctl start zmush:
+
+    sudo systemctl daemon-reload
+    sudo systemctl enable --now zmush
+
+You can access the logs via journalctl, which is awesome but beyond the scope of this guide (honestly this whole section is but I'm nice).  Here are some useful incantations:
+
+    journalctl -u yourapp -f          # follow, like tail -f
+    journalctl -u yourapp -n 100      # last 100 lines
+    journalctl -u yourapp -o cat      # strip timestamps/metadata, just the raw output
+    journalctl -u yourapp --since today
+
+If you are getting weird "Permission Denied" errors when starting the service and you're on Fedora, run these commands:
+
+    sudo dnf install policycoreutils-python-utils
+    sudo semanage fcontext -a -t bin_t "/path/to/app(/.*)?"
+    sudo restorecon -Rv /path/to/app
+
+If you're anal-retentive and don't want to mess with SELinux without confirming this is the cause, look for AVC denials in:
+
+    sudo ausearch -m avc -ts recent
+
+GLHF!
 
 ### Connecting, and Basic Concepts
 
