@@ -403,6 +403,8 @@ Where the # is obviously the number you recorded from the backup command
 
     force <obj> <command> - Force <object> to run command
 
+    let (<name> <val>)* <action> - Create variables.  
+
     list-add <string> <val> - Return a new stringified list adding <val>.  String can be either a string or a list itself
     list-remove <string> <index> - Remove item from stringified list
     list-remove-all <string> <val> - Remove all val from list.  Returns count, or 0 if none
@@ -449,13 +451,20 @@ And the dual predicates are:
     ?contains       if the first value contains the second.  First value can be a list, or a string
 
 
-### Reader Shortcuts
+### Reader Autos
 
 Auto-Interpolation:
 
-    @eval emit here `The attr is: [v here a]`
+    emit here `The attr is: [v here a]`
     ;translates to:
-    @eval emit here {str "The attr is: [v here a]"}
+    emit here {str "The attr is: [v here a]"}
+
+Auto-Let:
+
+    [x 1 y 2] `([x], [y])`
+    ;translates to:
+    let x 1 y 2 `([x], [y])`
+
 
 ### PDLs (Pipe-Delimited Lists)
 
