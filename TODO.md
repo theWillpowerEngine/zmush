@@ -28,6 +28,10 @@
 
 ### Changelogs
 
+#### 0.0.3 -> 0.0.4
+
+* 
+
 #### 0.0.2 -> 0.0.3 
 
 * Changed ZObjects to (by default) dirty themselves and save on a timer.  Can still be switched to saving in real time with AutoSaveMins setting.
@@ -38,7 +42,7 @@
 * Added special registers like %a (actor id), %an (actor name) and the various pronouns (%as, %ao, %ap) along with numbered registers %1-%9
 * Added commands:  @eval, @user (and various subcommands for user management), !exit, @server (backup, restore and shutdown)
 * Added 'sts' and 'stg' keywords, and the concept of special zelazny keywords (sts) which can only be used in particular situations
-* Added keywords:  concat, do, emit, force, let, list-add, list-remove, list-remove-all, list-index, log, match, set, string
+* Added keywords:  concat, do, emit, force, let, list-add, list-remove, list-remove-all, list-index, log, match, set, setv, string
 * Added singleton predicates:  ??
 * Added comparison predicates:  ?=, ?!, ?contains
 * Added reader shortcut for 'string' keyword (ticks as string delimiters)

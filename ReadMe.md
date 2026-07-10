@@ -1,4 +1,4 @@
-# ZMUSH Reference Guide (0.0.2)
+# ZMUSH Reference Guide (0.0.3)
 
 ## Building, Configuring and Running the Server
 
