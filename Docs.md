@@ -502,24 +502,37 @@ These can only be evaluated in special contexts, or by particular users
 
 ## Appendix:  Tutorial-level Snippers
 
-@attr here.outside=sunny
-It's {single {v outside} normal} here.
+    @attr here.outside=sunny
+    It's {single {v outside} normal} here.
 
-@flag here=handler
-@attr here.$echo *=emit this %1
-@attr here.$1 *:*=do {emit here %2} {emit here %1}
+    @flag here=handler
+    @attr here.$echo *=emit this %1
+    @attr here.$1 *:*=do {emit here %2} {emit here %1}
 
 This is for the master room (using %a emits to the right person, not to the room itself):
-@flag here=handler
-@attr here.$test=emit %a "The test worked"
 
-@cr List Demo Object (LDO)
-@flag LDO=Handler
-@attr LDO.$add *=set list {list-add {v list} %1}
-add 1
-add 2
-add I was here
-@ex LDO
+    @flag here=handler
+    @attr here.$test=emit %a "The test worked"
+
+    @cr List Demo Object (LDO)
+    @flag LDO=Handler
+    @attr LDO.$add *=set list {list-add {v list} %1}
+    add 1
+    add 2
+    add I was here
+    @ex LDO
+
+Fun with functions and auto-Vs:
+
+    @cr Function Object (FNO)
+    @attr FNO.>fn(x y)=emit %a `The coords are ([x], [y])`
+    @eval FNO.fn 10 15
+
+    ;You can also rewrite the bit from LDO above from:
+    @attr LDO.$add *=set list {list-add {v list} %1}
+    ;to:
+    @attr LDO.$add *=set list {list-add LDO.list %1}
+
 
 ## Appendix:  Common Snippets and Libraries
 
