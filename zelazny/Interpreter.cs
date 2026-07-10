@@ -676,6 +676,22 @@ public static class Interpreter
                     }
                 }
 
+                //Auto-V
+                else if (t.Value.Contains("."))
+                {
+                    var parts = t.Value.Split('.', 2);
+                    if (parts.Length != 2)
+                        return t.Value;
+
+                    var o = Engine.GlobalFind(context, parts[0]);
+                    if (o == null)
+                        return t.Value;
+                    var attr = o.GetAttrValue(parts[1]);
+                    if (attr == null)
+                        return t.Value;
+                    return attr;
+                }
+
                 else
                 {
                     var checkName = t.Value.ToLower();
