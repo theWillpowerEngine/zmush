@@ -6,6 +6,9 @@ public static class Interpreter
     {
         var list = toke.Children;
 
+        if (registers == null)
+            registers = new Registers(context);
+
         var cmd = list[0];
 
         if (quota == 0)
@@ -139,7 +142,6 @@ public static class Interpreter
                     scopeVars.Add(s, s2);
                 }
 
-                if (registers == null) registers = new Registers(context);
                 registers.AdvanceLetScope();
                 foreach (var key in scopeVars.Keys)
                     registers.Let(key, scopeVars[key]);
@@ -247,15 +249,13 @@ public static class Interpreter
                 s = ParseValue(list[3], context, ref quota, registers);
                 o.SetAttrValue(s2, s);
                 o.Save();
-                return s2;
+                return s;
 
             case "setv":
                 if (list.Count != 3)
                     return "--Exception: 'setv' requires exactly 2 parameters--";
                 if (list[1].TT != TokenType.Name)
                     return "--Exception: 'setv' requires the first parameter to be a name--";
-                if (registers == null)
-                    return "--Exception: There is no let scope (explicit or implicit) available to setv on--";
 
                 s = list[1].Value;
                 s2 = ParseValue(list[2], context, ref quota, registers);

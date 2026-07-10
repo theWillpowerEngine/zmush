@@ -244,7 +244,7 @@ public class ZObject
         if (attr != null)
             attr.Value = value;
         else
-            Attrs.Add(new Attr { Name = name, Value = value });
+            Attrs.Add(new Attr { Name = name.ToLowerInvariant(), Value = value });
     }
 }
 

@@ -47,7 +47,7 @@ This output can be logged to a file using your terminal system.  This has high u
 
 ### Setting up on Linux the Right Way
 
-This approach will setup zmush as a systemctl daemon, meaning it will always quietly run in the background and not be bothersome.  This also gives you access to the awesome journalctl.  If you're on windows idk try WSL or something.
+This approach will setup zmush as a systemctl daemon, meaning it will always quietly run in the background and not be bothersome.  This also gives you access to the awesome journalctl.  If you're on windows idk try WSL or docker or something.
 
     sudo dnf install git dotnet-sdk-10.0
 
@@ -85,10 +85,10 @@ Next let's have systemctl start zmush:
 
 You can access the logs via journalctl, which is awesome but beyond the scope of this guide (honestly this whole section is but I'm nice).  Here are some useful incantations:
 
-    journalctl -u yourapp -f          # follow, like tail -f
-    journalctl -u yourapp -n 100      # last 100 lines
-    journalctl -u yourapp -o cat      # strip timestamps/metadata, just the raw output
-    journalctl -u yourapp --since today
+    journalctl -u zmush -f          # follow, like tail -f
+    journalctl -u zmush -n 100      # last 100 lines
+    journalctl -u zmush -o cat      # strip timestamps/metadata, just the raw output
+    journalctl -u zmush --since today
 
 If you are getting weird "Permission Denied" errors when starting the service and you're on Fedora, run these commands:
 
