@@ -196,6 +196,15 @@ public static class Reader
                     ro.Errors.Add("Unmatched end-bracket found");
                     break;
 
+                //autolet
+                case '[':
+                    addWork();
+                    var autoletCode = ScanTo(code, ref i, ']');
+                    var autolet = new Token(new List<Token> { new Token("let", TokenType.Keyword) });
+                    autolet.Children.AddRange(ReadCode(autoletCode, ro));
+                    retVal.AddRange(autolet.Children);
+                    break;
+
                 case '"':
                     addWork();
                     stringDelim = c;

@@ -249,6 +249,19 @@ public static class Interpreter
                 o.Save();
                 return s2;
 
+            case "setv":
+                if (list.Count != 3)
+                    return "--Exception: 'setv' requires exactly 2 parameters--";
+                if (list[1].TT != TokenType.Name)
+                    return "--Exception: 'setv' requires the first parameter to be a name--";
+                if (registers == null)
+                    return "--Exception: There is no let scope (explicit or implicit) available to setv on--";
+
+                s = list[1].Value;
+                s2 = ParseValue(list[2], context, ref quota, registers);
+                registers.Let(s, s2);
+                return s2;
+
             case "single":
                 if (list.Count == 1)
                     return "--Exception: 'single' requires at least 1 parameter (and really it should be 2 or you're just wasting quota)--";

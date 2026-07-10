@@ -416,6 +416,8 @@ Where the # is obviously the number you recorded from the backup command
 
     set [<obj>] <attr> <val> - Set attribute value on obj, or the context
 
+    setv <name> <val> - Set variable value.  
+
     single <val>... - Returns the first of the values that follow it that isn't empty.
 
     stg <setting> - Gets the Engine Setting specified (see "Settings, Roles and Permissions" earlier in this guide for more info on Engine Settings)
