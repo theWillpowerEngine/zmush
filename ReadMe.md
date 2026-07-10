@@ -64,6 +64,9 @@ Neuter
 
 ### Special Attributes
 
+    $<command string>   Custom Commands
+    >name([parm]...)    Function
+
 #### Exits
 
     arriveMsg    Special Message to show when arriving (special registers:   %a %an)
@@ -218,6 +221,16 @@ Auto-Let:
     [x 1 y 2] `([x], [y])`
     ;translates to:
     let x 1 y 2 `([x], [y])`
+
+Auto-V:
+
+    12.attr
+    here.attr
+
+Function calls
+
+    12.f 1 2
+    me.fWithNoParms
 
 ### Special Zelazny Commands
 

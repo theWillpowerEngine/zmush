@@ -188,6 +188,27 @@ public class ZObject
             return Locks.Any(l => l.Item1 == lockName && l.Item2 == lockVal);
     }
 
+    internal string? GetMatchingFunctionAttr(string name, int parms, bool excludeParent = false)
+    {
+        name = name.ToLowerInvariant();
+
+        var attr = Attrs.FirstOrDefault(a => Matcher.IsMatchingFunction(a.Name.ToLowerInvariant(), name, parms));
+        if (attr != null)
+            return attr.Name;
+
+        if (excludeParent)
+            return null;
+
+        var parentage = GetCompleteParentage();
+        foreach (var parent in parentage)
+        {
+            attr = parent.Attrs.FirstOrDefault(a => Matcher.IsMatchingFunction(a.Name.ToLowerInvariant(), name, parms));
+            if (attr != null)
+                return attr.Name;
+        }
+        return null;
+    }
+
     internal string? GetAttrValue(string name, bool excludeParent = false)
     {
         name = name.ToLowerInvariant();

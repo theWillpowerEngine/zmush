@@ -1,5 +1,3 @@
-* We need a (probably attribute-based) metaphor for functions (maybe attribute and zelazny based so that there can be globals)
-
 * Attribute locks/flags of some kind (for special and hidden attributes)
 * Template attributes (use for character creation PoC)
 

@@ -21,12 +21,65 @@ public static class Interpreter
         else if (quota > 0)
             quota -= 1;
 
-        string s, s2;
+        string? s, s2;
         ZObject? o, o2;
         int i = 0;
 
-        if (cmd.TT == TokenType.Name && list.Count == 1)
-            return ParseValue(cmd, context, ref quota, registers);
+        if (cmd.TT == TokenType.Name)
+        {
+            if (cmd.Value.Contains("."))
+            {
+                var eles = cmd.Value.Split('.');
+                if (eles.Length != 2)
+                    return $"--Exception: Invalid dotted notation: {cmd.Value}--";
+
+                o = Engine.GlobalFind(context, eles[0]);
+
+                if (o == null)
+                    return $"--Exception: Object '{eles[0]}' not found--";
+
+                var name = eles[1];
+                s = o.GetMatchingFunctionAttr(name, list.Count - 1);
+
+                //Function call
+                if (s != null)
+                {
+                    var f = o.GetAttrValue(s);
+                    if (f == null)
+                        return $"--Exception: Attribute '{s}' not found on #{o.Id}--";
+                    if (registers == null)
+                        return $"--Exception: No registers available for function call--";
+
+                    registers.AdvanceLetScope();
+                    var parmNames = Matcher.ExtractParameterNames(o, s, list.Count - 1);
+
+                    i = 0;
+                    foreach (var pn in parmNames)
+                    {
+                        registers.Let(pn, ParseValue(list[++i], context, ref quota, registers));
+                    }
+
+                    if (!f.StartsWith("{"))
+                        f = "{" + f + "}";
+
+                    var result = ZString.Eval(f, o, ref quota, registers);
+                    registers.EndLetScope();
+                    return result;
+                }
+
+                //Auto-V
+                s = o.GetAttrValue(name);
+                if (s == null)
+                    return $"--Exception: Attribute '{name}' not found on #{o.Id}--";
+                else
+                    return s;
+            }
+
+            //Just a single name at root level
+            if (list.Count == 1)
+                return ParseValue(cmd, context, ref quota, registers);
+
+        }
 
         if (cmd.Value.StartsWith("?"))
             return ParsePredicate(cmd, list.Skip(1).ToList(), context, ref quota, registers);

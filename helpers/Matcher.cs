@@ -78,8 +78,31 @@ public static class Matcher
         return valIsTruthy;
     }
 
-    internal static string Escape(string message)
+    public static string Escape(string message)
     {
         return message.Replace("{", "%{").Replace("}", "%}");
+    }
+
+    public static bool IsMatchingFunction(string check, string name, int parms)
+    {
+        var key = $">{name}";
+
+        if (!check.StartsWith(key))
+            return false;
+
+        check = check.Substring(key.Length).Trim();
+        var parts = check.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+        if (parts.Length != parms)
+            return false;
+
+        return true;
+    }
+
+    public static List<string> ExtractParameterNames(ZObject o, string name, int parms)
+    {
+        var parmS = name.TrimEnd(')').Split('(', StringSplitOptions.RemoveEmptyEntries)[1];
+        var eles = parmS.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+
+        return eles.ToList();
     }
 }
