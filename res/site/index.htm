@@ -67,6 +67,15 @@
                         return
                     }
 
+                    if (xhr.status == 0 && !error) {
+                        Cookies.remove("ZSession")
+                        location.reload()
+                        return
+                    }
+
+                    console.error("API Error! Status: " + xhr.status + ", Error: " + error);
+                    console.error("Response Text: " + xhr.responseText);
+
                     callback(0, { status: xhr.status, statusMsg: error, error: xhr.responseText })
                 })
             },
@@ -112,7 +121,8 @@
                                 $("#log").html(Z.logs.join("<br />") + "<br />")
 
                         } else {
-                            alert("API Error!  " + res.error)
+                            Z.logs.push("API Error:  " + res.error)
+                            $("#log").append("API Error:  " + res.error + "<br />")
                         }
                         Z.setRefreshTimer()
                     })
@@ -130,7 +140,8 @@
                             handleResult(res)
                             Z.frame()
                         } else {
-                            alert("API Error!  " + res.error)
+                            Z.logs.push("API Error:  " + res.error)
+                            $("#log").append("API Error:  " + res.error + "<br />")
                         }
                     })
                 } else {
@@ -169,7 +180,8 @@
                         $("#cmd").val("")
                         $("#cmd").focus()
                     } else {
-                        alert("API Error!  " + res.error)
+                        Z.logs.push("API Error:  " + res.error)
+                        $("#log").append("API Error:  " + res.error + "<br />")
                     }
                     Z.setRefreshTimer()
                 })
