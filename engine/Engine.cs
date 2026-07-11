@@ -124,10 +124,7 @@ public static partial class Engine
 
         var session = Sessions.Values.FirstOrDefault(s => s.UserId == pc.Id);
         if (session == null)
-        {
-            Log("dev", $"PlayerEmit called for PC {pc.Id} but no session was found for that user.");
             return;
-        }
 
         var log = Logs.GetOrAdd(session.Key, _ => new List<string>());
         log.Add(Matcher.Escape(message));

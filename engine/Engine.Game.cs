@@ -220,6 +220,39 @@ public static partial class Engine
                 PlayerEmit(session.Key, $"Removed lock '{(string.IsNullOrEmpty(up2) ? up1 : $"{up1}:{up2}")}' from #{o.Id}");
                 break;
 
+            case "@parent":
+                (s, s2) = GetNamedValue(rest);
+                o = Find(user, s);
+                if (o == null)
+                {
+                    PlayerEmit(session.Key, $"I can't find '{s}'");
+                    break;
+                }
+
+                if (!o.CheckPermissions(session.UserId))
+                {
+                    PlayerEmit(session.Key, $"You don't have permission to change the parent of #{o.Id}");
+                    Log("hax", $"User #{session.UserId} attempted to change the parent of #{o.Id} without permission.");
+                    break;
+                }
+
+                if (!int.TryParse(s2, out var newParentId))
+                {
+                    PlayerEmit(session.Key, $"Invalid parent ID: '{s2}'");
+                    break;
+                }
+
+                if (!Objects.ContainsKey(newParentId))
+                {
+                    PlayerEmit(session.Key, $"No object with ID #{newParentId} exists.");
+                    break;
+                }
+
+                o.Parent = newParentId;
+                o.Save();
+                PlayerEmit(session.Key, $"Parent of #{o.Id} is now #{newParentId}");
+                break;
+
             case "@flag":
                 (s, s2) = GetNamedValue(rest);
                 o = Find(user, s);

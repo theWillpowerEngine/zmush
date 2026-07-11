@@ -96,6 +96,8 @@ Neuter
 
     @examine (@ex) <obj>
 
+    @parent <obj>=<id>
+
     @password <user name>=<new password>
     
     @user <user name>=<pwd>
