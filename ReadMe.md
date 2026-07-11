@@ -172,6 +172,10 @@ Neuter
 
     match <check> (<compare> <val>)... [<val>] - For each pair, if the compare value matches the check value, evaluate and return that pair's value.  The optional final value is if nothing matches
 
+    roll <sides>
+    roll <number> <sides>
+    roll-pool <number> <sides> - Returns a PDL of the individual dice rolls
+
     set [<obj>] <attr> <val> - Set attribute value on obj, or the context
 
     setv <name> <val> - Set variable value.  

@@ -11,6 +11,8 @@ public static partial class Engine
 {
     public const string Version = "0.0.3";
 
+    public static Random R = new();
+
     public static Settings Settings { get; private set; } = new();
 
     public static Scheduler Scheduler { get; private set; } = new();

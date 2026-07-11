@@ -63,6 +63,7 @@ public static class Reader
         "list-add", "list-index", "list-remove", "list-remove-all",
         "log",
         "match",
+        "roll", "roll-pool",
         "set",
         "single",
         "stg", "sts",

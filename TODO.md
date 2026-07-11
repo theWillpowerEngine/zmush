@@ -28,7 +28,8 @@
 
 #### 0.0.3 -> 0.0.4
 
-* 
+* Added commands:  @parent
+* Added keywords:  roll
 
 #### 0.0.2 -> 0.0.3 
 

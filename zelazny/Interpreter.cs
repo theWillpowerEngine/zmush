@@ -286,6 +286,44 @@ public static class Interpreter
 
                 return "";
 
+            case "roll":
+                if (list.Count == 2)
+                {
+                    s = ParseValue(list[1], context, ref quota, registers);
+                    if (!int.TryParse(s, out var sides))
+                        return "--Exception: 'roll' parameter must be an integer--";
+                    return (Engine.R.Next(sides) + 1).ToString();
+                }
+                else if (list.Count == 3)
+                {
+                    s = ParseValue(list[1], context, ref quota, registers);
+                    if (!int.TryParse(s, out var count))
+                        return "--Exception: 'roll' first parameter must be an integer--";
+                    s = ParseValue(list[2], context, ref quota, registers);
+                    if (!int.TryParse(s, out var sides))
+                        return "--Exception: 'roll' second parameter must be an integer--";
+                    var result = 0;
+                    for (var j = 0; j < count; j++)
+                        result += Engine.R.Next(sides) + 1;
+                    return result.ToString();
+                }
+                return "--Exception: 'roll' requires 1 or 2 parameters--";
+
+            case "roll-pool":
+                if (list.Count != 3)
+                    return "--Exception: 'roll-pool' requires exactly 2 parameters--";
+
+                s = ParseValue(list[1], context, ref quota, registers);
+                if (!int.TryParse(s, out var count2))
+                    return "--Exception: 'roll-pool' first parameter must be an integer--";
+                s = ParseValue(list[2], context, ref quota, registers);
+                if (!int.TryParse(s, out var sides2))
+                    return "--Exception: 'roll-pool' second parameter must be an integer--";
+                var result2 = "";
+                for (var j = 0; j < count2; j++)
+                    result2 = PDL.Add(result2, (Engine.R.Next(sides2) + 1).ToString());
+                return result2;
+
             case "set":
                 if (list.Count != 3 && list.Count != 4)
                     return "--Exception: 'set' requires 2 or 3 parameters--";
