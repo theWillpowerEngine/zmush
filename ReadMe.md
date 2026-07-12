@@ -163,10 +163,6 @@ Neuter
 
     let (<name> <val>)* <action> - Create variables.  
 
-    add <string> <val> - Return a new stringified list adding <val>.  String can be either a string or a list itself
-    remove <string> <index> - Remove item from stringified list
-    remove-all <string> <val> - Remove all val from list.  Returns count, or 0 if none
-    index <list> <val> - Return index of item in list (1 based).  0 if not found
 
     log <val> - Logs a message with the 'zelazny' tag in the zmush log
 
@@ -188,6 +184,23 @@ Neuter
 
     val (v) <attr> - Get value of attribute from context
     val (v) <obj> <attr> - Get alue of attribute from object
+
+#### PDL / List Keywords
+
+    add <string> <val> - Return a new stringified list adding <val>.  String can be either a string or a list itself
+    
+    index <list> <val> - Return index of item in list (1 based).  0 if not found
+
+    map <list> <command> - Evaluate command for each item in list, returning the new list.  %i will be the iterative element
+
+    remove <string> <index> - Remove item from stringified list
+    remove-all <string> <val> - Remove all val from list.  Returns count, or 0 if none
+    
+### Special Keywords
+
+These can only be evaluated in special contexts, or by particular users
+
+    sts <setting> <val> - Sets the Engine Setting specified (see "Settings, Roles and Permissions" earlier in this guide for more info on Engine Settings)
 
 ### Predicates
 
@@ -238,12 +251,6 @@ Function calls
     12.f 1 2
     me.fWithNoParms
 
-### Special Zelazny Commands
-
-These can only be evaluated in special contexts, or by particular users
-
-    sts <setting> <val> - Sets the Engine Setting specified (see "Settings, Roles and Permissions" earlier in this guide for more info on Engine Settings)
-
 ### Built in Formatters
 
     [blah] - Action link (command = text)
@@ -265,3 +272,5 @@ These can only be evaluated in special contexts, or by particular users
     %ao   Objective pronoun (him/her/it) %Ao to capitalize it
     %ap   Possessive pronoun (his/hers/its) %Ap to capitalize it
     %l    Actor's location
+
+    %i    Iterative element for list keywords

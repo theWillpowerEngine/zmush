@@ -256,16 +256,19 @@ This is for the master room (using %a emits to the right person, not to the room
     add I was here
     @ex LDO
 
+    ;You can also rewrite the bit from LDO above from:
+    @attr LDO.$add *=set list {add {v list} %1}
+    ;to:
+    @attr LDO.$add *=set list {add LDO.list %1}
+
+    @eval map "1|2|3" {concat "Hi " %i}
+
+
 Fun with functions and auto-Vs:
 
     @cr Function Object (FNO)
     @attr FNO.>fn(x y)=emit %a `The coords are ([x], [y])`
     @eval FNO.fn 10 15
-
-    ;You can also rewrite the bit from LDO above from:
-    @attr LDO.$add *=set list {add {v list} %1}
-    ;to:
-    @attr LDO.$add *=set list {add LDO.list %1}
 
 
 ## Appendix:  Common Snippets and Libraries

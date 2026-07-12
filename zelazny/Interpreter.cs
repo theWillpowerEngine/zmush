@@ -110,6 +110,27 @@ public static class Interpreter
                 var idx = PDL.FindIndex(s, s2);
                 return idx.ToString();
 
+            case "map":
+                if (list.Count != 3)
+                    return "--Exception: 'list-map' requires exactly 2 parameters--";
+
+                s = ParseValue(list[1], context, ref quota, registers);
+
+
+                var oldIterator = registers?.IterativeElement ?? "";
+                registers?.IterativeElement = s;
+
+                var items = PDL.Split(s);
+                s2 = "";
+                foreach (var item in items)
+                {
+                    registers?.IterativeElement = item;
+                    s2 = PDL.Add(s2, ParseValue(list[2], context, ref quota, registers));
+                }
+
+                registers?.IterativeElement = oldIterator;
+                return s2;
+
             case "remove":
                 if (list.Count != 3)
                     return "--Exception: 'list-remove' requires exactly 2 parameters--";
@@ -651,6 +672,9 @@ public static class Interpreter
                     ZObject? actor;
                     switch (registerName)
                     {
+                        case "i":
+                            return registers?.IterativeElement ?? "";
+
                         case "a":
                             return registers?.ActorId.ToString() ?? "";
                         case "an":

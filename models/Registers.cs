@@ -19,6 +19,8 @@ public class Registers
 
     public string[] Numbered;
 
+    public string IterativeElement = "";
+
     public List<Let> LetScope = new();
     private int CurrentLetScope = 1;
 
@@ -101,6 +103,8 @@ public class Registers
             null => "its"
         };
         s = s.Replace("%ap", pronoun);
+
+        s = s.Replace("%i", IterativeElement);
 
         return s;
     }

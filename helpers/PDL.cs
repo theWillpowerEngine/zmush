@@ -35,4 +35,10 @@ public static class PDL
         }
         return 0;
     }
+
+    public static List<string> Split(string s)
+    {
+        var parts = s.Split('|', StringSplitOptions.RemoveEmptyEntries);
+        return parts.ToList();
+    }
 }
