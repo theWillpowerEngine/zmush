@@ -1,3 +1,5 @@
+* Add the cool functional array methods (map, select, etc.) to PDLs
+
 * Attribute locks/flags of some kind (for special and hidden attributes)
 * Template attributes (use for character creation PoC)
 
@@ -28,8 +30,9 @@
 
 #### 0.0.3 -> 0.0.4
 
+* Removed the list- prefix for PDL keywords it was more annoying that helpful
 * Added commands:  @parent
-* Added keywords:  roll
+* Added keywords:  roll, roll-pool
 
 #### 0.0.2 -> 0.0.3 
 

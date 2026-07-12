@@ -163,10 +163,10 @@ Neuter
 
     let (<name> <val>)* <action> - Create variables.  
 
-    list-add <string> <val> - Return a new stringified list adding <val>.  String can be either a string or a list itself
-    list-remove <string> <index> - Remove item from stringified list
-    list-remove-all <string> <val> - Remove all val from list.  Returns count, or 0 if none
-    list-index <list> <val> - Return index of item in list (1 based).  0 if not found
+    add <string> <val> - Return a new stringified list adding <val>.  String can be either a string or a list itself
+    remove <string> <index> - Remove item from stringified list
+    remove-all <string> <val> - Remove all val from list.  Returns count, or 0 if none
+    index <list> <val> - Return index of item in list (1 based).  0 if not found
 
     log <val> - Logs a message with the 'zelazny' tag in the zmush log
 

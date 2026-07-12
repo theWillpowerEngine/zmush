@@ -54,13 +54,14 @@ public static class Reader
 {
     private static List<string> KWs = new()
     {
+        "add", "index", "remove", "remove-all",
+
         "?=", "?!", "??", "?contains",
         "concat",
         "emit",
         "force",
         "do",
         "let",
-        "list-add", "list-index", "list-remove", "list-remove-all",
         "log",
         "match",
         "roll", "roll-pool",

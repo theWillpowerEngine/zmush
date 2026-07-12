@@ -89,6 +89,51 @@ public static class Interpreter
 
         switch (cmd.Value)
         {
+            //PDL Keywords
+            case "add":
+                if (list.Count != 3)
+                    return "--Exception: 'list-add' requires exactly 2 parameters--";
+
+                s = ParseValue(list[1], context, ref quota, registers);
+                s2 = ParseValue(list[2], context, ref quota, registers);
+
+                s = PDL.Add(s, s2);
+                return s;
+
+            case "index":
+                if (list.Count != 3)
+                    return "--Exception: 'list-index' requires exactly 2 parameters--";
+
+                s = ParseValue(list[1], context, ref quota, registers);
+                s2 = ParseValue(list[2], context, ref quota, registers);
+
+                var idx = PDL.FindIndex(s, s2);
+                return idx.ToString();
+
+            case "remove":
+                if (list.Count != 3)
+                    return "--Exception: 'list-remove' requires exactly 2 parameters--";
+
+                s = ParseValue(list[1], context, ref quota, registers);
+                s2 = ParseValue(list[2], context, ref quota, registers);
+
+                if (!int.TryParse(s2, out var idx2))
+                    return "--Exception: 'list-remove' requires the second parameter to be a numeric index (1-based)--";
+
+                s = PDL.RemoveAtIndex(s, idx2);
+                return s;
+
+            case "remove-all":
+                if (list.Count != 3)
+                    return "--Exception: 'list-remove-all' requires exactly 2 parameters--";
+
+                s = ParseValue(list[1], context, ref quota, registers);
+                s2 = ParseValue(list[2], context, ref quota, registers);
+
+                s = PDL.RemoveAll(s, s2);
+                return s;
+
+            //Other Keywords
             case "concat":
                 if (list.Count < 3)
                     return "--Exception: 'concat' requires at least 2 parameters--";
@@ -202,49 +247,6 @@ public static class Interpreter
                 s = ParseValue(list[list.Count - 1], context, ref quota, registers);
                 registers.EndLetScope();
 
-                return s;
-
-            case "list-add":
-                if (list.Count != 3)
-                    return "--Exception: 'list-add' requires exactly 2 parameters--";
-
-                s = ParseValue(list[1], context, ref quota, registers);
-                s2 = ParseValue(list[2], context, ref quota, registers);
-
-                s = PDL.Add(s, s2);
-                return s;
-
-            case "list-index":
-                if (list.Count != 3)
-                    return "--Exception: 'list-index' requires exactly 2 parameters--";
-
-                s = ParseValue(list[1], context, ref quota, registers);
-                s2 = ParseValue(list[2], context, ref quota, registers);
-
-                var idx = PDL.FindIndex(s, s2);
-                return idx.ToString();
-
-            case "list-remove":
-                if (list.Count != 3)
-                    return "--Exception: 'list-remove' requires exactly 2 parameters--";
-
-                s = ParseValue(list[1], context, ref quota, registers);
-                s2 = ParseValue(list[2], context, ref quota, registers);
-
-                if (!int.TryParse(s2, out var idx2))
-                    return "--Exception: 'list-remove' requires the second parameter to be a numeric index (1-based)--";
-
-                s = PDL.RemoveAtIndex(s, idx2);
-                return s;
-
-            case "list-remove-all":
-                if (list.Count != 3)
-                    return "--Exception: 'list-remove-all' requires exactly 2 parameters--";
-
-                s = ParseValue(list[1], context, ref quota, registers);
-                s2 = ParseValue(list[2], context, ref quota, registers);
-
-                s = PDL.RemoveAll(s, s2);
                 return s;
 
             case "log":
