@@ -1,7 +1,11 @@
-* Add the cool functional array methods (map, select, etc.) to PDLs
+Finish @attr/lock and @attr/unlock
 
 * Attribute locks/flags of some kind (for special and hidden attributes)
+
 * Template attributes (use for character creation PoC)
+
+
+* More PDL methods:  filter, ...
 
 * Consider adding "layer" tags like ooc where people can add stuff that folks can flag to subscribe or unsubscribe to
   * Config driven?
@@ -28,7 +32,7 @@
 
 ### Changelogs
 
-#### 0.0.3 -> 0.0.4
+#### 0.0.3 -> 0.0.4 (Saves Not Backwards Compatible)
 
 * Removed the list- prefix for PDL keywords it was more annoying that helpful
 * Added commands:  @parent

@@ -386,6 +386,16 @@ public static partial class Engine
                         }
                         break;
 
+                    case "lock":
+                    case "l":
+
+                        break;
+
+                    case "unlock":
+                    case "u":
+
+                        break;
+
                     case "clear":
                     case "c":
                     default:

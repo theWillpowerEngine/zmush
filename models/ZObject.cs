@@ -1,3 +1,4 @@
+using System.Runtime.InteropServices;
 using YamlDotNet.Serialization;
 
 public enum ZObType
@@ -25,6 +26,16 @@ public class Attr
 {
     public string Name = "";
     public string Value = "";
+
+    public List<(string, string)> Locks = new();
+
+    public bool HasLock(string lockName, string? lockVal = null)
+    {
+        if (lockVal == null)
+            return Locks.Any(l => l.Item1 == lockName);
+        else
+            return Locks.Any(l => l.Item1 == lockName && l.Item2 == lockVal);
+    }
 }
 
 public class ZObject
