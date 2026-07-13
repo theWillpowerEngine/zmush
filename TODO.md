@@ -1,5 +1,7 @@
-Fix the visibility issue (@decomp me on local and look at the +home attr)
 Try and figure out the functional inheritance "problem" (How can +home @tel without also allowing the player to?)
+
+* A flag for rooms which can't have exits added except by the owner, and maybe a role perm to allow doing that anyway
+  * perms in general (they already soft exist but lets make it explicit)
 
 * Attribute visibility locks (dark) ??
 
@@ -17,6 +19,7 @@ Try and figure out the functional inheritance "problem" (How can +home @tel with
 
 * Consider a queueing system for commands to avoid speed-spamming the endpoint
   * Take this chance to actually hook up quota too?
+  * Slow and Fast modes (settings based?)
 
 *Session Timeout
 

@@ -81,11 +81,11 @@ public class ZObject
             Workers.QueueForSave(this);
     }
 
-    public bool CheckPermissions(int userId)
+    public bool CheckPermissions(int objectId, ZObject? overrideZO)
     {
-        var user = Engine.Objects[userId];
+        var user = Engine.Objects[objectId];
 
-        if (userId == Owner)
+        if (objectId == Owner)
             return true;
 
         if (!Locks.Any(l => l.Item1 == "full"))
@@ -93,14 +93,16 @@ public class ZObject
             if (Locks.Any(l => l.Item1 == "public"))
                 return true;
 
-            if (Locks.Any(l => l.Item1 == "pc" && l.Item2.Split('|', ' ').Any(s => s.TrimStart("#").ToString() == userId.ToString())))
+            if (Locks.Any(l => l.Item1 == "id" && l.Item2.Split('|', ' ').Any(s => s.TrimStart("#").ToString() == objectId.ToString())))
                 return true;
         }
 
-        if (Engine.Sessions.Any(s => s.Value.UserId == userId))
+        if (Engine.IsAdminUser(objectId))
+            return true;
+
+        if (overrideZO != null)
         {
-            var session = Engine.Sessions.FirstOrDefault(s => s.Value.UserId == userId).Value;
-            if (session != null && session.Roles.Contains("admin"))
+            if (CheckPermissions(overrideZO.Id, null))
                 return true;
         }
 

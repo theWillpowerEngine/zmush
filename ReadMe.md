@@ -36,7 +36,7 @@ The server is now running.  You can shut it down safely by pressing 'x'.  The se
 
     Lock        Arg        Type(s)      Category    Function
     public      -           -           Access      Disable normal security, anyone can edit
-    pc          Id List     -           Access      Allow certain characters access to the ZObject.  Space delimited
+    id          Id List     -           Access      Allow certain characters access to the ZObject.  Space delimited
     full        -           -           Access      Overrides any other acccess-level locks and returns to default (only owner + admins)
 
     fixed       -           Item        Item        Only those with access to the ZObject can pick it up or drop it
@@ -47,7 +47,7 @@ The server is now running.  You can shut it down safely by pressing 'x'.  The se
     check       Code        Exit        Exit        Run Zelazny, can pass if it returns a truthy value.  If there are multiple checks only one has to pass.  Allow/Deny only matter if there are no checks
 
     owner       -           Attribute   Access      Only the owner can set this attribute (note:  supercedes other locks)
-    pc          Id List     Attribute   Access      List of Ids that can set this attribute.  Don't technically have to be characters
+    id          Id List     Attribute   Access      List of Ids that can set this attribute.  Don't technically have to be characters
     template    -           Attribute   Inherit     When a new ZObject is created or parented to this, copy this attribute don't inherit it (includes locks)
 
 ### Flags

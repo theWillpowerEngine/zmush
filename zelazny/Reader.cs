@@ -73,7 +73,8 @@ public static class Reader
         "val", "v",
     };
 
-    public static string ScanTo(string s, ref int i, char terminator, char? opener = null)
+    public static string
+    ScanTo(string s, ref int i, char terminator, char? opener = null)
     {
         var depth = 0;
         var work = "";
@@ -96,7 +97,11 @@ public static class Reader
             work += c;
         }
 
-        throw new IndexOutOfRangeException($"Unterminated string, missing {terminator} in {work}");
+        return $"--Exception: Unterminated string, missing {terminator} in {work}";
+    }
+    public static bool ExceptionGuard(string s)
+    {
+        return s.StartsWith("--Exception: ");
     }
 
     private static List<Token> ReadCode(string code, ReaderOutput ro)
@@ -162,7 +167,9 @@ public static class Reader
                 if (lookAhead == '{')
                 {
                     i++;
-                    ScanTo(code, ref i, '}', '{');
+                    var scanned = ScanTo(code, ref i, '}', '{');
+                    if (ExceptionGuard(scanned))
+                        ro.Errors.Add(scanned);
                 }
 
                 //Regular comment, ; to EOL or ;
@@ -192,7 +199,10 @@ public static class Reader
                 case '{':
                     addWork();
                     var innerCode = ScanTo(code, ref i, '}', '{');
-                    retVal.Add(new Token(ReadCode(innerCode, ro)));
+                    if (ExceptionGuard(innerCode))
+                        ro.Errors.Add(innerCode);
+                    else
+                        retVal.Add(new Token(ReadCode(innerCode, ro)));
                     break;
 
                 case '}':
@@ -203,9 +213,14 @@ public static class Reader
                 case '[':
                     addWork();
                     var autoletCode = ScanTo(code, ref i, ']');
-                    var autolet = new Token(new List<Token> { new Token("let", TokenType.Keyword) });
-                    autolet.Children.AddRange(ReadCode(autoletCode, ro));
-                    retVal.AddRange(autolet.Children);
+                    if (ExceptionGuard(autoletCode))
+                        ro.Errors.Add(autoletCode);
+                    else
+                    {
+                        var autolet = new Token(new List<Token> { new Token("let", TokenType.Keyword) });
+                        autolet.Children.AddRange(ReadCode(autoletCode, ro));
+                        retVal.AddRange(autolet.Children);
+                    }
                     break;
 
                 case '"':
@@ -278,8 +293,10 @@ public static class Reader
                 }
 
                 var tag = ScanTo(code, ref i, ']');
-
-                ro.Append(tag, TokenType.Tag);
+                if (ExceptionGuard(tag))
+                    ro.Errors.Add(tag);
+                else
+                    ro.Append(tag, TokenType.Tag);
                 continue;
             }
 
@@ -293,7 +310,10 @@ public static class Reader
                 }
 
                 var codeBlock = ScanTo(code, ref i, '}', '{');
-                ro.Append(ReadCode(codeBlock, ro));
+                if (ExceptionGuard(codeBlock))
+                    ro.Errors.Add(codeBlock);
+                else
+                    ro.Append(ReadCode(codeBlock, ro));
                 continue;
             }
 
@@ -316,7 +336,7 @@ public static class Reader
             case 's':
                 return "&nbsp;";
             case 't':
-                return "&nbsp;&nbsp;&nbsp;&nbsp;";
+                return "&emsp;";
             case 'n':
                 return "<br />";
             default:

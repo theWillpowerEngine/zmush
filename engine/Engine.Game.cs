@@ -153,7 +153,7 @@ public static partial class Engine
                                 }
                                 break;
 
-                            case "pc":
+                            case "id":
                                 if (lockParts.Length != 2)
                                 {
                                     PlayerEmit(session.Key, $"{s} requires a lock value, you didn't provide one.");
@@ -429,21 +429,21 @@ public static partial class Engine
                     _ => throw new Exception($"Unsupported ZObType: {o.ZOT}")
                 };
 
-                session.SpecialOutput(Matcher.Escape($"@create/{s} {o.Name}<br />"));
-                session.SpecialOutput(Matcher.Escape($"@desc {o.Name}={o.Desc}<br />"));
+                session.SpecialOutput($"@create/{s} {o.Name}%n");
+                session.SpecialOutput($"@desc {o.Name}={o.Desc}%n");
                 foreach (var sf in o.Flags)
                 {
-                    session.SpecialOutput(Matcher.Escape($"@flag {o.Name}={sf}<br />"));
+                    session.SpecialOutput($"@flag {o.Name}={sf}%n");
                 }
                 foreach (var sa in o.Attrs)
                 {
-                    session.SpecialOutput(Matcher.Escape($"@attr {o.Name}.{sa.Name}={sa.Value}<br />"));
+                    session.SpecialOutput($"@attr {o.Name}.{sa.Name}={sa.Value}%n");
                     foreach (var sl in sa.Locks)
                     {
                         if (!string.IsNullOrWhiteSpace(sl.Item2))
-                            session.SpecialOutput(Matcher.Escape($"@attr/lock {o.Name}.{sa.Name}={sl.Item1}:{sl.Item2}<br />"));
+                            session.SpecialOutput($"@attr/lock {o.Name}.{sa.Name}={sl.Item1}:{sl.Item2}%n");
                         else
-                            session.SpecialOutput(Matcher.Escape($"@attr/lock {o.Name}.{sa.Name}={sl.Item1}<br />"));
+                            session.SpecialOutput($"@attr/lock {o.Name}.{sa.Name}={sl.Item1}%n");
                     }
                 }
                 break;

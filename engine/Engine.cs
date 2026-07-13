@@ -297,6 +297,18 @@ public static partial class Engine
         return null;
     }
 
+    internal static bool IsAdminUser(int userId)
+    {
+        if (Sessions.Any(s => s.Value.UserId == userId))
+        {
+            var session = Sessions.FirstOrDefault(s => s.Value.UserId == userId).Value;
+            if (session != null && session.Roles.Contains("admin"))
+                return true;
+        }
+
+        return false;
+    }
+
     internal static SessionModel MakeSessionFor(User dbUser)
     {
         var existing = Sessions.Values.FirstOrDefault(s => s.UserId == dbUser.Id);

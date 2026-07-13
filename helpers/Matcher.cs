@@ -80,7 +80,15 @@ public static class Matcher
 
     public static string Escape(string message)
     {
-        return message.Replace("{", "%{").Replace("}", "%}");
+        var s = message;
+
+        //Removing escapes
+        s = s.Replace("%n", "<br />").Replace("%s", "&nbsp;").Replace("%t", "&emsp;");
+
+        s = s.Replace("%", "%%");
+
+        s = s.Replace("{", "%{").Replace("}", "%}");
+        return s;
     }
 
     public static bool IsMatchingFunction(string check, string name, int parms)

@@ -40,7 +40,7 @@ public class Attr
         if (HasLock("owner"))
             return actor.Id == target.Owner;
 
-        if (HasLock("pc") && PDL.FindIndex(Locks.Single(l => l.Item1 == "pc").Item2, actor.Id.ToString()) > 0)
+        if (HasLock("id") && PDL.FindIndex(Locks.Single(l => l.Item1 == "id").Item2, actor.Id.ToString()) > 0)
             return true;
 
         return false;
