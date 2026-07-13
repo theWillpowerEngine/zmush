@@ -35,7 +35,7 @@ public class Attr
         if (!Locks.Any()) return true;
 
         if (HasLock("owner"))
-            return actor.Id == target.Owner;
+            return actor.Id == target.Owner || Engine.IsAdminUser(actor.Id);
 
         if (HasLock("id"))
         {
@@ -46,11 +46,11 @@ public class Attr
                 if (PDL.FindIndex(Locks.Single(l => l.Item1 == "id").Item2, executor.Id.ToString()) > 0)
                     return true;
 
+            if (Engine.IsAdminUser(actor.Id))
+                return true;
+
             return false;
         }
-
-        // if (Engine.IsAdminUser(actor.Id))
-        //     return true;
 
         return true;
     }

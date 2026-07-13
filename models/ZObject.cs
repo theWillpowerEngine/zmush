@@ -105,8 +105,8 @@ public class ZObject
                 return true;
         }
 
-        // if (Engine.IsAdminUser(o.Id))
-        //     return true;
+        if (Engine.IsAdminUser(o.Id))
+            return true;
 
         if (o.HasFlag(Flag.SetAndGet))
             return true;
