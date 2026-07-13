@@ -83,7 +83,7 @@
             startGame() {
                 $("#authed").fadeIn()
                 $("#inputBar").fadeIn(() => {
-                    Cookies.set("ZInGame", "Yes", { expires: 1 })
+                    Cookies.set("ZInGame", "Yes")
                     Z.frame()
                     $("#cmd").focus()
                 });
