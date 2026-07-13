@@ -244,6 +244,17 @@ public static class Interpreter
 
                 return Engine.Command(fakeSession, forceVal);
 
+            case "id":
+                if (list.Count != 2)
+                    return "--Exception: 'id' requires exactly 1 parameter--";
+
+                s = ParseValue(list[1], context, ref quota, registers);
+                o = Engine.GlobalFind(context, s);
+                if (o == null)
+                    return $"--Exception: Object '{s}' not found--";
+
+                return o.Id.ToString();
+
             case "let":
                 if (list.Count < 4)
                     return "--Exception: 'let' requires at least 3 parameters--";

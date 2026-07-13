@@ -160,6 +160,15 @@ Neuter
 
 ## Zelazny
 
+@create/player Stimpy
+@desc Stimpy=The default admin character.  Very powerful.  Also adorable.
+@flag Stimpy=Handler
+@attr Stimpy.$+home=emit a %You don't have a home set! 
+@attr Stimpy.home=bob
+
+
+
+
 ### Keywords
 
     concat <val> <val>... - Combine into a single string
@@ -170,8 +179,9 @@ Neuter
 
     force <obj> <command> - Force <object> to run command
 
-    let (<name> <val>)* <action> - Create variables.  
+    id <obj> - Return ZOID
 
+    let (<name> <val>)* <action> - Create variables.  
 
     log <val> - Logs a message with the 'zelazny' tag in the zmush log
 

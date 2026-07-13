@@ -1,3 +1,6 @@
+Fix the visibility issue (@decomp me on local and look at the +home attr)
+Try and figure out the functional inheritance "problem" (How can +home @tel without also allowing the player to?)
+
 * Attribute visibility locks (dark) ??
 
 * More PDL methods:  filter, ...

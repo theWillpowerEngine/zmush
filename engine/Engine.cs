@@ -174,7 +174,7 @@ public static partial class Engine
 
     public static List<ZObject> GetObjectsInScope(ZObject scope, bool includeRoomHierarchy = false)
     {
-        var ret = new List<ZObject>();
+        var ret = new HashSet<ZObject>();
         ret.Add(scope);
 
         List<int> locationsInScope = new List<int>() { scope.Id };
@@ -217,8 +217,8 @@ public static partial class Engine
                 throw new Exception($"Unknown ZObType {scope.ZOT} for object {scope.Id} in GetObjectsInScope");
         }
 
-        ret.AddRange(Objects.Values.Where(o => locationsInScope.Contains(o.Id) || locationsInScope.Contains(o.Location)));
-        return ret;
+        ret.UnionWith(Objects.Values.Where(o => locationsInScope.Contains(o.Id) || locationsInScope.Contains(o.Location)));
+        return ret.ToList();
     }
 
     public static ZObject? Find(int userId, string name, bool localRoomOnly = false)
