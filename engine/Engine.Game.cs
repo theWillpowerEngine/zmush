@@ -67,270 +67,10 @@ public static partial class Engine
             }
         }
 
+        string[] lockParts;
+
         switch (kw)
         {
-            case "@name":
-                (s, s2) = GetNamedValue(rest);
-                o = Find(user, s);
-                if (o == null)
-                {
-                    PlayerEmit(session.Key, $"I can't find '{s}'");
-                    break;
-                }
-
-                if (!o.CheckPermissions(session.UserId))
-                {
-                    PlayerEmit(session.Key, $"You don't have permission to rename #{o.Id}");
-                    Log("hax", $"User #{session.UserId} attempted to rename #{o.Id} without permission.");
-                    break;
-                }
-
-                o.Name = s2;
-                o.Save();
-                PlayerEmit(session.Key, $"Renamed #{o.Id} to '{s2}'");
-                break;
-
-            case "@desc":
-                (s, s2) = GetNamedValue(rest);
-                o = Find(user, s);
-                if (o == null)
-                {
-                    PlayerEmit(session.Key, $"I can't find '{s}'");
-                    break;
-                }
-
-                if (!o.CheckPermissions(session.UserId))
-                {
-                    PlayerEmit(session.Key, $"You don't have permission to change the description of #{o.Id}");
-                    Log("hax", $"User #{session.UserId} attempted to change the description of #{o.Id} without permission.");
-                    break;
-                }
-
-                o.Desc = s2;
-                o.Save();
-                PlayerEmit(session.Key, $"Updated description of #{o.Id} to '{s2}'");
-                break;
-
-            case "@lock":
-                (s, s2) = GetNamedValue(rest);
-                o = Find(user, s);
-                if (o == null)
-                {
-                    PlayerEmit(session.Key, $"I can't find '{s}'");
-                    break;
-                }
-
-                if (!o.CheckPermissions(session.UserId))
-                {
-                    PlayerEmit(session.Key, $"You don't have permission to lock #{o.Id}");
-                    Log("hax", $"User #{session.UserId} attempted to manipulate locks on #{o.Id} without permission.");
-                    break;
-                }
-
-                var lockParts = s2.Split(':', 2).Select(s => s.Trim()).ToArray();
-                var lp1 = lockParts[0].ToLowerInvariant();
-                var lp2 = lockParts.Length > 1 ? lockParts[1] : "";
-
-                switch (subCmd)
-                {
-                    case null:
-                        if (string.IsNullOrEmpty(s2))
-                        {
-                            PlayerEmit(session.Key, $"You must specify a lock type and value.");
-                            break;
-                        }
-
-                        if (o.Locks.Any(l => l.Item1 == lp1 && l.Item2 == lp2))
-                        {
-                            PlayerEmit(session.Key, $"Lock '{(string.IsNullOrEmpty(lp2) ? lp1 : $"{lp1}:{lp2}")}' already exists on #{o.Id}");
-                            break;
-                        }
-
-                        o.Locks.Add((lp1, lp2));
-                        o.Save();
-                        PlayerEmit(session.Key, $"Added lock '{lp1}:{lp2}' to #{o.Id}");
-                        break;
-
-                    case "list":
-                    case "l":
-                        if (!o.Locks.Any())
-                        {
-                            PlayerEmit(session.Key, $"No locks on #{o.Id}");
-                            break;
-                        }
-                        PlayerEmit(session.Key, "Locks on #{o.Id}:");
-                        var i = 1;
-                        o.Locks.ForEach(l => PlayerEmit(session.Key, $"%t{i++}) %s{(string.IsNullOrEmpty(l.Item2) ? l.Item1 : $"{l.Item1}:{l.Item2}")}"));
-                        break;
-                }
-
-                break;
-
-            case "@unlock":
-                (s, s2) = GetNamedValue(rest);
-                o = Find(user, s);
-                if (o == null)
-                {
-                    PlayerEmit(session.Key, $"I can't find '{s}'");
-                    break;
-                }
-
-                if (!o.CheckPermissions(session.UserId))
-                {
-                    PlayerEmit(session.Key, $"You don't have permission to unlock #{o.Id}");
-                    Log("hax", $"User #{session.UserId} attempted to unlock #{o.Id} without permission.");
-                    break;
-                }
-
-                var unlockParts = s2.Split(':', 2).Select(s => s.Trim()).ToArray();
-                var up1 = unlockParts[0].ToLowerInvariant();
-                var up2 = unlockParts.Length > 1 ? unlockParts[1] : "";
-
-                if (string.IsNullOrEmpty(s2))
-                {
-                    PlayerEmit(session.Key, $"You must specify a lock to remove.");
-                    break;
-                }
-
-                if (int.TryParse(s2, out var lockIndex))
-                {
-                    if (lockIndex < 1 || lockIndex > o.Locks.Count)
-                    {
-                        PlayerEmit(session.Key, $"Lock index {lockIndex} is out of range.  Use @unlock/list to see the locks on #{o.Id}");
-                        break;
-                    }
-
-                    var indexedLock = o.Locks[lockIndex - 1];
-                    o.Locks.RemoveAt(lockIndex - 1);
-                    o.Save();
-                    PlayerEmit(session.Key, $"Removed lock '{(string.IsNullOrEmpty(indexedLock.Item2) ? indexedLock.Item1 : $"{indexedLock.Item1}:{indexedLock.Item2}")}' from #{o.Id}");
-                    break;
-                }
-
-
-                var lockToRemove = o.Locks.FirstOrDefault(l => l.Item1 == up1 && l.Item2 == up2);
-                if (lockToRemove == default)
-                {
-                    PlayerEmit(session.Key, $"Lock '{(string.IsNullOrEmpty(up2) ? up1 : $"{up1}:{up2}")}' does not exist on #{o.Id}");
-                    break;
-                }
-                o.Locks.Remove(lockToRemove);
-                o.Save();
-
-                PlayerEmit(session.Key, $"Removed lock '{(string.IsNullOrEmpty(up2) ? up1 : $"{up1}:{up2}")}' from #{o.Id}");
-                break;
-
-            case "@parent":
-                (s, s2) = GetNamedValue(rest);
-                o = Find(user, s);
-                if (o == null)
-                {
-                    PlayerEmit(session.Key, $"I can't find '{s}'");
-                    break;
-                }
-
-                if (!o.CheckPermissions(session.UserId))
-                {
-                    PlayerEmit(session.Key, $"You don't have permission to change the parent of #{o.Id}");
-                    Log("hax", $"User #{session.UserId} attempted to change the parent of #{o.Id} without permission.");
-                    break;
-                }
-
-                if (!int.TryParse(s2, out var newParentId))
-                {
-                    PlayerEmit(session.Key, $"Invalid parent ID: '{s2}'");
-                    break;
-                }
-
-                if (!Objects.ContainsKey(newParentId))
-                {
-                    PlayerEmit(session.Key, $"No object with ID #{newParentId} exists.");
-                    break;
-                }
-
-                o.Parent = newParentId;
-                o.Save();
-                PlayerEmit(session.Key, $"Parent of #{o.Id} is now #{newParentId}");
-                break;
-
-            case "@flag":
-                (s, s2) = GetNamedValue(rest);
-                o = Find(user, s);
-                if (o == null)
-                {
-                    PlayerEmit(session.Key, $"I can't find '{s}'");
-                    break;
-                }
-
-                if (!o.CheckPermissions(session.UserId))
-                {
-                    PlayerEmit(session.Key, $"You don't have permission to flag #{o.Id}");
-                    Log("hax", $"User #{session.UserId} attempted to manipulate flags on #{o.Id} without permission.");
-                    break;
-                }
-
-                var unset = s2.StartsWith("!");
-                if (unset)
-                    s2 = s2.Substring(1);
-
-                if (!Enum.TryParse<Flag>(s2, true, out var flag))
-                {
-                    if (s2.ToLowerInvariant() == "male" || s2.ToLowerInvariant() == "m")
-                    {
-                        o.Male = true;
-                        PlayerEmit(session.Key, $"#{o.Id} is now male.");
-                        break;
-                    }
-                    else if (s2.ToLowerInvariant() == "female" || s2.ToLowerInvariant() == "f")
-                    {
-                        o.Male = false;
-                        PlayerEmit(session.Key, $"#{o.Id} is now female.");
-                        break;
-                    }
-                    else if (s2.ToLowerInvariant() == "neuter" || s2.ToLowerInvariant() == "n")
-                    {
-                        o.Male = null;
-                        PlayerEmit(session.Key, $"#{o.Id} is now neuter.");
-                        break;
-                    }
-
-                    PlayerEmit(session.Key, $"'{s2}' is not a valid flag.");
-                    break;
-                }
-
-                var requiredRoles = Settings.RolesRequiredForFlag(flag);
-                if (requiredRoles != null && !session.Roles.Contains("admin") && !session.Roles.Any(r => requiredRoles.Contains(r)))
-                {
-                    PlayerEmit(session.Key, $"You don't have permission to set the '{flag}' flag.");
-                    Log("hax", $"User #{session.UserId} attempted to set the '{flag}' flag on #{o.Id} without permission.");
-                    break;
-                }
-
-                if (o.HasFlag(flag) && !unset)
-                {
-                    PlayerEmit(session.Key, $"#{o.Id} already has the '{flag}' flag.  If you want to unset it, use: @flag #{o.Id} !{flag}");
-                    break;
-                }
-                else if (!o.HasFlag(flag) && unset)
-                {
-                    PlayerEmit(session.Key, $"#{o.Id} does not have the '{flag}' flag.  If you want to set it, use: @flag #{o.Id} {flag}");
-                    break;
-                }
-
-                if (unset)
-                {
-                    o.Flags.Remove(flag);
-                    o.Save();
-                    PlayerEmit(session.Key, $"Removed '{flag}' flag from #{o.Id}");
-                }
-                else
-                {
-                    o.Flags.Add(flag);
-                    o.Save();
-                    PlayerEmit(session.Key, $"Added '{flag}' flag to #{o.Id}");
-                }
-                break;
-
             case "@attr":
                 var clear = !rest.Contains("=") || subCmd == "clear" || subCmd == "c";
 
@@ -631,6 +371,27 @@ public static partial class Engine
                 PlayerEmit(session.Key, $"Created new {zot} #{newObj.Id} named '{newObj.Name}'");
                 break;
 
+            case "@desc":
+                (s, s2) = GetNamedValue(rest);
+                o = Find(user, s);
+                if (o == null)
+                {
+                    PlayerEmit(session.Key, $"I can't find '{s}'");
+                    break;
+                }
+
+                if (!o.CheckPermissions(session.UserId))
+                {
+                    PlayerEmit(session.Key, $"You don't have permission to change the description of #{o.Id}");
+                    Log("hax", $"User #{session.UserId} attempted to change the description of #{o.Id} without permission.");
+                    break;
+                }
+
+                o.Desc = s2;
+                o.Save();
+                PlayerEmit(session.Key, $"Updated description of #{o.Id} to '{s2}'");
+                break;
+
             case "@dig":
                 var oneSidedExit = subCmd?.Contains("1") ?? false;
                 var tpAfterDig = subCmd?.Contains("t") ?? false;
@@ -686,6 +447,197 @@ public static partial class Engine
                     PlayerEmit(session.Key, $"Created new room #{newRoomId} named '{rest}' with exit from #{user.Location}");
                 break;
 
+            case "@eval":
+                if (!rest.StartsWith("{"))
+                    rest = "{" + rest + "}";
+
+                var evaled = ZString.Eval(rest, user, ref user.Quota);
+                PlayerEmit(session.Key, $"Result: {evaled}");
+                break;
+
+            case "@examine":
+            case "@ex":
+                o = Find(user, rest);
+                if (o == null)
+                    o = GlobalFind(user, rest);
+
+                if (o == null)
+                {
+                    PlayerEmit(session.Key, $"I can't find '{rest}'");
+                    break;
+                }
+
+                session.SpecialOutput($"[bold {o.Name} (#{o.Id})]%n");
+                session.SpecialOutput(o.Desc + "%n");
+                if (o.Parent >= 0)
+                    session.SpecialOutput($"%t[bold Parent:] #{o.Parent}%n");
+                session.SpecialOutput($"%t[bold Owner:] #{o.Owner}%n");
+                if (o.Flags.Any())
+                    session.SpecialOutput($"%t[bold Flags:] {string.Join(", ", o.Flags)}%n");
+                if (o.Attrs.Any())
+                {
+                    session.SpecialOutput($"%t[bold Attributes:]%n");
+                    foreach (var a in o.Attrs)
+                    {
+                        session.SpecialOutput($"%t{a.Name} = {a.Value}%n");
+                    }
+                }
+                break;
+
+            case "@flag":
+                (s, s2) = GetNamedValue(rest);
+                o = Find(user, s);
+                if (o == null)
+                {
+                    PlayerEmit(session.Key, $"I can't find '{s}'");
+                    break;
+                }
+
+                if (!o.CheckPermissions(session.UserId))
+                {
+                    PlayerEmit(session.Key, $"You don't have permission to flag #{o.Id}");
+                    Log("hax", $"User #{session.UserId} attempted to manipulate flags on #{o.Id} without permission.");
+                    break;
+                }
+
+                var unset = s2.StartsWith("!");
+                if (unset)
+                    s2 = s2.Substring(1);
+
+                if (!Enum.TryParse<Flag>(s2, true, out var flag))
+                {
+                    if (s2.ToLowerInvariant() == "male" || s2.ToLowerInvariant() == "m")
+                    {
+                        o.Male = true;
+                        PlayerEmit(session.Key, $"#{o.Id} is now male.");
+                        break;
+                    }
+                    else if (s2.ToLowerInvariant() == "female" || s2.ToLowerInvariant() == "f")
+                    {
+                        o.Male = false;
+                        PlayerEmit(session.Key, $"#{o.Id} is now female.");
+                        break;
+                    }
+                    else if (s2.ToLowerInvariant() == "neuter" || s2.ToLowerInvariant() == "n")
+                    {
+                        o.Male = null;
+                        PlayerEmit(session.Key, $"#{o.Id} is now neuter.");
+                        break;
+                    }
+
+                    PlayerEmit(session.Key, $"'{s2}' is not a valid flag.");
+                    break;
+                }
+
+                var requiredRoles = Settings.RolesRequiredForFlag(flag);
+                if (requiredRoles != null && !session.Roles.Contains("admin") && !session.Roles.Any(r => requiredRoles.Contains(r)))
+                {
+                    PlayerEmit(session.Key, $"You don't have permission to set the '{flag}' flag.");
+                    Log("hax", $"User #{session.UserId} attempted to set the '{flag}' flag on #{o.Id} without permission.");
+                    break;
+                }
+
+                if (o.HasFlag(flag) && !unset)
+                {
+                    PlayerEmit(session.Key, $"#{o.Id} already has the '{flag}' flag.  If you want to unset it, use: @flag #{o.Id} !{flag}");
+                    break;
+                }
+                else if (!o.HasFlag(flag) && unset)
+                {
+                    PlayerEmit(session.Key, $"#{o.Id} does not have the '{flag}' flag.  If you want to set it, use: @flag #{o.Id} {flag}");
+                    break;
+                }
+
+                if (unset)
+                {
+                    o.Flags.Remove(flag);
+                    o.Save();
+                    PlayerEmit(session.Key, $"Removed '{flag}' flag from #{o.Id}");
+                }
+                else
+                {
+                    o.Flags.Add(flag);
+                    o.Save();
+                    PlayerEmit(session.Key, $"Added '{flag}' flag to #{o.Id}");
+                }
+                break;
+
+            case "@lock":
+                (s, s2) = GetNamedValue(rest);
+                o = Find(user, s);
+                if (o == null)
+                {
+                    PlayerEmit(session.Key, $"I can't find '{s}'");
+                    break;
+                }
+
+                if (!o.CheckPermissions(session.UserId))
+                {
+                    PlayerEmit(session.Key, $"You don't have permission to lock #{o.Id}");
+                    Log("hax", $"User #{session.UserId} attempted to manipulate locks on #{o.Id} without permission.");
+                    break;
+                }
+
+                lockParts = s2.Split(':', 2).Select(s => s.Trim()).ToArray();
+                var lp1 = lockParts[0].ToLowerInvariant();
+                var lp2 = lockParts.Length > 1 ? lockParts[1] : "";
+
+                switch (subCmd)
+                {
+                    case null:
+                        if (string.IsNullOrEmpty(s2))
+                        {
+                            PlayerEmit(session.Key, $"You must specify a lock type and value.");
+                            break;
+                        }
+
+                        if (o.Locks.Any(l => l.Item1 == lp1 && l.Item2 == lp2))
+                        {
+                            PlayerEmit(session.Key, $"Lock '{(string.IsNullOrEmpty(lp2) ? lp1 : $"{lp1}:{lp2}")}' already exists on #{o.Id}");
+                            break;
+                        }
+
+                        o.Locks.Add((lp1, lp2));
+                        o.Save();
+                        PlayerEmit(session.Key, $"Added lock '{lp1}:{lp2}' to #{o.Id}");
+                        break;
+
+                    case "list":
+                    case "l":
+                        if (!o.Locks.Any())
+                        {
+                            PlayerEmit(session.Key, $"No locks on #{o.Id}");
+                            break;
+                        }
+                        PlayerEmit(session.Key, "Locks on #{o.Id}:");
+                        var i = 1;
+                        o.Locks.ForEach(l => PlayerEmit(session.Key, $"%t{i++}) %s{(string.IsNullOrEmpty(l.Item2) ? l.Item1 : $"{l.Item1}:{l.Item2}")}"));
+                        break;
+                }
+
+                break;
+
+            case "@name":
+                (s, s2) = GetNamedValue(rest);
+                o = Find(user, s);
+                if (o == null)
+                {
+                    PlayerEmit(session.Key, $"I can't find '{s}'");
+                    break;
+                }
+
+                if (!o.CheckPermissions(session.UserId))
+                {
+                    PlayerEmit(session.Key, $"You don't have permission to rename #{o.Id}");
+                    Log("hax", $"User #{session.UserId} attempted to rename #{o.Id} without permission.");
+                    break;
+                }
+
+                o.Name = s2;
+                o.Save();
+                PlayerEmit(session.Key, $"Renamed #{o.Id} to '{s2}'");
+                break;
+
             case "@nuke":
                 o = subCmd == "global" || subCmd == "g" ? GlobalFind(user, rest) : Find(user, rest);
                 if (o == null)
@@ -712,47 +664,37 @@ public static partial class Engine
                 Log($"User #{session.UserId} nuked {o.ZOT} #{o.Id}, '{o.Name}'");
                 break;
 
-            case "@tel":
-                int telId = int.MinValue;
-                if (rest.StartsWith("#") || int.TryParse(rest, out telId))
+            case "@parent":
+                (s, s2) = GetNamedValue(rest);
+                o = Find(user, s);
+                if (o == null)
                 {
-                    if (telId == int.MinValue)
-                        if (!int.TryParse(rest.Substring(1), out telId))
-                        {
-                            PlayerEmit(session.Key, $"Invalid Id:  {rest}");
-                            break;
-                        }
-
-                    o = Objects.GetValueOrDefault(telId);
-                    if (o == null)
-                    {
-                        PlayerEmit(session.Key, $"I can't find #{telId} to teleport to.");
-                        break;
-                    }
-
-                    if (o.ZOT != ZObType.Room)
-                    {
-                        PlayerEmit(session.Key, $"You can only teleport to rooms.");
-                        break;
-                    }
-                }
-                else
-                {
-                    o = Objects.Values.FirstOrDefault(z => z.ZOT == ZObType.Room && z.Name.ToLowerInvariant().Contains(rest.ToLowerInvariant()));
-                    if (o == null)
-                    {
-                        PlayerEmit(session.Key, $"I can't find '{rest}' to teleport to.");
-                        break;
-                    }
+                    PlayerEmit(session.Key, $"I can't find '{s}'");
+                    break;
                 }
 
-                RoomEmit(o.Id, $"{user.Name} appears in a puff of smoke.");
-                var oldLoc = user.Location;
-                user.Location = o.Id;
-                RoomEmit(oldLoc, $"{user.Name} disappears in a puff of smoke.");
+                if (!o.CheckPermissions(session.UserId))
+                {
+                    PlayerEmit(session.Key, $"You don't have permission to change the parent of #{o.Id}");
+                    Log("hax", $"User #{session.UserId} attempted to change the parent of #{o.Id} without permission.");
+                    break;
+                }
 
-                user.Save();
-                Log("admin", $"{user.Name} (#{user.Id}) teleported to #{o.Id} '{o.Name}'");
+                if (!int.TryParse(s2, out var newParentId))
+                {
+                    PlayerEmit(session.Key, $"Invalid parent ID: '{s2}'");
+                    break;
+                }
+
+                if (!Objects.ContainsKey(newParentId))
+                {
+                    PlayerEmit(session.Key, $"No object with ID #{newParentId} exists.");
+                    break;
+                }
+
+                o.Parent = newParentId;
+                o.Save();
+                PlayerEmit(session.Key, $"Parent of #{o.Id} is now #{newParentId}");
                 break;
 
             case "@password":
@@ -873,6 +815,103 @@ public static partial class Engine
                         PlayerEmit(session.Key, $"Unknown subcommand '{subCmd}'.  Valid subcommands: shutdown, backup, restore [#]");
                         break;
                 }
+                break;
+
+            case "@tel":
+                int telId = int.MinValue;
+                if (rest.StartsWith("#") || int.TryParse(rest, out telId))
+                {
+                    if (telId == int.MinValue)
+                        if (!int.TryParse(rest.Substring(1), out telId))
+                        {
+                            PlayerEmit(session.Key, $"Invalid Id:  {rest}");
+                            break;
+                        }
+
+                    o = Objects.GetValueOrDefault(telId);
+                    if (o == null)
+                    {
+                        PlayerEmit(session.Key, $"I can't find #{telId} to teleport to.");
+                        break;
+                    }
+
+                    if (o.ZOT != ZObType.Room)
+                    {
+                        PlayerEmit(session.Key, $"You can only teleport to rooms.");
+                        break;
+                    }
+                }
+                else
+                {
+                    o = Objects.Values.FirstOrDefault(z => z.ZOT == ZObType.Room && z.Name.ToLowerInvariant().Contains(rest.ToLowerInvariant()));
+                    if (o == null)
+                    {
+                        PlayerEmit(session.Key, $"I can't find '{rest}' to teleport to.");
+                        break;
+                    }
+                }
+
+                RoomEmit(o.Id, $"{user.Name} appears in a puff of smoke.");
+                var oldLoc = user.Location;
+                user.Location = o.Id;
+                RoomEmit(oldLoc, $"{user.Name} disappears in a puff of smoke.");
+
+                user.Save();
+                Log("admin", $"{user.Name} (#{user.Id}) teleported to #{o.Id} '{o.Name}'");
+                break;
+
+            case "@unlock":
+                (s, s2) = GetNamedValue(rest);
+                o = Find(user, s);
+                if (o == null)
+                {
+                    PlayerEmit(session.Key, $"I can't find '{s}'");
+                    break;
+                }
+
+                if (!o.CheckPermissions(session.UserId))
+                {
+                    PlayerEmit(session.Key, $"You don't have permission to unlock #{o.Id}");
+                    Log("hax", $"User #{session.UserId} attempted to unlock #{o.Id} without permission.");
+                    break;
+                }
+
+                var unlockParts = s2.Split(':', 2).Select(s => s.Trim()).ToArray();
+                var up1 = unlockParts[0].ToLowerInvariant();
+                var up2 = unlockParts.Length > 1 ? unlockParts[1] : "";
+
+                if (string.IsNullOrEmpty(s2))
+                {
+                    PlayerEmit(session.Key, $"You must specify a lock to remove.");
+                    break;
+                }
+
+                if (int.TryParse(s2, out var lockIndex))
+                {
+                    if (lockIndex < 1 || lockIndex > o.Locks.Count)
+                    {
+                        PlayerEmit(session.Key, $"Lock index {lockIndex} is out of range.  Use @unlock/list to see the locks on #{o.Id}");
+                        break;
+                    }
+
+                    var indexedLock = o.Locks[lockIndex - 1];
+                    o.Locks.RemoveAt(lockIndex - 1);
+                    o.Save();
+                    PlayerEmit(session.Key, $"Removed lock '{(string.IsNullOrEmpty(indexedLock.Item2) ? indexedLock.Item1 : $"{indexedLock.Item1}:{indexedLock.Item2}")}' from #{o.Id}");
+                    break;
+                }
+
+
+                var lockToRemove = o.Locks.FirstOrDefault(l => l.Item1 == up1 && l.Item2 == up2);
+                if (lockToRemove == default)
+                {
+                    PlayerEmit(session.Key, $"Lock '{(string.IsNullOrEmpty(up2) ? up1 : $"{up1}:{up2}")}' does not exist on #{o.Id}");
+                    break;
+                }
+                o.Locks.Remove(lockToRemove);
+                o.Save();
+
+                PlayerEmit(session.Key, $"Removed lock '{(string.IsNullOrEmpty(up2) ? up1 : $"{up1}:{up2}")}' from #{o.Id}");
                 break;
 
             case "@user":
@@ -1006,41 +1045,10 @@ public static partial class Engine
 
                 break;
 
-            case "@eval":
-                if (!rest.StartsWith("{"))
-                    rest = "{" + rest + "}";
-
-                var evaled = ZString.Eval(rest, user, ref user.Quota);
-                PlayerEmit(session.Key, $"Result: {evaled}");
-                break;
-
-            case "@examine":
-            case "@ex":
-                o = Find(user, rest);
-                if (o == null)
-                    o = GlobalFind(user, rest);
-
-                if (o == null)
-                {
-                    PlayerEmit(session.Key, $"I can't find '{rest}'");
-                    break;
-                }
-
-                session.SpecialOutput($"[bold {o.Name} (#{o.Id})]%n");
-                session.SpecialOutput(o.Desc + "%n");
-                if (o.Parent >= 0)
-                    session.SpecialOutput($"%t[bold Parent:] #{o.Parent}%n");
-                session.SpecialOutput($"%t[bold Owner:] #{o.Owner}%n");
-                if (o.Flags.Any())
-                    session.SpecialOutput($"%t[bold Flags:] {string.Join(", ", o.Flags)}%n");
-                if (o.Attrs.Any())
-                {
-                    session.SpecialOutput($"%t[bold Attributes:]%n");
-                    foreach (var a in o.Attrs)
-                    {
-                        session.SpecialOutput($"%t{a.Name} = {a.Value}%n");
-                    }
-                }
+            case "!exit":
+            case "!ex":
+                PlayerEmit(session.Key, $"Signed out!  The screen will refresh in a moment...");
+                Sessions.TryRemove(session.Key, out _);
                 break;
 
             case "!password":
@@ -1063,24 +1071,54 @@ public static partial class Engine
                 PlayerEmit(session.Key, $"Updated your password");
                 break;
 
-            case "!exit":
-            case "!ex":
-                PlayerEmit(session.Key, $"Signed out!  The screen will refresh in a moment...");
-                Sessions.TryRemove(session.Key, out _);
+            case "emote":
+            case "em":
+                if (string.IsNullOrEmpty(rest))
+                {
+                    PlayerEmit(session.Key, $"Emote what?");
+                    break;
+                }
+                if (subCmd == "ns")
+                    RoomEmit(user.Location, $"{user.Name}{rest}");
+                else
+                    RoomEmit(user.Location, $"{user.Name} {rest}");
                 break;
 
-            case "look":
-            case "l":
+            case "drop":
+            case "dr":
                 if (string.IsNullOrEmpty(rest))
+                {
+                    PlayerEmit(session.Key, $"Drop what?");
                     break;
+                }
 
                 o = Find(user, rest);
                 if (o == null)
                 {
-                    PlayerEmit(session.Key, $"Look at what?");
+                    PlayerEmit(session.Key, $"You can't find '{rest}' anywhere...");
                     break;
                 }
-                PlayerEmit(session.Key, o.Desc);
+                if (o.Location != user.Id)
+                {
+                    PlayerEmit(session.Key, $"You're not carrying {o.Name}");
+                    break;
+                }
+
+                if (o.HasLock("fixed") && !o.CheckPermissions(session.UserId))
+                {
+                    PlayerEmit(session.Key, $"You can't drop {o.Name}.");
+                    break;
+                }
+
+                if (o.HasLock("static"))
+                {
+                    PlayerEmit(session.Key, $"You can't drop {o.Name}, it's static.");
+                    break;
+                }
+
+                o.Location = user.Location;
+                o.Save();
+                RoomEmit(user.Location, $"{user.Name} drops {o.Name} on the ground.");
                 break;
 
             case "get":
@@ -1125,43 +1163,6 @@ public static partial class Engine
                 RoomEmit(user.Location, $"{user.Name} picks up {o.Name}.");
                 break;
 
-            case "drop":
-            case "dr":
-                if (string.IsNullOrEmpty(rest))
-                {
-                    PlayerEmit(session.Key, $"Drop what?");
-                    break;
-                }
-
-                o = Find(user, rest);
-                if (o == null)
-                {
-                    PlayerEmit(session.Key, $"You can't find '{rest}' anywhere...");
-                    break;
-                }
-                if (o.Location != user.Id)
-                {
-                    PlayerEmit(session.Key, $"You're not carrying {o.Name}");
-                    break;
-                }
-
-                if (o.HasLock("fixed") && !o.CheckPermissions(session.UserId))
-                {
-                    PlayerEmit(session.Key, $"You can't drop {o.Name}.");
-                    break;
-                }
-
-                if (o.HasLock("static"))
-                {
-                    PlayerEmit(session.Key, $"You can't drop {o.Name}, it's static.");
-                    break;
-                }
-
-                o.Location = user.Location;
-                o.Save();
-                RoomEmit(user.Location, $"{user.Name} drops {o.Name} on the ground.");
-                break;
-
             case "inventory":
             case "inv":
             case "i":
@@ -1174,6 +1175,20 @@ public static partial class Engine
                 PlayerEmit(session.Key, $"You are carrying: {string.Join(", ", inv.Select(o => o.Name))}");
                 break;
 
+            case "look":
+            case "l":
+                if (string.IsNullOrEmpty(rest))
+                    break;
+
+                o = Find(user, rest);
+                if (o == null)
+                {
+                    PlayerEmit(session.Key, $"Look at what?");
+                    break;
+                }
+                PlayerEmit(session.Key, o.Desc);
+                break;
+
             case "say":
                 if (string.IsNullOrEmpty(rest))
                 {
@@ -1181,19 +1196,6 @@ public static partial class Engine
                     break;
                 }
                 RoomEmit(user.Location, $"{user.Name} says, \"{rest}\"");
-                break;
-
-            case "emote":
-            case "em":
-                if (string.IsNullOrEmpty(rest))
-                {
-                    PlayerEmit(session.Key, $"Emote what?");
-                    break;
-                }
-                if (subCmd == "ns")
-                    RoomEmit(user.Location, $"{user.Name}{rest}");
-                else
-                    RoomEmit(user.Location, $"{user.Name} {rest}");
                 break;
 
             //Exits, custom commands

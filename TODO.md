@@ -29,7 +29,7 @@
 
 ### Changelogs
 
-#### 0.0.3 -> 0.0.4 (Saves Not Backwards Compatible)
+#### 0.0.3 -> 0.0.4
 
 * Removed the list- prefix for PDL keywords it was more annoying that helpful
 * Added commands:  @parent, @attr/lock, @attr/listlocks, @attr/unlock
