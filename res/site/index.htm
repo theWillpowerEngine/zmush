@@ -193,9 +193,18 @@
 
         $(() => {
             $(document).on('click', ".action-link", function (e) {
+                var targ = $(e.target)
+                if (targ.is("#special-output")) return;
+
                 e.preventDefault();
                 const cmd = $(this).attr("data-action");
                 Z.command(cmd);
+            });
+
+            $(document).on('click', "#special-output", function (e) {
+                var s = $(this).html().replaceAll("<br>", "\n")
+                navigator.clipboard.writeText(s)
+                $("#log").append("Copied to clipboard<br />")
             });
 
             if (sessionId) {

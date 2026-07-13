@@ -98,6 +98,7 @@ Neuter
     @desc <obj>=<name>
 
     @examine (@ex) <obj>
+    @decompile (@dc) <obj>
 
     @parent <obj>=<id>
 

@@ -137,6 +137,7 @@ public static partial class Engine
 
                         lockParts = s2.Split(':');
                         s = lockParts[0].ToLower();
+                        s2 = lockParts.Length > 1 ? lockParts[1] : "";
 
                         switch (s)
                         {
@@ -390,6 +391,53 @@ public static partial class Engine
                 o.Desc = s2;
                 o.Save();
                 PlayerEmit(session.Key, $"Updated description of #{o.Id} to '{s2}'");
+                break;
+
+            case "@decompile":
+            case "@decomp":
+            case "@dc":
+                o = Find(user, rest);
+                if (o == null)
+                    o = GlobalFind(user, rest);
+                if (o == null)
+                {
+                    PlayerEmit(session.Key, $"I can't find '{rest}'");
+                    break;
+                }
+
+                if (!o.CheckPermissions(session.UserId))
+                {
+                    PlayerEmit(session.Key, $"You don't have permission to decompile #{o.Id}");
+                    Log("hax", $"User #{session.UserId} attempted to decompile #{o.Id} without permission.");
+                    break;
+                }
+
+                s = o.ZOT switch
+                {
+                    ZObType.Room => "room",
+                    ZObType.Exit => "exit",
+                    ZObType.Character => "player",
+                    ZObType.Item => "item",
+                    _ => throw new Exception($"Unsupported ZObType: {o.ZOT}")
+                };
+
+                session.SpecialOutput(Matcher.Escape($"@create/{s} {o.Name}<br />"));
+                session.SpecialOutput(Matcher.Escape($"@desc {o.Name}={o.Desc}<br />"));
+                foreach (var sf in o.Flags)
+                {
+                    session.SpecialOutput(Matcher.Escape($"@flag {o.Name}={sf}<br />"));
+                }
+                foreach (var sa in o.Attrs)
+                {
+                    session.SpecialOutput(Matcher.Escape($"@attr {o.Name}.{sa.Name}={sa.Value}<br />"));
+                    foreach (var sl in sa.Locks)
+                    {
+                        if (!string.IsNullOrWhiteSpace(sl.Item2))
+                            session.SpecialOutput(Matcher.Escape($"@attr/lock {o.Name}.{sa.Name}={sl.Item1}:{sl.Item2}<br />"));
+                        else
+                            session.SpecialOutput(Matcher.Escape($"@attr/lock {o.Name}.{sa.Name}={sl.Item1}<br />"));
+                    }
+                }
                 break;
 
             case "@dig":
@@ -1358,7 +1406,7 @@ public static partial class Engine
         var so = session.GetSpecialOutput();
         if (!string.IsNullOrWhiteSpace(so))
         {
-            ret += "<div id='specialOutput'>";
+            ret += "<div id='special-output'>";
             ret += ZString.Eval(so, loc);
             ret += "<br /></div>";
         }

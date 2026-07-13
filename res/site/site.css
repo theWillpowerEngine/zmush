@@ -26,6 +26,14 @@ body {
     box-shadow: 0 0 0 2px #94B0DA;
 }
 
+#special-output {
+    margin-left: 10px;
+    margin-right: 10px;
+    background-color: #694A38;
+    cursor: pointer;
+}
+
+
 .color-red {
     color: #D62828;
 }
