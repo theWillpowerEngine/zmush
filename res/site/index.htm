@@ -83,6 +83,7 @@
             startGame() {
                 $("#authed").fadeIn()
                 $("#inputBar").fadeIn(() => {
+                    Cookies.set("ZInGame", "Yes", { expires: 1 })
                     Z.frame()
                     $("#cmd").focus()
                 });
@@ -190,14 +191,15 @@
 
         window['ZVER'] = "{ZMVER}";
         window['sessionId'] = Cookies.get("ZSession")
+        window['ZInGame'] = Cookies.get("ZInGame") === "Yes"
 
         $(() => {
             $(document).on('click', ".action-link", function (e) {
                 var targ = $(e.target)
-                if (targ.is("#special-output")) return;
+                if (targ.is("#special-output")) return
 
                 e.preventDefault();
-                const cmd = $(this).attr("data-action");
+                const cmd = $(this).attr("data-action")
                 Z.command(cmd);
             });
 
@@ -208,11 +210,11 @@
                 $("#cmd").focus()
             });
 
-            if (sessionId) {
+            if (!ZInGame && sessionId) {
                 Z.post("/reauth", sessionId, (suc, res) => {
                     if (suc) {
                         $("#banner").fadeOut(() => {
-                            Z.startGame();
+                            Z.startGame()
                         })
                     } else {
                         $("#banner").fadeOut(() => {
