@@ -50,7 +50,7 @@ public static class Interpreter
                     if (registers == null)
                         return $"--Exception: No registers available for function call--";
 
-                    registers.AdvanceLetScope();
+                    registers.AdvanceLetScope(o);
                     var parmNames = Matcher.ExtractParameterNames(o, s, list.Count - 1);
 
                     i = 0;
@@ -272,7 +272,7 @@ public static class Interpreter
                     scopeVars.Add(s, s2);
                 }
 
-                registers.AdvanceLetScope();
+                registers.AdvanceLetScope(null);
                 foreach (var key in scopeVars.Keys)
                     registers.Let(key, scopeVars[key]);
 
@@ -370,8 +370,10 @@ public static class Interpreter
                     return $"--Exception: Object '{s}' not found--";
 
                 s2 = ParseValue(list[2], context, ref quota, registers);
-
                 s = ParseValue(list[3], context, ref quota, registers);
+
+                if (!o.CheckPermissions(context, registers?.Executor))
+                    return $"--Exception: You do not have permission to set attributes on #{o.Id}--";
 
                 var attr = o.Attrs.FirstOrDefault(a => a.Name.ToLowerInvariant() == s2.ToLowerInvariant());
                 if (attr != null && !attr.CanSet(o, context))
@@ -542,6 +544,9 @@ public static class Interpreter
                     var oV = Engine.Find(context, oVName);
                     if (oV == null)
                         return $"--Exception: Object '{oVName}' not found--";
+
+                    if (!oV.CheckPermissions(context, registers?.Executor))
+                        return $"--Exception: You do not have permission to get attributes on #{oV.Id}--";
 
                     return oV.GetAttrValue(ParseValue(list[2], context, ref quota, registers)) ?? "";
                 }

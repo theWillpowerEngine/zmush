@@ -1,4 +1,5 @@
-Try and figure out the functional inheritance "problem" (How can +home @tel without also allowing the player to?)
+Test the whole executor thing
+
 
 * A flag for rooms which can't have exits added except by the owner, and maybe a role perm to allow doing that anyway
   * perms in general (they already soft exist but lets make it explicit)

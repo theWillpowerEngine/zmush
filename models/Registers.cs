@@ -24,6 +24,8 @@ public class Registers
     public List<Let> LetScope = new();
     private int CurrentLetScope = 1;
 
+    public ZObject? Executor;
+
     public Registers(List<string> registers, ZObject actor)
     {
         Numbered = registers.ToArray();
@@ -37,9 +39,13 @@ public class Registers
         ActorName = actor.Name;
     }
 
-    public void AdvanceLetScope()
+    private Stack<ZObject> ExecutorStack = new();
+
+    public void AdvanceLetScope(ZObject? executor = null)
     {
         CurrentLetScope++;
+        ExecutorStack.Push(executor);
+        Executor = executor;
     }
 
     public void EndLetScope()
@@ -52,6 +58,14 @@ public class Registers
         foreach (var let in letsToRemove)
         {
             LetScope.Remove(let);
+        }
+
+        if (ExecutorStack.Count > 0)
+            Executor = ExecutorStack.Pop();
+        else
+        {
+            Engine.Log("dev", "You should never see this, but the Executor stack was empty so the logic is broken somewhere...");
+            Executor = null;
         }
     }
 
