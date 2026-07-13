@@ -32,7 +32,8 @@
 #### 0.0.3 -> 0.0.4
 
 * Removed the list- prefix for PDL keywords it was more annoying that helpful
-* Added commands:  @parent, @attr/lock, @attr/listlocks, @attr/unlock
+* Made special output a visibly-different section of the UI and added "copy to clipboard" on click
+* Added commands:  @parent, @attr/lock, @attr/listlocks, @attr/unlock, @decompile
 * Added keywords:  roll, roll-pool
 
 #### 0.0.2 -> 0.0.3 
