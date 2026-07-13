@@ -1,9 +1,6 @@
-Finish @attr/lock and @attr/unlock
-
-* Attribute locks/flags of some kind (for special and hidden attributes)
 
 * Template attributes (use for character creation PoC)
-
+* Attribute visibility locks (dark) ??
 
 * More PDL methods:  filter, ...
 
@@ -35,7 +32,7 @@ Finish @attr/lock and @attr/unlock
 #### 0.0.3 -> 0.0.4 (Saves Not Backwards Compatible)
 
 * Removed the list- prefix for PDL keywords it was more annoying that helpful
-* Added commands:  @parent
+* Added commands:  @parent, @attr/lock, @attr/listlocks, @attr/unlock
 * Added keywords:  roll, roll-pool
 
 #### 0.0.2 -> 0.0.3 

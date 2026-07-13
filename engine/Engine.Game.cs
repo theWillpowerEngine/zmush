@@ -388,12 +388,70 @@ public static partial class Engine
 
                     case "lock":
                     case "l":
+                        attr = o.Attrs.FirstOrDefault(attr => attr.Name == attrName);
+                        if (attr == null)
+                        {
+                            PlayerEmit(session.Key, $"#{o.Id} does not have an attribute named '{attrName}'");
+                            break;
+                        }
 
+                        lockParts = s2.Split(':');
+                        s = lockParts[0].ToLower();
+
+                        switch (s)
+                        {
+                            case "owner":
+                                if (lockParts.Length != 1)
+                                {
+                                    PlayerEmit(session.Key, $"{s} doesn't take a lock value, you passed '{lockParts[1]}'.");
+                                    return RenderFrame(session);
+                                }
+                                break;
+
+                            case "pc":
+                                if (lockParts.Length != 2)
+                                {
+                                    PlayerEmit(session.Key, $"{s} requires a lock value, you didn't provide one.");
+                                    return RenderFrame(session);
+                                }
+                                break;
+
+                            default:
+                                PlayerEmit(session.Key, $"Unknown lock type for attributes:  {s}.");
+                                return RenderFrame(session);
+                        }
+
+                        attr.AddOrSetLock(s, s2);
+                        o.Save();
+                        PlayerEmit(session.Key, $"Set lock '{s}' on attribute #{o.Id}.{attrName} to '{s2}'.");
+                        break;
+
+                    case "listlocks":
+                    case "ll":
+                        attr = o.Attrs.FirstOrDefault(attr => attr.Name == attrName);
+                        if (attr == null)
+                        {
+                            PlayerEmit(session.Key, $"#{o.Id} does not have an attribute named '{attrName}'");
+                            break;
+                        }
+                        session.SpecialOutput($"Locks for attribute #{o.Id}.{attrName}: {string.Join("<br /> ", attr.Locks.Select(l => $"{l.Item1}:{l.Item2}"))}<br />");
                         break;
 
                     case "unlock":
                     case "u":
-
+                        attr = o.Attrs.FirstOrDefault(attr => attr.Name == attrName);
+                        if (attr == null)
+                        {
+                            PlayerEmit(session.Key, $"#{o.Id} does not have an attribute named '{attrName}'");
+                            break;
+                        }
+                        if (attr.RemoveLock(s2))
+                        {
+                            PlayerEmit(session.Key, $"Removed lock '{s2}' from attribute #{o.Id}.{attrName}");
+                            o.Save();
+                        }
+                        else
+                            PlayerEmit(session.Key, $"Attribute #{o.Id}.{attrName} does not have a lock named '{s2}'");
                         break;
 
                     case "clear":
@@ -402,6 +460,12 @@ public static partial class Engine
                         attr = o.Attrs.FirstOrDefault(a => a.Name == attrName);
                         if (attr != null)
                         {
+                            if (!attr.CanSet(o, user, session))
+                            {
+                                PlayerEmit(session.Key, $"You do not have permission to set the '{attrName}' attribute on #{o.Id}");
+                                break;
+                            }
+
                             if (clear)
                             {
                                 o.Attrs.Remove(attr);
@@ -912,6 +976,12 @@ public static partial class Engine
                         if (!dbU3?.Roles.Contains(s2) ?? true)
                         {
                             PlayerEmit(session.Key, $"User '{s}' does not have the '{s2}' role.");
+                            break;
+                        }
+
+                        if (dbU3 == null)
+                        {
+                            PlayerEmit(session.Key, $"User '{s}' does not exist.");
                             break;
                         }
 

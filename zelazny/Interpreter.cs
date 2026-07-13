@@ -361,6 +361,11 @@ public static class Interpreter
                 s2 = ParseValue(list[2], context, ref quota, registers);
 
                 s = ParseValue(list[3], context, ref quota, registers);
+
+                var attr = o.Attrs.FirstOrDefault(a => a.Name.ToLowerInvariant() == s2.ToLowerInvariant());
+                if (attr != null && !attr.CanSet(o, context))
+                    return $"--Exception: You do not have permission to set the '{s2}' attribute on #{o.Id}--";
+
                 o.SetAttrValue(s2, s);
                 o.Save();
                 return s;

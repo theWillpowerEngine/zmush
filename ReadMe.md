@@ -46,6 +46,9 @@ The server is now running.  You can shut it down safely by pressing 'x'.  The se
     deny        Id List     Exit        Exit        Deny certain people (unlocked otherwise.  Can't combine with allow).  Space delimited
     check       Code        Exit        Exit        Run Zelazny, can pass if it returns a truthy value.  If there are multiple checks only one has to pass.  Allow/Deny only matter if there are no checks
 
+    owner       -           Attribute   Access      Only the owner can set this attribute (note:  supercedes other locks)
+    pc          Id List     Attribute   Access      List of Ids that can set this attribute.  Don't technically have to be characters
+
 ### Flags
 
 Dark
@@ -118,6 +121,10 @@ Neuter
     @attr/val (@attr/v) <obj>.<attr>
 
     @attr/list (@attr/l) <obj>
+
+    @attr/lock (@attr/l) <obj>.<attr>=<lock>[:<val>]        //Set attribute lock
+    @attr/unlock (@attr/u) <obj>.<attr>=<lock>
+    @attr/listlocks (@attr/ll) <obj>.<attr>
 
     @create (@cr) <name>
         @cr/item (@cr/i)

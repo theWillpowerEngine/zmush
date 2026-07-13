@@ -1,44 +1,44 @@
 public static class PDL
 {
-    public static string Add(string s1, string s2)
+    public static string Add(string list, string toAdd)
     {
-        var ret = $"|{s1}|{s2}|";
+        var ret = $"|{list}|{toAdd}|";
         ret = ret.Replace("||", "|");
         return ret;
     }
 
-    public static string RemoveAll(string s1, string s2)
+    public static string RemoveAll(string list, string toRemove)
     {
-        var ret = $"|{s1}|{s2}|";
-        ret = ret.Replace($"|{s2}|", "|");
+        var ret = $"|{list}|{toRemove}|";
+        ret = ret.Replace($"|{toRemove}|", "|");
         ret = ret.Replace("||", "|");
         return ret;
     }
 
-    public static string RemoveAtIndex(string s1, int index)
+    public static string RemoveAtIndex(string list, int index)
     {
-        var parts = s1.Split('|', StringSplitOptions.RemoveEmptyEntries);
+        var parts = list.Split('|', StringSplitOptions.RemoveEmptyEntries);
         if (index < 1 || index > parts.Length)
-            return s1;
+            return list;
 
         var ret = string.Join("|", parts.Where((p, i) => i != index - 1));
         return ret;
     }
 
-    public static int FindIndex(string s1, string s2)
+    public static int FindIndex(string list, string searchFor)
     {
-        var parts = s1.Split('|', StringSplitOptions.RemoveEmptyEntries);
+        var parts = list.Split('|', StringSplitOptions.RemoveEmptyEntries);
         for (int i = 0; i < parts.Length; i++)
         {
-            if (parts[i] == s2)
+            if (parts[i] == searchFor)
                 return i + 1;
         }
         return 0;
     }
 
-    public static List<string> Split(string s)
+    public static List<string> Split(string list)
     {
-        var parts = s.Split('|', StringSplitOptions.RemoveEmptyEntries);
+        var parts = list.Split('|', StringSplitOptions.RemoveEmptyEntries);
         return parts.ToList();
     }
 }
