@@ -48,6 +48,7 @@ The server is now running.  You can shut it down safely by pressing 'x'.  The se
 
     owner       -           Attribute   Access      Only the owner can set this attribute (note:  supercedes other locks)
     pc          Id List     Attribute   Access      List of Ids that can set this attribute.  Don't technically have to be characters
+    template    -           Attribute   Inherit     When a new ZObject is created or parented to this, copy this attribute don't inherit it (includes locks)
 
 ### Flags
 

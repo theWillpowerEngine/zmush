@@ -22,55 +22,6 @@ public enum Flag
     S1, S2, S3, S4, S5, S6, S7, S8, S9, S10,
 }
 
-public class Attr
-{
-    public string Name = "";
-    public string Value = "";
-
-    public List<(string, string)> Locks = new();
-
-    public bool HasLock(string lockName, string? lockVal = null)
-    {
-        if (lockVal == null)
-            return Locks.Any(l => l.Item1 == lockName);
-        else
-            return Locks.Any(l => l.Item1 == lockName && l.Item2 == lockVal);
-    }
-
-    public void AddOrSetLock(string name, string val)
-    {
-        if (HasLock(name))
-            Locks.RemoveAll(l => l.Item1 == name);
-
-        Locks.Add((name, val));
-    }
-
-    public bool RemoveLock(string name)
-    {
-        if (!HasLock(name))
-            return false;
-
-        Locks.RemoveAll(l => l.Item1 == name);
-        return true;
-    }
-
-    public bool CanSet(ZObject target, ZObject actor, SessionModel? session = null)
-    {
-        if (!Locks.Any()) return true;
-
-        if (session != null && session.Roles.Contains("admin"))
-            return true;
-
-        if (HasLock("owner"))
-            return actor.Id == target.Owner;
-
-        if (HasLock("pc") && PDL.FindIndex(Locks.Single(l => l.Item1 == "pc").Item2, actor.Id.ToString()) > 0)
-            return true;
-
-        return false;
-    }
-}
-
 public class ZObject
 {
     public int Id;
@@ -224,6 +175,27 @@ public class ZObject
         return ret;
     }
 
+    internal void ApplyParentage()
+    {
+        if (Parent < 0) return;
+        if (!Engine.Objects.TryGetValue(Parent, out var parent))
+            return;
+
+        var templateAttrs = parent.Attrs.Where(a => a.HasLock("template")).ToList();
+        foreach (var templateAttr in templateAttrs)
+        {
+            if (!Attrs.Any(a => a.Name == templateAttr.Name))
+            {
+                Attrs.Add(new Attr
+                {
+                    Name = templateAttr.Name,
+                    Value = templateAttr.Value,
+                    Locks = [.. templateAttr.Locks.ToList()]
+                });
+            }
+        }
+    }
+
     public bool HasLock(string lockName, string? lockVal = null)
     {
         if (lockVal == null)
@@ -265,11 +237,18 @@ public class ZObject
             return null;
 
         var parentage = GetCompleteParentage();
+
         foreach (var parent in parentage)
         {
             attr = parent.Attrs.FirstOrDefault(a => a.Name.ToLowerInvariant() == name);
             if (attr != null)
+            {
+                //Check if we're out of sync with the template
+                if (attr.HasLock("template"))
+                    ApplyParentage();
+
                 return attr.Value;
+            }
         }
 
         return null;

@@ -1,13 +1,9 @@
-
-* Template attributes (use for character creation PoC)
 * Attribute visibility locks (dark) ??
 
 * More PDL methods:  filter, ...
 
 * Consider adding "layer" tags like ooc where people can add stuff that folks can flag to subscribe or unsubscribe to
   * Config driven?
-
-* @decompile
 
 * WHO (use SpecialOutput)
 

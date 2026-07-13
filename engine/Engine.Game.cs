@@ -11,6 +11,9 @@ public static partial class Engine
 
     internal static string Command(SessionModel session, string command)
     {
+        if (string.IsNullOrWhiteSpace(command))
+            return RenderFrame(session);
+
         var user = Objects[session.UserId];
         var cmd = command;    //ZString.Eval(command, user, ref user.Quota);  //TODO:  Config gate this?
 
@@ -142,6 +145,7 @@ public static partial class Engine
                         switch (s)
                         {
                             case "owner":
+                            case "template":
                                 if (lockParts.Length != 1)
                                 {
                                     PlayerEmit(session.Key, $"{s} doesn't take a lock value, you passed '{lockParts[1]}'.");
@@ -164,7 +168,10 @@ public static partial class Engine
 
                         attr.AddOrSetLock(s, s2);
                         o.Save();
-                        PlayerEmit(session.Key, $"Set lock '{s}' on attribute #{o.Id}.{attrName} to '{s2}'.");
+                        if (!string.IsNullOrWhiteSpace(s2))
+                            PlayerEmit(session.Key, $"Set lock '{s}' on attribute #{o.Id}.{attrName} to '{s2}'.");
+                        else
+                            PlayerEmit(session.Key, $"Set lock '{s}' on attribute #{o.Id}.{attrName}.");
                         break;
 
                     case "listlocks":
@@ -368,6 +375,7 @@ public static partial class Engine
                     Parent = parent
                 };
 
+                newObj.ApplyParentage();
                 newObj.Save();
                 PlayerEmit(session.Key, $"Created new {zot} #{newObj.Id} named '{newObj.Name}'");
                 break;
@@ -741,6 +749,7 @@ public static partial class Engine
                 }
 
                 o.Parent = newParentId;
+                o.ApplyParentage();
                 o.Save();
                 PlayerEmit(session.Key, $"Parent of #{o.Id} is now #{newParentId}");
                 break;
