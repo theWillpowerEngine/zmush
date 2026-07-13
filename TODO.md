@@ -1,8 +1,8 @@
-Test the whole executor thing
+* Find a way to limit who can call functions so that we don't just expose admin functionality (A special flag that requires roles to set?  A series of locks?)
 
-
-* A flag for rooms which can't have exits added except by the owner, and maybe a role perm to allow doing that anyway
-  * perms in general (they already soft exist but lets make it explicit)
+* Special permissions (codify it as a system):
+  * Can ignore sealed
+  * ...
 
 * Attribute visibility locks (dark) ??
 

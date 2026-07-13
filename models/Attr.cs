@@ -30,19 +30,28 @@ public class Attr
         return true;
     }
 
-    public bool CanSet(ZObject target, ZObject actor, SessionModel? session = null)
+    public bool CanSet(ZObject target, ZObject actor, ZObject? executor = null)
     {
         if (!Locks.Any()) return true;
-
-        if (session != null && session.Roles.Contains("admin"))
-            return true;
 
         if (HasLock("owner"))
             return actor.Id == target.Owner;
 
-        if (HasLock("id") && PDL.FindIndex(Locks.Single(l => l.Item1 == "id").Item2, actor.Id.ToString()) > 0)
-            return true;
+        if (HasLock("id"))
+        {
+            if (PDL.FindIndex(Locks.Single(l => l.Item1 == "id").Item2, actor.Id.ToString()) > 0)
+                return true;
 
-        return false;
+            if (executor != null)
+                if (PDL.FindIndex(Locks.Single(l => l.Item1 == "id").Item2, executor.Id.ToString()) > 0)
+                    return true;
+
+            return false;
+        }
+
+        // if (Engine.IsAdminUser(actor.Id))
+        //     return true;
+
+        return true;
     }
 }

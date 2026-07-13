@@ -234,6 +234,10 @@ Where the # is obviously the number you recorded from the backup command
 
 Strings that start with a | can be treated in certain contexts as lists.  the list-* commands are the most obvious example, but this concept appears throughout zmush.
 
+### Contexts, Functions and Executors
+
+Function calls have a special permission step where the object that the function is on is checked for permission to do the thing if the user can't.
+
 ## Appendix:  Tutorial-level Snippers
 
     @attr here.outside=sunny

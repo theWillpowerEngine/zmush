@@ -208,7 +208,7 @@ public static partial class Engine
                         attr = o.Attrs.FirstOrDefault(a => a.Name == attrName);
                         if (attr != null)
                         {
-                            if (!attr.CanSet(o, user, session))
+                            if (!attr.CanSet(o, user))
                             {
                                 PlayerEmit(session.Key, $"You do not have permission to set the '{attrName}' attribute on #{o.Id}");
                                 break;
@@ -301,6 +301,15 @@ public static partial class Engine
                     "i" => ZObType.Item,
                     _ => ZObType.Item
                 };
+
+                if (zot == ZObType.Exit)
+                {
+                    if (Objects[user.Location].HasFlag(Flag.Sealed) && !Objects[user.Location].CheckPermissions(session.UserId))
+                    {
+                        PlayerEmit(session.Key, $"You don't have permission to open an exit in the sealed room #{user.Location}");
+                        break;
+                    }
+                }
 
                 var loc = subCmd switch
                 {
@@ -451,6 +460,12 @@ public static partial class Engine
             case "@dig":
                 var oneSidedExit = subCmd?.Contains("1") ?? false;
                 var tpAfterDig = subCmd?.Contains("t") ?? false;
+
+                if (Objects[user.Location].HasFlag(Flag.Sealed) && !Objects[user.Location].CheckPermissions(session.UserId))
+                {
+                    PlayerEmit(session.Key, $"You don't have permission to dig in the sealed room #{user.Location}");
+                    break;
+                }
 
                 o = new ZObject
                 {

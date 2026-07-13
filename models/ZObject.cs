@@ -17,6 +17,8 @@ public enum Flag
     CanForce,
     ForceMajeure,
     NukeSafe,
+    SetAndGet,
+    Sealed,
 
     U1, U2, U3, U4, U5, U6, U7, U8, U9, U10,
     S1, S2, S3, S4, S5, S6, S7, S8, S9, S10,
@@ -89,7 +91,7 @@ public class ZObject
         return CheckPermissions(o, overrideZO);
     }
 
-    public bool CheckPermissions(ZObject o, ZObject? overrideZO = null)
+    public bool CheckPermissions(ZObject o, ZObject? executor = null)
     {
         if (o.Id == Owner)
             return true;
@@ -103,12 +105,15 @@ public class ZObject
                 return true;
         }
 
-        if (Engine.IsAdminUser(o.Id))
+        // if (Engine.IsAdminUser(o.Id))
+        //     return true;
+
+        if (o.HasFlag(Flag.SetAndGet))
             return true;
 
-        if (overrideZO != null)
+        if (executor != null)
         {
-            if (CheckPermissions(overrideZO.Id, null))
+            if (CheckPermissions(executor, null))
                 return true;
         }
 

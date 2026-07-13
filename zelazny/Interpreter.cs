@@ -51,7 +51,7 @@ public static class Interpreter
                         return $"--Exception: No registers available for function call--";
 
                     registers.AdvanceLetScope(o);
-                    var parmNames = Matcher.ExtractParameterNames(o, s, list.Count - 1);
+                    var parmNames = Matcher.ExtractParameterNames(context, s, list.Count - 1);
 
                     i = 0;
                     foreach (var pn in parmNames)
@@ -62,7 +62,7 @@ public static class Interpreter
                     if (!f.StartsWith("{"))
                         f = "{" + f + "}";
 
-                    var result = ZString.Eval(f, o, ref quota, registers);
+                    var result = ZString.Eval(f, context, ref quota, registers);
                     registers.EndLetScope();
                     return result;
                 }
@@ -70,7 +70,7 @@ public static class Interpreter
                 //Auto-V
                 s = o.GetAttrValue(name);
                 if (s == null)
-                    return $"--Exception: Attribute '{name}' not found on #{o.Id}--";
+                    return $"--Exception: Attribute '{name}' not found on #{o.Id} (possible function argument-count mismatch?)--";
                 else
                     return s;
             }
@@ -370,13 +370,15 @@ public static class Interpreter
                     return $"--Exception: Object '{s}' not found--";
 
                 s2 = ParseValue(list[2], context, ref quota, registers);
+                if (list[3].TT == TokenType.Keyword)
+                    list[3].TT = TokenType.Name;
                 s = ParseValue(list[3], context, ref quota, registers);
 
                 if (!o.CheckPermissions(context, registers?.Executor))
                     return $"--Exception: You do not have permission to set attributes on #{o.Id}--";
 
                 var attr = o.Attrs.FirstOrDefault(a => a.Name.ToLowerInvariant() == s2.ToLowerInvariant());
-                if (attr != null && !attr.CanSet(o, context))
+                if (attr != null && !attr.CanSet(o, context, registers?.Executor))
                     return $"--Exception: You do not have permission to set the '{s2}' attribute on #{o.Id}--";
 
                 o.SetAttrValue(s2, s);

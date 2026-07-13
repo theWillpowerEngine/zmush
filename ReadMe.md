@@ -58,6 +58,8 @@ Handler (enables command handlers)
 CanForce
 ForceMajeure (ignores unforceable commands from Settings file)
 NukeSafe
+SetAndGet (can freely get and set attributes on objects they otherwise don't have permissions to.  Doesn't override attribute locks though, just object-level locks and ownership)
+Sealed (Can't have exits added to it)
 
 U1 - U10
 S1 - S10
