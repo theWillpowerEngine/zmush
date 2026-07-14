@@ -50,7 +50,9 @@ public static partial class Engine
 
         var deleted = false;
 
-        Log("Press 'X' to stop the server, or 'R' to restart it.  'L' will reload the site content without disrupting the server.  '\\' will shut down AND delete all your files so don't press that unless you really want to.");
+        if (!CLA.Headless)
+            Log("Press 'X' to stop the server, or 'R' to restart it.  'L' will reload the site content without disrupting the server.  '\\' will shut down AND delete all your files so don't press that unless you really want to.");
+
         while (!Stop)
         {
             Thread.Sleep(250);
@@ -172,24 +174,28 @@ public static partial class Engine
         }
     }
 
-    public static List<ZObject> GetObjectsInScope(ZObject scope, bool includeRoomHierarchy = false)
+    public static List<ZObject> GetObjectsInScope(ZObject scope, bool includeHierarchy = false)
     {
         var ret = new HashSet<ZObject>();
         ret.Add(scope);
 
         List<int> locationsInScope = new List<int>() { scope.Id };
+        HashSet<ZObject> objectsInScope = new HashSet<ZObject>();
 
         switch (scope.ZOT)
         {
             case ZObType.Room:
-                if (includeRoomHierarchy)
+                if (includeHierarchy)
                     locationsInScope.AddRange(scope.GetCompleteParentage().Select(p => p.Id));
                 break;
 
             case ZObType.Character:
                 locationsInScope.Add(scope.Location);
-                if (includeRoomHierarchy)
+                if (includeHierarchy)
+                {
                     locationsInScope.AddRange(Objects[scope.Location].GetCompleteParentage().Select(p => p.Id));
+                    objectsInScope.UnionWith(scope.GetCompleteParentage());
+                }
                 break;
 
             case ZObType.Item:
@@ -198,7 +204,7 @@ public static partial class Engine
                 if (loc.ZOT == ZObType.Character)
                 {
                     locationsInScope.Add(loc.Location);
-                    if (includeRoomHierarchy)
+                    if (includeHierarchy)
                         locationsInScope.AddRange(Objects[loc.Location].GetCompleteParentage().Select(p => p.Id));
                 }
                 break;
@@ -206,7 +212,7 @@ public static partial class Engine
             case ZObType.Exit:
                 locationsInScope.Add(scope.Location);
                 locationsInScope.Add(scope.Parent);
-                if (includeRoomHierarchy)
+                if (includeHierarchy)
                 {
                     locationsInScope.AddRange(Objects[scope.Location].GetCompleteParentage().Select(p => p.Id));
                     locationsInScope.AddRange(Objects[scope.Parent].GetCompleteParentage().Select(p => p.Id));
@@ -218,6 +224,7 @@ public static partial class Engine
         }
 
         ret.UnionWith(Objects.Values.Where(o => locationsInScope.Contains(o.Id) || locationsInScope.Contains(o.Location)));
+        ret.UnionWith(objectsInScope);
         return ret.ToList();
     }
 

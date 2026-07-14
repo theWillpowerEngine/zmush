@@ -65,6 +65,7 @@ public static class Reader
         "let",
         "log",
         "match",
+        "move",
         "roll", "roll-pool",
         "set",
         "single",

@@ -239,7 +239,7 @@ public static class Interpreter
 
                 var forceVal = ParseValue(list[2], context, ref quota, registers);
                 s = forceVal.Split(' ', '/', '\\')[0].ToLower();
-                if (Engine.Settings.UnforceableCommands.Contains(s) && !o.HasFlag(Flag.ForceMajeure))
+                if (Engine.Settings.UnforceableCommands.Contains(s) && !o.HasFlag(Flag.ForceMajeure, true))
                     return $"--Exception: Command '{s}' is not allowed to be forced--";
 
                 return Engine.Command(fakeSession, forceVal);
@@ -319,6 +319,49 @@ public static class Interpreter
                 }
 
                 return "";
+
+            case "move":
+                if (list.Count != 3)
+                    return "--Exception: 'move' requires exactly 2 parameters--";
+
+                s = ParseValue(list[1], context, ref quota, registers);
+                o = Engine.GlobalFind(context, s);
+                if (o == null)
+                    return $"--Exception: 'move' could not find object '{s}'--";
+
+                if (!context.HasFlag(Flag.Teleporter, true) && !(registers?.Executor?.HasFlag(Flag.Teleporter, true) ?? false) && !Engine.IsAdminUser(context.Id))
+                    if (!o.CheckPermissions(context, registers?.Executor))
+                        return $"--Exception: 'move' permission denied for object '{s}'--";
+
+                s2 = ParseValue(list[2], context, ref quota, registers);
+                var dest = Engine.GlobalFind(context, s2);
+                if (dest == null)
+                    return $"--Exception: 'move' could not find destination '{s2}'--";
+
+                switch (o.ZOT)
+                {
+                    case ZObType.Room:
+                        return $"--Exception: 'move' cannot move a room and '{s}' is a room--";
+
+                    case ZObType.Item:
+                        if (dest.ZOT != ZObType.Room && dest.ZOT != ZObType.Character)
+                            return $"--Exception: 'move' destination for ZOT {o.ZOT} must be a room or a character and '{s2}' is not a room or a character--";
+                        break;
+
+                    case ZObType.Exit:
+                    case ZObType.Character:
+                        if (dest.ZOT != ZObType.Room)
+                            return $"--Exception: 'move' destination for ZOT {o.ZOT} must be a room and '{s2}' is not a room--";
+                        break;
+
+                    default:
+                        return $"--Exception: 'move' cannot move object of type {o.ZOT}--";
+                }
+
+                o.Location = dest.Id;
+                o.Save();
+
+                return dest.Id.ToString();
 
             case "roll":
                 if (list.Count == 2)
@@ -403,7 +446,7 @@ public static class Interpreter
                 for (i = 1; i < list.Count; i++)
                 {
                     var val = ParseValue(list[i], context, ref quota, registers);
-                    if (!string.IsNullOrWhiteSpace(val))
+                    if (Matcher.IsTruthy(val))
                         return val;
                 }
                 return "";

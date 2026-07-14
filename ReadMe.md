@@ -60,6 +60,7 @@ ForceMajeure (ignores unforceable commands from Settings file)
 NukeSafe
 SetAndGet (can freely get and set attributes on objects they otherwise don't have permissions to.  Doesn't override attribute locks though, just object-level locks and ownership)
 Sealed (Can't have exits added to it)
+Teleporter
 
 U1 - U10
 S1 - S10
@@ -188,6 +189,8 @@ Neuter
     log <val> - Logs a message with the 'zelazny' tag in the zmush log
 
     match <check> (<compare> <val>)... [<val>] - For each pair, if the compare value matches the check value, evaluate and return that pair's value.  The optional final value is if nothing matches
+
+    move <obj> <loc> - Moves ZObjects.  Requires ownership/permission, or the Teleporter flag
 
     roll <sides>
     roll <number> <sides>

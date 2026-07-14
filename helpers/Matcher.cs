@@ -88,6 +88,8 @@ public static class Matcher
         s = s.Replace("%", "%%");
 
         s = s.Replace("{", "%{").Replace("}", "%}");
+        s = s.Replace("[", "%[").Replace("]", "%]");
+
         return s;
     }
 

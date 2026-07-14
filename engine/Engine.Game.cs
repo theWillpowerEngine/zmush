@@ -53,20 +53,24 @@ public static partial class Engine
         //Check permissions if necessary
         if (!isAdmin && Settings.ProtectedCommands.Contains(kw))
         {
-            var requiredPerms = Settings.CommandPerms.FirstOrDefault(kvp => kvp.Key.Contains(kw)).Value;
-            if (requiredPerms == null || !requiredPerms.Any())
+            //Kind of janky but the easiest way to make this work
+            if (cmd != "@tel" || !user.HasFlag(Flag.Teleporter, true))
             {
-                PlayerEmit(session.Key, $"You don't have permission to use the '{kw}' command.");
-                Log("hax", $"User #{session.UserId} attempted to use protected command '{kw}' without permission.");
-                return RenderFrame(session);
-            }
+                var requiredPerms = Settings.CommandPerms.FirstOrDefault(kvp => kvp.Key.Contains(kw)).Value;
+                if (requiredPerms == null || !requiredPerms.Any())
+                {
+                    PlayerEmit(session.Key, $"You don't have permission to use the '{kw}' command.");
+                    Log("hax", $"User #{session.UserId} attempted to use protected command '{kw}' without permission.");
+                    return RenderFrame(session);
+                }
 
-            var allowedRoles = Settings.Roles.Where(r => r.Value.Any(v => requiredPerms.Contains(v))).Select(r => r.Key).ToHashSet();
-            if (!session.Roles.Any(r => allowedRoles.Contains(r)))
-            {
-                PlayerEmit(session.Key, $"You don't have permission to use the '{kw}' command.");
-                Log("hax", $"User #{session.UserId} attempted to use protected command '{kw}' without permission.  Gate 2");
-                return RenderFrame(session);
+                var allowedRoles = Settings.Roles.Where(r => r.Value.Any(v => requiredPerms.Contains(v))).Select(r => r.Key).ToHashSet();
+                if (!session.Roles.Any(r => allowedRoles.Contains(r)))
+                {
+                    PlayerEmit(session.Key, $"You don't have permission to use the '{kw}' command.");
+                    Log("hax", $"User #{session.UserId} attempted to use protected command '{kw}' without permission.  Gate 2");
+                    return RenderFrame(session);
+                }
             }
         }
 
@@ -1342,7 +1346,7 @@ public static partial class Engine
                 }
 
                 //Custom Command Handlers
-                var potentialHandlers = GetObjectsInScope(user, true).Where(z => z.HasFlag(Flag.Handler)).ToList();
+                var potentialHandlers = GetObjectsInScope(user, true).Where(z => z.HasFlag(Flag.Handler, true)).ToList();
                 bool handled = false;
 
                 foreach (var h in potentialHandlers)
@@ -1357,7 +1361,7 @@ public static partial class Engine
                                 handlerVal = "{" + handlerVal + "}";
 
                             var registers = Matcher.ExtractCommandHandlerRegisters(command, a.Name.Substring(1));
-                            s = ZString.Eval(handlerVal, h, ref user.Quota, new Registers(registers, user));
+                            s = ZString.Eval(handlerVal, user, ref user.Quota, new Registers(registers, user));
                             if (s.StartsWith("--Exception:"))
                                 PlayerEmit(session.Key, $"Error in command handler: {s}");
                             handled = true;

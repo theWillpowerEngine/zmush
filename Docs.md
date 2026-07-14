@@ -268,11 +268,33 @@ This is for the master room (using %a emits to the right person, not to the room
     @eval map "1|2|3" {concat "Hi " %i}
 
 
-Fun with functions and auto-Vs:
+### Fun with functions and auto-Vs
 
     @cr Function Object (FNO)
     @attr FNO.>fn(x y)=emit %a `The coords are ([x], [y])`
     @eval FNO.fn 10 15
+
+### Building +home and +bind on the master character:
+
+    @create/player Master Character
+    @flag Master Character=Handler
+    @flag Master Character=Teleporter
+
+    @attr Master Character.home=no
+    @attr/lock Master Character.home=id:2
+    @attr/lock Master Character.home=template
+
+    @attr Master Character.$+home = [loc {v %a home}] {?? loc {do {move %a loc} {emit loc {concat %an " comes home"}}} {emit %a "You don't have a home set!"}}
+    
+    ;or, formatted nicely:
+    
+    [loc {v %a home}] 
+    {?? loc 
+        {do 
+            {move %a loc} 
+            {emit loc {concat %an " comes home"}}} 
+        
+        {emit %a "You don't have a home set!"}}
 
 
 ## Appendix:  Common Snippets and Libraries

@@ -19,6 +19,7 @@ public enum Flag
     NukeSafe,
     SetAndGet,
     Sealed,
+    Teleporter,
 
     U1, U2, U3, U4, U5, U6, U7, U8, U9, U10,
     S1, S2, S3, S4, S5, S6, S7, S8, S9, S10,
