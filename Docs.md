@@ -289,7 +289,7 @@ This is for the master room (using %a emits to the right person, not to the room
     ;or, formatted nicely:
     
     [loc {v %a home}] 
-    {?? loc 
+    {if loc 
         {do 
             {move %a loc} 
             {emit loc {concat %an " comes home"}}} 

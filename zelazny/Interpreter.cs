@@ -81,7 +81,7 @@ public static class Interpreter
 
         }
 
-        if (cmd.Value.StartsWith("?"))
+        if (cmd.Value.StartsWith("?") || cmd.Value == "if")
             return ParsePredicate(cmd, list.Skip(1).ToList(), context, ref quota, registers);
 
         if (cmd.TT != TokenType.Keyword)
@@ -664,6 +664,7 @@ public static class Interpreter
                 else
                     return "";
 
+            case "if":
             case "??":
                 if (!isValidSingleton)
                     return $"--Exception: '??' requires 1-3 parameters--";

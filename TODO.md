@@ -37,6 +37,9 @@
 #### 0.0.3 -> 0.0.4
 
 * Removed the list- prefix for PDL keywords it was more annoying that helpful
+* Added 'if' alias for ??, since that's one way to use that predicate
+* Key system flags like Teleporter, CanForce and ForceMajeure will no longer inherit
+* Added Sealed flag for rooms which can't have exits added
 * Made special output a visibly-different section of the UI and added "copy to clipboard" on click
 * Added commands:  @parent, @attr/lock, @attr/listlocks, @attr/unlock, @decompile
 * Added keywords:  roll, roll-pool, move

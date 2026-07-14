@@ -239,7 +239,7 @@ And dual predicates:
 The singleton predicates are:
 
      Predicate       Description
-    ??              if the value is truthy
+    ?? (if)         if the value is truthy
     ?num            if the value is numeric
     ?oid            If the value is a valid object id
 
