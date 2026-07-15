@@ -12,7 +12,7 @@ public class Settings : BaseModel<Settings>
     [YamlIgnore]
     public bool AutoSaveEnabled => AutoSaveMinutes > 0;
 
-    public int NewCharacterStartingRoom = 1;
+    public int NewCharacterStartingRoom = 2;
     public int MasterRoom = 1;
     public int MasterCharacter = -1;
     public int MasterItem = -1;

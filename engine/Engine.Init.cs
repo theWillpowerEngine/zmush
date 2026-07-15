@@ -58,11 +58,23 @@ public static partial class Engine
 
             var room = new ZObject
             {
-                Id = 1,
+                Id = 0,
                 ZOT = ZObType.Room,
                 Name = "Master Room",
-                Desc = "This room is the parent of every other room (by default at least), which means anything you put here will be accessible everywhere.  This room is very powerful.  As a reminder, the Master User is #2.  It works the same way as the Master Room, but for users.",
-                Owner = 0
+                Desc = "This room is the parent of every other room (by default at least), which means anything you put here will be accessible everywhere.  This room is very powerful, so be careful what you put here.",
+                Owner = 1
+            };
+
+            room.Save(true);
+
+            room = new ZObject
+            {
+                Id = 2,
+                ZOT = ZObType.Room,
+                Name = "Starting Room",
+                Parent = 0,
+                Desc = "This is the default starting room for new users.",
+                Owner = 1
             };
 
             room.Save(true);
@@ -76,18 +88,18 @@ public static partial class Engine
 
             var wizard = new ZObject
             {
-                Id = 0,
+                Id = 1,
                 ZOT = ZObType.Character,
                 Name = "Stimpy",
                 Desc = "The default admin character.  Very powerful.  Also adorable.",
-                Owner = 0,
-                Location = 1,
+                Owner = 1,
+                Location = 2,
                 Parent = -1
             };
 
             wizard.Save(true);
 
-            var wizUser = new User(0, "owner", Version);
+            var wizUser = new User(1, "owner", Version);
             wizUser.Roles.Add("admin");
             wizUser.SetPassword("owner");
             wizUser.Save();
