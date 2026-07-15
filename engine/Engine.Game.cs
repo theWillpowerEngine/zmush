@@ -1147,6 +1147,40 @@ public static partial class Engine
                 PlayerEmit(session.Key, $"Updated your password");
                 break;
 
+            case "!who":
+                var whoList = "Name                               Location                           Last Activity%n";
+
+                foreach (var whoS in Sessions.Values)
+                {
+                    var whoU = Objects[whoS.UserId];
+                    var whoName = whoU.Name;
+
+                    if (whoName.Length > 35)
+                        whoName = whoName.Substring(0, 31) + "... ";
+                    else
+                        whoName = whoName.PadRight(35);
+
+                    var whoLoc = Objects.GetValueOrDefault(whoU.Location)?.Name ?? "Unknown";
+
+                    if (whoLoc.Length > 35)
+                        whoLoc = whoLoc.Substring(0, 31) + "... ";
+                    else
+                        whoLoc = whoLoc.PadRight(35);
+
+                    var whoTime = DateTime.Now.Subtract(whoS.LastActivity).TotalSeconds;
+                    if (whoTime < 120)
+                        whoList += $"  {whoName}{whoLoc}{whoTime:0}s%n";
+                    else if (whoTime < 3600)
+                        whoList += $"  {whoName}{whoLoc}{Math.Round(whoTime / 60):0}m%n";
+                    else if (whoTime < 86400)
+                        whoList += $"  {whoName}{whoLoc}{Math.Round(whoTime / 3600):0}h%n";
+                    else
+                        whoList += $"  {whoName}{whoLoc}{Math.Round(whoTime / 86400):0}d%n";
+                }
+
+                session.SpecialOutput(whoList.Replace(" ", "%s"));
+                break;
+
             case "emote":
             case "em":
                 if (string.IsNullOrEmpty(rest))

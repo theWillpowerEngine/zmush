@@ -156,21 +156,14 @@ Neuter
         backup (b)
         restore (r) #   - the first backup is 0
 
+    !who
+
     !exit (!ex)
     !password <current password>=<new password>
 
     clear
 
 ## Zelazny
-
-@create/player Stimpy
-@desc Stimpy=The default admin character.  Very powerful.  Also adorable.
-@flag Stimpy=Handler
-@attr Stimpy.$+home=emit a %You don't have a home set! 
-@attr Stimpy.home=bob
-
-
-
 
 ### Keywords
 
