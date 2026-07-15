@@ -542,16 +542,16 @@ public static partial class Engine
                     break;
                 }
 
-                session.SpecialOutput($"[bold {o.Name} (#{o.Id})]%n");
+                session.SpecialOutput($"<b>{o.Name} (#{o.Id})</b>%n");
                 session.SpecialOutput(o.Desc + "%n");
                 if (o.Parent >= 0)
-                    session.SpecialOutput($"%t[bold Parent:] #{o.Parent}%n");
-                session.SpecialOutput($"%t[bold Owner:] #{o.Owner}%n");
+                    session.SpecialOutput($"%t<b>Parent:</b> #{o.Parent}%n");
+                session.SpecialOutput($"%t<b>Owner:</b> #{o.Owner}%n");
                 if (o.Flags.Any())
-                    session.SpecialOutput($"%t[bold Flags:] {string.Join(", ", o.Flags)}%n");
+                    session.SpecialOutput($"%t<b>Flags:</b> {string.Join(", ", o.Flags)}%n");
                 if (o.Attrs.Any())
                 {
-                    session.SpecialOutput($"%t[bold Attributes:]%n");
+                    session.SpecialOutput($"%t<b>Attributes:</b>%n");
                     foreach (var a in o.Attrs)
                     {
                         session.SpecialOutput($"%t{a.Name} = {a.Value}%n");

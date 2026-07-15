@@ -648,7 +648,7 @@ public static class Interpreter
                 s = ParseValue(rest[1], context, ref quota, registers);
 
                 if (checkVal.StartsWith("|"))
-                    res = checkVal.Contains("|" + s + "|");
+                    res = PDL.FindIndex(checkVal, s) > 0;
                 else
                     res = (checkVal + " ").Contains(s);
 

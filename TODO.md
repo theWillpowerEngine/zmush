@@ -40,7 +40,7 @@
 * Key system flags will no longer inherit
 * Added flags:  Sealed, Teleporter
 * Made special output a visibly-different section of the UI and added "copy to clipboard" on click
-* Added commands:  @parent, @attr/lock, @attr/listlocks, @attr/unlock, @decompile
+* Added commands:  @parent, @attr/lock, @attr/listlocks, @attr/unlock, @decompile, !who
 * Added keywords:  roll, roll-pool, move
 
 #### 0.0.2 -> 0.0.3 
