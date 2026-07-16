@@ -17,6 +17,19 @@ Run the following commands:
 
 The server is now running.  You can shut it down safely by pressing 'x'.  The server supports several command line arguments, you can add --help when running the server to see a full list of them.
 
+### Useful Commands (In-Game)
+
+#### Create a New User
+
+    @cr/c Name
+
+Note the ID (for this example, #9)
+
+    @cr/u login:pwd=#9
+
+
+
+
 ## Quick References
 
 ### Settings
@@ -147,7 +160,10 @@ Neuter
     @dig/t <name>
     @dig/1t <name>
 
+    @chown <obj>=<owner>
+
     @tel <room>         Can be #id or name part
+    @tel <character>=<room>
 
     @eval <zelazny code>
 

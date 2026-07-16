@@ -58,10 +58,14 @@ public class Settings : BaseModel<Settings>
         File.WriteAllText(Path.Combine(Engine.RootPath, "Settings"), ToYaml());
     }
 
+    //Built-in Permissions:
+    //
+    //  tpother - can @tel other
+
     public Dictionary<string, HashSet<string>> Roles = new Dictionary<string, HashSet<string>>()
     {
-        { "wizard", new HashSet<string>() { "basic", "advanced" } },
-        { "moderatus", new HashSet<string>() { "basic" } }
+        { "wizard", new HashSet<string>() { "basic", "advanced", "tpother" } },
+        { "moderatus", new HashSet<string>() { "basic", "tpother" } }
     };
 
     private List<string>? _protectedCommands = null;

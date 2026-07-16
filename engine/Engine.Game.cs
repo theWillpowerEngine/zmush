@@ -197,6 +197,19 @@ public static partial class Engine
                             PlayerEmit(session.Key, $"#{o.Id} does not have an attribute named '{attrName}'");
                             break;
                         }
+
+                        if (attr.Locks.Any(l => l.Item1 == "template"))
+                        {
+                            var upar = Objects.GetValueOrDefault(o.Parent);
+                            if (upar != null && !upar.CheckPermissions(session.UserId))
+                            {
+                                PlayerEmit(session.Key, $"You don't have permission to remove the 'template' lock from attribute #{o.Id}.{attrName}");
+                                Log("hax", $"User #{session.UserId} attempted to remove the 'template' lock from attribute #{o.Id}.{attrName} without permission.");
+                                break;
+                            }
+
+                        }
+
                         if (attr.RemoveLock(s2))
                         {
                             PlayerEmit(session.Key, $"Removed lock '{s2}' from attribute #{o.Id}.{attrName}");
@@ -247,6 +260,38 @@ public static partial class Engine
                         }
                         break;
                 }
+                break;
+
+            case "@chown":
+                (s, s2) = GetNamedValue(rest);
+                o = Find(user, s);
+                if (o == null)
+                {
+                    PlayerEmit(session.Key, $"I can't find '{rest}'");
+                    break;
+                }
+
+                if (!o.CheckPermissions(session.UserId))
+                {
+                    PlayerEmit(session.Key, $"You don't have permission to change the owner of #{o.Id}");
+                    Log("hax", $"User #{session.UserId} attempted to change the owner of #{o.Id} without permission.");
+                    break;
+                }
+
+                o2 = Find(user, s2);
+                if (o2 == null)
+                {
+                    PlayerEmit(session.Key, $"I can't find '{s2}'");
+                    break;
+                }
+                if (o2.ZOT != ZObType.Character)
+                {
+                    PlayerEmit(session.Key, $"You can only change the owner to a character.");
+                    break;
+                }
+                o.Owner = o2.Id;
+                o.Save();
+                PlayerEmit(session.Key, $"Owner of #{o.Id} is now #{o2.Id}");
                 break;
 
             case "@create":
@@ -387,6 +432,9 @@ public static partial class Engine
                     Location = loc,
                     Parent = parent
                 };
+
+                if (zot == ZObType.Character)
+                    newObj.Owner = newObj.Id;
 
                 newObj.ApplyParentage();
                 newObj.Save();
@@ -894,46 +942,82 @@ public static partial class Engine
                 break;
 
             case "@tel":
-                int telId = int.MinValue;
-                if (rest.StartsWith("#") || int.TryParse(rest, out telId))
+                if (rest.Contains("="))
                 {
-                    if (telId == int.MinValue)
-                        if (!int.TryParse(rest.Substring(1), out telId))
-                        {
-                            PlayerEmit(session.Key, $"Invalid Id:  {rest}");
-                            break;
-                        }
-
-                    o = Objects.GetValueOrDefault(telId);
+                    (s, s2) = GetNamedValue(rest);
+                    o = GlobalFind(user, s);
                     if (o == null)
                     {
-                        PlayerEmit(session.Key, $"I can't find #{telId} to teleport to.");
+                        PlayerEmit(session.Key, $"I can't find '{s}'");
                         break;
                     }
 
-                    if (o.ZOT != ZObType.Room)
+                    if (!isAdmin && !session.Roles.Contains("tpother") && o.Id != user.Id)
                     {
-                        PlayerEmit(session.Key, $"You can only teleport to rooms.");
+                        PlayerEmit(session.Key, $"You don't have permission to teleport other users.");
+                        Log("hax", $"User #{session.UserId} attempted to teleport other users without 'tpother' permission.");
                         break;
                     }
+
+                    var target = Find(user, s2);
+                    if (target == null)
+                    {
+                        PlayerEmit(session.Key, $"I can't find '{s2}'");
+                        break;
+                    }
+
+                    RoomEmit(o.Location, $"{o.Name} disappears in a puff of smoke.");
+                    o.Location = target.Id;
+                    o.Save();
+                    RoomEmit(o.Location, $"{o.Name} appears in a puff of smoke.");
+
+                    Log("admin", $"{user.Name} (#{user.Id}) teleported #{o.Id} '{o.Name}' to #{target.Id} '{target.Name}'");
+                    PlayerEmit(session.Key, $"Teleported #{o.Id} '{o.Name}' to #{target.Id} '{target.Name}'");
                 }
                 else
                 {
-                    o = Objects.Values.FirstOrDefault(z => z.ZOT == ZObType.Room && z.Name.ToLowerInvariant().Contains(rest.ToLowerInvariant()));
-                    if (o == null)
+
+                    int telId = int.MinValue;
+                    if (rest.StartsWith("#") || int.TryParse(rest, out telId))
                     {
-                        PlayerEmit(session.Key, $"I can't find '{rest}' to teleport to.");
-                        break;
+                        if (telId == int.MinValue)
+                            if (!int.TryParse(rest.Substring(1), out telId))
+                            {
+                                PlayerEmit(session.Key, $"Invalid Id:  {rest}");
+                                break;
+                            }
+
+                        o = Objects.GetValueOrDefault(telId);
+                        if (o == null)
+                        {
+                            PlayerEmit(session.Key, $"I can't find #{telId} to teleport to.");
+                            break;
+                        }
+
+                        if (o.ZOT != ZObType.Room)
+                        {
+                            PlayerEmit(session.Key, $"You can only teleport to rooms.");
+                            break;
+                        }
                     }
+                    else
+                    {
+                        o = Objects.Values.FirstOrDefault(z => z.ZOT == ZObType.Room && z.Name.ToLowerInvariant().Contains(rest.ToLowerInvariant()));
+                        if (o == null)
+                        {
+                            PlayerEmit(session.Key, $"I can't find '{rest}' to teleport to.");
+                            break;
+                        }
+                    }
+
+                    RoomEmit(o.Id, $"{user.Name} appears in a puff of smoke.");
+                    var oldLoc = user.Location;
+                    user.Location = o.Id;
+                    RoomEmit(oldLoc, $"{user.Name} disappears in a puff of smoke.");
+
+                    user.Save();
+                    Log("admin", $"{user.Name} (#{user.Id}) teleported to #{o.Id} '{o.Name}'");
                 }
-
-                RoomEmit(o.Id, $"{user.Name} appears in a puff of smoke.");
-                var oldLoc = user.Location;
-                user.Location = o.Id;
-                RoomEmit(oldLoc, $"{user.Name} disappears in a puff of smoke.");
-
-                user.Save();
-                Log("admin", $"{user.Name} (#{user.Id}) teleported to #{o.Id} '{o.Name}'");
                 break;
 
             case "@unlock":
@@ -1395,9 +1479,15 @@ public static partial class Engine
                                 handlerVal = "{" + handlerVal + "}";
 
                             var registers = Matcher.ExtractCommandHandlerRegisters(command, a.Name.Substring(1));
-                            s = ZString.Eval(handlerVal, user, ref user.Quota, new Registers(registers, user));
-                            if (s.StartsWith("--Exception:"))
+                            s = ZString.Eval(handlerVal, user, ref user.Quota, new Registers(registers, user)
+                            {
+                                Executor = h
+                            });
+
+                            if (s.Contains("--Exception:"))
+                            {
                                 PlayerEmit(session.Key, $"Error in command handler: {s}");
+                            }
                             handled = true;
                         }
                     }
@@ -1414,8 +1504,27 @@ public static partial class Engine
 
     internal static string RenderFrame(SessionModel session)
     {
-        var user = Objects[session.UserId];
-        var loc = Objects[user.Location];
+        var user = Objects.GetValueOrDefault(session.UserId);
+        if (user == null)
+        {
+            Log("WARN", $"Session {session.Key} has no user object.  This should never happen.");
+            return "Your login session, or user record, are invalid.  Please !exit, and then login again.  If this persists, contact an admin.";
+        }
+
+        var loc = Objects.GetValueOrDefault(user.Location);
+        if (loc == null)
+        {
+            Log("WARN", $"User #{user.Id} had no location object.  Moving to default room.");
+            PlayerEmit(session.Key, $"Your location is invalid.  Moving you to the default room.");
+            user.Location = Settings.NewCharacterStartingRoom;
+            user.Save();
+            loc = Objects.GetValueOrDefault(user.Location);
+            if (loc == null)
+            {
+                Log("CRITICAL", $"Default room #{Settings.NewCharacterStartingRoom} does not exist.  This should never happen.");
+                return "The default room is missing.  Please contact an admin.";
+            }
+        }
 
         var ret = "";
         ret += $"<b>{loc.Name}</b>%n";
