@@ -819,7 +819,7 @@ public static class Interpreter
                         return t.Value;
                     var attr = o.GetAttrValue(parts[1]);
                     if (attr == null)
-                        return t.Value;
+                        return "";
                     return attr;
                 }
 

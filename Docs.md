@@ -297,7 +297,7 @@ This is for the master room (using %a emits to the right person, not to the room
         {emit %a "You don't have a home set!"}}
 
     @attr Master Character.bindlist=|3
-    @attr Master Character.$+bind=if {?contains 2.bindList %l} {do {set %a home %l} {emit %a "You set your home to this location."} } {emit %a "You can't bind here!"}
+    @attr Master Character.$+bind=if {?contains 3.bindList %l} {do {set %a home %l} {emit %a "You set your home to this location."} } {emit %a "You can't bind here!"}
 
     ;or, formatted:
     if {?contains 2.bindList %l} 
