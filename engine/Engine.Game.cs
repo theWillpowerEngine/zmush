@@ -507,6 +507,13 @@ public static partial class Engine
                             session.SpecialOutput($"@attr/lock {o.Name}.{sa.Name}={sl.Item1}%n");
                     }
                 }
+                foreach (var sl in o.Locks)
+                {
+                    if (!string.IsNullOrWhiteSpace(sl.Item2))
+                        session.SpecialOutput($"@lock {o.Name}={sl.Item1}:{sl.Item2}%n");
+                    else
+                        session.SpecialOutput($"@lock {o.Name}={sl.Item1}%n");
+                }
                 break;
 
             case "@dig":

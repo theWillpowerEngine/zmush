@@ -44,10 +44,13 @@ public class User
     public static User? Load(string name)
     {
         var path = Path.Combine(Engine.PlayerPath, $"{name}.zpc");
-        if (!File.Exists(path))
+        var files = Directory.GetFiles(Engine.PlayerPath, $"*.zpc", SearchOption.TopDirectoryOnly);
+        var file = files.FirstOrDefault(f => Path.GetFileNameWithoutExtension(f).Equals(name, StringComparison.OrdinalIgnoreCase));
+
+        if (file == null)
             return null;
 
-        var yaml = File.ReadAllText(path);
+        var yaml = File.ReadAllText(file);
         var deserializer = new YamlDotNet.Serialization.Deserializer();
         return deserializer.Deserialize<User>(yaml);
     }

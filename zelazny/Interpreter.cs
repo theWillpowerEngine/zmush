@@ -513,7 +513,7 @@ public static class Interpreter
                 return sb.ToString();
 
             case "sts":
-                if (context.Id != 0)
+                if (context.Id != 0 && context.Id != 1)
                     return "--Exception: 'sts' can only be used in the context of the main admin user--";
                 if (list.Count != 3)
                     return "--Exception: 'sts' requires exactly 2 parameters--";
@@ -620,6 +620,11 @@ public static class Interpreter
         var isValidSingleton = singletonHasFalse || singletonIsSimple || rest.Count == 2;
         var isValidComparison = comparisonHasFalse || comparisonIsSimple || rest.Count == 3;
 
+        ZObject? o;
+
+        bool res;
+        bool wasSingleton = false;
+
         switch (cmd.Value)
         {
             case "?=":
@@ -628,19 +633,9 @@ public static class Interpreter
                 if (!isValidComparison)
                     return $"--Exception: '{cmd.Value}' requires 2-4 parameters--";
                 s = ParseValue(rest[1], context, ref quota, registers);
-                var res = s.ToLower() == checkVal.ToLower();
+                res = s.ToLower() == checkVal.ToLower();
                 if (isNE) res = !res;
-                if (res)
-                {
-                    if (comparisonIsSimple) return "1";
-                    return ParseValue(rest[2], context, ref quota, registers);
-                }
-                else if (comparisonHasFalse)
-                    return ParseValue(rest[3], context, ref quota, registers);
-                else if (comparisonIsSimple)
-                    return "0";
-                else
-                    return "";
+                break;
 
             case "?contains":
                 if (!isValidComparison)
@@ -651,68 +646,64 @@ public static class Interpreter
                     res = PDL.FindIndex(checkVal, s) > 0;
                 else
                     res = (checkVal + " ").Contains(s);
-
-                if (res)
-                {
-                    if (comparisonIsSimple) return "1";
-                    return ParseValue(rest[2], context, ref quota, registers);
-                }
-                else if (comparisonHasFalse)
-                    return ParseValue(rest[3], context, ref quota, registers);
-                else if (comparisonIsSimple)
-                    return "0";
-                else
-                    return "";
+                break;
 
             case "if":
             case "??":
                 if (!isValidSingleton)
                     return $"--Exception: '??' requires 1-3 parameters--";
-                if (Matcher.IsTruthy(checkVal))
-                {
-                    if (singletonIsSimple) return "1";
-                    return ParseValue(rest[1], context, ref quota, registers);
-                }
-                else if (singletonHasFalse)
-                    return ParseValue(rest[2], context, ref quota, registers);
-                else if (singletonIsSimple)
-                    return "0";
-                else
-                    return "";
+                res = Matcher.IsTruthy(checkVal);
+                wasSingleton = true;
+                break;
 
             case "?num":
                 if (!isValidSingleton)
                     return $"--Exception: '?num' requires 1-3 parameters--";
-                if (int.TryParse(checkVal, out var numVal))
-                {
-                    if (singletonIsSimple) return "1";
-                    return ParseValue(rest[1], context, ref quota, registers);
-                }
-                else if (singletonHasFalse)
-                    return ParseValue(rest[2], context, ref quota, registers);
-                else if (singletonIsSimple)
-                    return "0";
-                else
-                    return "";
+                res = int.TryParse(checkVal, out var numVal2);
+                wasSingleton = true;
+                break;
 
             case "?oid":
                 if (!isValidSingleton)
                     return $"--Exception: '?oid' requires 1-3 parameters--";
-                if (int.TryParse(checkVal, out var oidVal) && Engine.Objects.ContainsKey(oidVal))
-                {
-                    if (singletonIsSimple) return "1";
-                    return ParseValue(rest[1], context, ref quota, registers);
-                }
-                else if (singletonHasFalse)
-                    return ParseValue(rest[2], context, ref quota, registers);
-                else if (singletonIsSimple)
-                    return "0";
-                else
-                    return "";
+                res = int.TryParse(checkVal, out var oidVal2) && Engine.Objects.ContainsKey(oidVal2);
+                wasSingleton = true;
+                break;
+
+            case "?flag":
+                if (!isValidComparison)
+                    return $"--Exception: '?flag' requires 2-4 parameters--";
+                s = ParseValue(rest[1], context, ref quota, registers);
+                o = Engine.Find(context, s);
+                if (o == null)
+                    o = Engine.GlobalFind(context, s);
+                if (o == null)
+                    return $"--Exception: Object '{s}' not found--";
+
+                if (!Enum.TryParse<Flag>(checkVal, true, out var fl))
+                    return $"--Exception: Flag '{checkVal}' is not a valid flag--";
+
+                res = o.HasFlag(fl, true);
+                break;
 
             default:
                 return $"--Exception: Unknown command '{cmd.Value}'--";
         }
+
+        var wasSimple = (wasSingleton && singletonIsSimple) || (!wasSingleton && comparisonIsSimple);
+        var hasFalse = (wasSingleton && singletonHasFalse) || (!wasSingleton && comparisonHasFalse);
+
+        if (res)
+        {
+            if (wasSimple) return "1";
+            return ParseValue(rest[rest.Count - (hasFalse ? 2 : 1)], context, ref quota, registers);
+        }
+        else if (hasFalse)
+            return ParseValue(rest[rest.Count - 1], context, ref quota, registers);
+        else if (wasSimple)
+            return "0";
+        else
+            return "";
     }
 
     private static string ParseValue(Token t, ZObject context, ref int quota, Registers? registers = null)
