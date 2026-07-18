@@ -45,7 +45,7 @@
 * The ZObject executing a function/command handler is now saved in a special hidden register and checked for permissions/access
 * Added template lock for attributes
 * Key system flags will no longer inherit
-* Added flags:  Sealed, Teleporter
+* Added flags:  Sealed, Teleporter, SetAndGet
 * Made special output a visibly-different section of the UI and added "copy to clipboard" on click
 * Added commands:  @chown, @parent, @attr/lock, @attr/listlocks, @attr/unlock, @decompile, !who
 * Added keywords:  roll, roll-pool, move, +, -, *, /

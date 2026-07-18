@@ -115,4 +115,15 @@ public static class Matcher
 
         return eles.ToList();
     }
+
+    public static Flag? ParseFlag(string input)
+    {
+        if (Enum.TryParse<Flag>(input, true, out var flag))
+            return flag;
+
+        if (input.ToLower() == "getandset")
+            return Flag.SetAndGet;
+
+        return null;
+    }
 }

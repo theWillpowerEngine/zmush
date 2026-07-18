@@ -634,7 +634,8 @@ public static partial class Engine
                 if (unset)
                     s2 = s2.Substring(1);
 
-                if (!Enum.TryParse<Flag>(s2, true, out var flag))
+                var flag = Matcher.ParseFlag(s2);
+                if (flag == null)
                 {
                     if (s2.ToLowerInvariant() == "male" || s2.ToLowerInvariant() == "m")
                     {
@@ -659,7 +660,7 @@ public static partial class Engine
                     break;
                 }
 
-                var requiredRoles = Settings.RolesRequiredForFlag(flag);
+                var requiredRoles = Settings.RolesRequiredForFlag(flag.Value);
                 if (requiredRoles != null && !session.Roles.Contains("admin") && !session.Roles.Any(r => requiredRoles.Contains(r)))
                 {
                     PlayerEmit(session.Key, $"You don't have permission to set the '{flag}' flag.");
@@ -667,12 +668,12 @@ public static partial class Engine
                     break;
                 }
 
-                if (o.HasFlag(flag) && !unset)
+                if (o.HasFlag(flag.Value) && !unset)
                 {
                     PlayerEmit(session.Key, $"#{o.Id} already has the '{flag}' flag.  If you want to unset it, use: @flag #{o.Id} !{flag}");
                     break;
                 }
-                else if (!o.HasFlag(flag) && unset)
+                else if (!o.HasFlag(flag.Value) && unset)
                 {
                     PlayerEmit(session.Key, $"#{o.Id} does not have the '{flag}' flag.  If you want to set it, use: @flag #{o.Id} {flag}");
                     break;
@@ -680,13 +681,13 @@ public static partial class Engine
 
                 if (unset)
                 {
-                    o.Flags.Remove(flag);
+                    o.Flags.Remove(flag.Value);
                     o.Save();
                     PlayerEmit(session.Key, $"Removed '{flag}' flag from #{o.Id}");
                 }
                 else
                 {
-                    o.Flags.Add(flag);
+                    o.Flags.Add(flag.Value);
                     o.Save();
                     PlayerEmit(session.Key, $"Added '{flag}' flag to #{o.Id}");
                 }

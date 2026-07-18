@@ -706,10 +706,11 @@ public static class Interpreter
                 if (o == null)
                     return $"--Exception: Object '{checkVal}' not found--";
 
-                if (!Enum.TryParse<Flag>(s, true, out var fl))
+                var fl = Matcher.ParseFlag(s);
+                if (fl == null)
                     return $"--Exception: Flag '{s}' is not a valid flag--";
 
-                res = o.HasFlag(fl, true);
+                res = o.HasFlag(fl.Value, true);
                 break;
 
             default:
