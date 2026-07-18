@@ -57,6 +57,8 @@ public static class Reader
         "add", "index", "remove", "remove-all",
         "map",
 
+        "+", "-", "*", "/",
+
         "?=", "?!", "??", "?contains", "if",
         "concat",
         "emit",

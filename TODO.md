@@ -30,7 +30,7 @@
 
 * Finish Character Creation/IC PoC
   
-  @attr cg.$+attrs=?? {v %a Internal} {emit %a "You've already set your attributes.  If you beg an admin they might reset them, but for now you're stuck with them"} {do {} {} {}}
+  @attr cg.$+attrs=?? {v %a Internal} {emit %a "You've already set your attributes.  If you beg an admin they might reset them, but for now you're stuck with them"} {do {set %a Internal {- {roll 4 4} 1}} {set %a External {- {roll 4 4} 1}} {set %a Mystical {- {roll 4 4} 1}} {emit %a "Your attributes have been set.  Proceed to step 2 when ready!"}}
 
 
 * Public chat channels (make it a library and use as a PoC for zelazny libraries)
@@ -48,7 +48,8 @@
 * Added flags:  Sealed, Teleporter
 * Made special output a visibly-different section of the UI and added "copy to clipboard" on click
 * Added commands:  @chown, @parent, @attr/lock, @attr/listlocks, @attr/unlock, @decompile, !who
-* Added keywords:  roll, roll-pool, move
+* Added keywords:  roll, roll-pool, move, +, -, *, /
+* Added predicates:  ?flag
 
 #### 0.0.2 -> 0.0.3 
 

@@ -223,6 +223,8 @@ public static partial class Engine
                 throw new Exception($"Unknown ZObType {scope.ZOT} for object {scope.Id} in GetObjectsInScope");
         }
 
+        locationsInScope.ForEach(l => ret.UnionWith(Objects.Values.Where(o => o.Location == l)));
+
         ret.UnionWith(Objects.Values.Where(o => locationsInScope.Contains(o.Id) || locationsInScope.Contains(o.Location)));
         ret.UnionWith(objectsInScope);
         return ret.ToList();

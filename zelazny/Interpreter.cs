@@ -78,7 +78,6 @@ public static class Interpreter
             //Just a single name at root level
             if (list.Count == 1)
                 return ParseValue(cmd, context, ref quota, registers);
-
         }
 
         if (cmd.Value.StartsWith("?") || cmd.Value == "if")
@@ -89,6 +88,30 @@ public static class Interpreter
 
         switch (cmd.Value)
         {
+            //Math
+            case "+":
+            case "-":
+            case "*":
+            case "/":
+                var op = cmd.Value;
+                var leftS = ParseValue(list[1], context, ref quota, registers);
+                var rightS = ParseValue(list[2], context, ref quota, registers);
+
+                if (!double.TryParse(leftS, out var left))
+                    return $"--Exception: Left operand '{leftS}' is not a number--";
+                if (!double.TryParse(rightS, out var right))
+                    return $"--Exception: Right operand '{rightS}' is not a number--";
+
+                return (op switch
+                {
+                    "+" => left + right,
+                    "-" => left - right,
+                    "*" => left * right,
+                    "/" => right != 0 ? left / right : double.NaN,
+                    _ => throw new InvalidOperationException($"Unknown operator '{op}'")
+                }).ToString();
+
+
             //PDL Keywords
             case "add":
                 if (list.Count != 3)

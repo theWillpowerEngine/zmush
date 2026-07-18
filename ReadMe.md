@@ -183,6 +183,8 @@ Neuter
 
 ### Keywords
 
+    <operator> <left> <right> - Operators:  +, -, *, /
+
     concat <val> <val>... - Combine into a single string
 
     do <val>... - Evaluate each value and return the last one
