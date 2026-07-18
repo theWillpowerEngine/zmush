@@ -614,6 +614,7 @@ public static partial class Engine
                 }
                 break;
 
+            case "@set":
             case "@flag":
                 (s, s2) = GetNamedValue(rest);
                 o = Find(user, s);
