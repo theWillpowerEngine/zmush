@@ -259,6 +259,7 @@ And the dual predicates are:
     ?!              if the values are not equal
 
     ?contains       if the first value contains the second.  First value can be a list, or a string
+    ?flag           if the object referenced by the first value has the flag in the second
 
 ### Reader Autos
 

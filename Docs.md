@@ -306,6 +306,17 @@ This is for the master room (using %a emits to the right person, not to the room
             {emit %a "You set your home to this location."}} 
         {emit %a "You can't bind here!"}
 
+    ;If you want to have areas that +home can't be used in, this snippet uses the S1 system flag to check this (setting S1 on a room makes it impossible to +home from there)
+
+    [loc {v %a home}] 
+    {?flag %l S1 
+        {emit %a "You can't teleport from here!"} 
+        {?? loc 
+            {do 
+                {move %a loc} 
+                {emit loc {concat %an " comes home"}}}
+            {emit %a "You don't have a home set!"}}}
+
 
 ## Appendix:  Common Snippets and Libraries
 

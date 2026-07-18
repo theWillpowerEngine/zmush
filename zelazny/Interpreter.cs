@@ -674,14 +674,14 @@ public static class Interpreter
                 if (!isValidComparison)
                     return $"--Exception: '?flag' requires 2-4 parameters--";
                 s = ParseValue(rest[1], context, ref quota, registers);
-                o = Engine.Find(context, s);
+                o = Engine.Find(context, checkVal);
                 if (o == null)
-                    o = Engine.GlobalFind(context, s);
+                    o = Engine.GlobalFind(context, checkVal);
                 if (o == null)
-                    return $"--Exception: Object '{s}' not found--";
+                    return $"--Exception: Object '{checkVal}' not found--";
 
-                if (!Enum.TryParse<Flag>(checkVal, true, out var fl))
-                    return $"--Exception: Flag '{checkVal}' is not a valid flag--";
+                if (!Enum.TryParse<Flag>(s, true, out var fl))
+                    return $"--Exception: Flag '{s}' is not a valid flag--";
 
                 res = o.HasFlag(fl, true);
                 break;
