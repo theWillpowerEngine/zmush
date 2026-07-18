@@ -118,6 +118,10 @@ public class ZObject
                 return true;
         }
 
+        //Not sure if this does anything since IsAdminUser looks at sessions, but we might need this logic at some point...
+        // if (o.ZOT != ZObType.Character)
+        //     return CheckPermissions(o.Owner, executor);
+
         return false;
     }
 

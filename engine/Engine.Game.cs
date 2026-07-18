@@ -1426,6 +1426,11 @@ public static partial class Engine
                                 checkCode = "{" + checkCode + "}";
 
                             var checkResult = ZString.Eval(checkCode, exit, ref user.Quota, registers);
+                            if (Reader.ExceptionGuard(checkResult))
+                            {
+                                PlayerEmit(session.Key, $"Error evaluating exit check: {checkResult}");
+                                break;
+                            }
                             if (Matcher.IsTruthy(checkResult))
                             {
                                 passed = true;

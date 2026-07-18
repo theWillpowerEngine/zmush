@@ -613,6 +613,9 @@ public static class Interpreter
         //ZObject? o, o2;
 
         var checkVal = ParseValue(rest[0], context, ref quota, registers);
+        if (Reader.ExceptionGuard(checkVal))
+            return checkVal;
+
         var singletonHasFalse = rest.Count == 3;
         var singletonIsSimple = rest.Count == 1;
         var comparisonHasFalse = rest.Count == 4;

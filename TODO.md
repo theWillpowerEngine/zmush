@@ -22,11 +22,17 @@
   * Take this chance to actually hook up quota too?
   * Slow and Fast modes (settings based?)
 
-*Session Timeout
+* Session Timeout
+
+* This is aids but at some point we need an "IDE" for writing Zelazny even I resort to using Kate or VSCode for long shit
 
 ### In-Game Projects
 
 * Finish Character Creation/IC PoC
+  
+  @attr cg.$+attrs=?? {v %a Internal} {emit %a "You've already set your attributes.  If you beg an admin they might reset them, but for now you're stuck with them"} {do {} {} {}}
+
+
 * Public chat channels (make it a library and use as a PoC for zelazny libraries)
 
 
