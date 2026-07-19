@@ -868,6 +868,13 @@ public static partial class Engine
                         Stop = true;
                         break;
 
+                    case "reindex":
+                    case "ri":
+                        Log($"User #{session.UserId} initiated server reindex.");
+                        Loader.LoadSiteContent();
+                        PlayerEmit(session.Key, $"Reindexed site content.");
+                        break;
+
                     case "backup":
                     case "b":
                         Log($"User #{session.UserId} initiated server backup.");

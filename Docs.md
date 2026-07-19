@@ -214,6 +214,33 @@ The locks detailed above are the "access" locks, which can go on any ZObject and
 
 ## First Login - Basic Tutorial
 
+This section doesn't stop to explain the commands and syntaxes, they are dealt with earlier in this guide
+
+After logging in with owner/owner for the first time, there are some things you'll do to fully move in and make it yours.  First and most importantly let's reset the password so anyone who wants to can't just login and do whatever they want in your MUSH.:
+
+    !password owner=frogger
+
+In this case, I set my password to 'frogger', but you should obviously use your own password there instead.  In a moment we're going to be doing things in the Master Room, rather than the new character starting room, so let's go there now:
+
+    @tel 0
+
+Next lets set the name of your game, and then reindex the game's HTML files so that it applies in your browser:
+
+    @eval sts name "My Cool Game Name"
+    @server/reindex    -or-    @srv/ri
+
+If you refresh the browser you'll now see your name is the title of the tab.  Cool!  Using that "@eval sts..." syntax you can now set any of the game's settings you might want to change from defaults.  I like my characters to have a Master Character, that works similarly to the Master Room.  This makes for a very convenient place to put custom command handlers you want all of your players to have without cluttering up the Master Room.  There's nothing wrong with doing it the other way, this is strictly optional.  But if you want to try it out, here's how you'd do it as an example of what I meant earlier:
+
+    @create/c Master Character (MC)
+    @eval sts masterpc {find MC}
+
+    
+
+
+
+
+
+
 ## Admin/Mod/Wizard Guide
 
 ### Incantation Before Mucking with the Server or File System

@@ -84,7 +84,7 @@ public static class Interpreter
             return ParsePredicate(cmd, list.Skip(1).ToList(), context, ref quota, registers);
 
         if (cmd.TT != TokenType.Keyword)
-            return "--Exception: First token must be a keyword--";
+            return $"--Exception: Invalid command, '{cmd.Value}'--";
 
         switch (cmd.Value)
         {
@@ -201,24 +201,36 @@ public static class Interpreter
                 return ret;
 
             case "emit":
-                if (list.Count != 3)
-                    return "--Exception: 'emit' requires exactly 2 parameters--";
+                if (list.Count == 2)
+                {
+                    if (registers?.ActorId != null)
+                        o = Engine.Objects[registers.ActorId];
+                    else
+                        o = context;
 
-                s = ParseValue(list[1], context, ref quota, registers);
-                o = Engine.GlobalFind(context, s);
+                    s2 = ParseValue(list[1], context, ref quota, registers);
+                }
+                else if (list.Count == 3)
+                {
+                    s = ParseValue(list[1], context, ref quota, registers);
+                    o = Engine.GlobalFind(context, s);
+
+                    s2 = ParseValue(list[2], context, ref quota, registers);
+                }
+                else
+                    return "--Exception: 'emit' requires 1 or 2 parameters--";
+
                 if (o == null)
-                    return $"--Exception: Object '{s}' not found--";
-
-                var emitVal = ParseValue(list[2], context, ref quota, registers);
+                    return $"--Exception: Emit target not found--";
 
                 switch (o.ZOT)
                 {
                     case ZObType.Room:
-                        Engine.RoomEmit(o.Id, emitVal);
+                        Engine.RoomEmit(o.Id, s2);
                         break;
 
                     case ZObType.Character:
-                        Engine.PlayerEmit(o, emitVal);
+                        Engine.PlayerEmit(o, s2);
                         break;
 
                     case ZObType.Item:
@@ -226,10 +238,10 @@ public static class Interpreter
                         switch (o2.ZOT)
                         {
                             case ZObType.Room:
-                                Engine.RoomEmit(o2.Id, emitVal);
+                                Engine.RoomEmit(o2.Id, s2);
                                 break;
                             case ZObType.Character:
-                                Engine.PlayerEmit(o2, emitVal);
+                                Engine.PlayerEmit(o2, s2);
                                 break;
                             default:
                                 return $"--Exception: Cannot emit to item located in object type {o2.ZOT}--";
@@ -239,7 +251,19 @@ public static class Interpreter
                     default:
                         return $"--Exception: Cannot emit to object type {o.ZOT}--";
                 }
-                return emitVal;
+                return s2;
+
+            case "find":
+                if (list.Count != 2)
+                    return "--Exception: 'find' requires exactly 1 parameter--";
+
+                s = ParseValue(list[1], context, ref quota, registers);
+                o = Engine.Find(context, s);
+                if (o == null)
+                    o = Engine.GlobalFind(context, s);
+                if (o == null)
+                    return "";
+                return o.Id.ToString();
 
             case "force":
                 if (list.Count != 3)
@@ -499,6 +523,11 @@ public static class Interpreter
                     case "masteritem":
                         return Engine.Settings.MasterItem.ToString();
 
+                    case "name":
+                        return Engine.Settings.Name;
+                    case "editorperm":
+                        return Engine.Settings.PermissionRequiredForInlineEditor ?? "";
+
                     case "autosaveminutes":
                     case "autosavemins":
                         return Engine.Settings.AutoSaveMinutes.ToString();
@@ -590,6 +619,14 @@ public static class Interpreter
                         s = Engine.Settings.MasterItem.ToString();
                         break;
 
+                    case "name":
+                        s = Engine.Settings.Name = s2;
+                        break;
+
+                    case "editorperm":
+                        s = Engine.Settings.PermissionRequiredForInlineEditor = string.IsNullOrWhiteSpace(s2) ? null : s2;
+                        break;
+
                     case "autosaveminutes":
                     case "autosavemins":
                         if (!isANumber)
@@ -601,6 +638,7 @@ public static class Interpreter
                     default:
                         return $"--Exception: Unknown setting '{s}'--";
                 }
+
                 Engine.Settings.Save();
                 return s;
 

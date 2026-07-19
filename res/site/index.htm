@@ -2,7 +2,7 @@
 
 <head>
     <meta charset="utf-8">
-    <title>zmush v{ZMVER}</title>
+    <title>~~Title~~ - zmush v~~ZMVER~~</title>
 
     <link rel="stylesheet" href="site.css" />
 
@@ -39,7 +39,7 @@
     </div>
 
     <script>
-        var refreshTimer = null;
+        var refreshTimer = null
 
         function handleResult(res) {
             Z.frameText = res.text
@@ -51,6 +51,7 @@
         }
 
         const Z = {
+            alwaysEdit: parseInt("~~CanEditByDefault~~"),
             frameText: null,
             logs: [],
 
@@ -189,7 +190,7 @@
             }
         }
 
-        window['ZVER'] = "{ZMVER}";
+        window['ZVER'] = "~~ZMVER~~";
         window['sessionId'] = Cookies.get("ZSession")
         window['ZInGame'] = Cookies.get("ZInGame") === "Yes"
 

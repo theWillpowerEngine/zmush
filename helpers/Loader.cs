@@ -54,19 +54,27 @@ public static class Loader
         foreach (var file in files)
         {
             var relativePath = file.Substring(Engine.HTMLRoot.Length).Replace(Path.DirectorySeparatorChar, '/');
+            var ext = Path.GetExtension(relativePath).ToLowerInvariant();
 
             var content = File.ReadAllBytes(file);
 
-            var contentAsString = Encoding.UTF8.GetString(content);
-            contentAsString = contentAsString.Replace("{ZMVER}", Engine.Version);
-            content = Encoding.UTF8.GetBytes(contentAsString);
+            //Replace merge tags in text files
+            if (new[] { ".html", ".htm", ".css", ".js", ".txt" }.Contains(ext))
+            {
+                var contentAsString = Encoding.UTF8.GetString(content);
+                contentAsString = contentAsString ?? "";
+
+                contentAsString = contentAsString.Replace("~~ZMVER~~", Engine.Version);
+                contentAsString = contentAsString.Replace("~~Title~~", Engine.Settings.Name);
+                contentAsString = contentAsString.Replace("~~CanEditByDefault~~", string.IsNullOrWhiteSpace(Engine.Settings.PermissionRequiredForInlineEditor) ? "1" : "0");
+
+                content = Encoding.UTF8.GetBytes(contentAsString);
+            }
 
             _cache.Add(relativePath, content);
-
             CachedURLs.Add(relativePath);
 
             string mime = "application/octet-stream";
-            var ext = Path.GetExtension(relativePath).ToLowerInvariant();
             switch (ext)
             {
                 case ".html":
@@ -85,8 +93,8 @@ public static class Loader
             //Cache index as "/"
             if (relativePath.StartsWith("index.htm"))
             {
-                _cache.Add("", File.ReadAllBytes(file));
-                _cachedMimes.Add("", mime);
+                _cache.Add("", content);
+                _cachedMimes.Add("", "text/html");
                 CachedURLs.Add("");
             }
         }

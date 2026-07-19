@@ -2,13 +2,15 @@ using YamlDotNet.Serialization;
 
 public class Settings : BaseModel<Settings>
 {
+    public string Name = "zmush";
+
     public bool BreakOnExceptionDontUseThisUnlessYoureSmart = false;
 
     public bool ShowHttpRequest = false;
 
     public bool LogQuotaExceeds = true;
 
-    public int AutoSaveMinutes = 1;     //0 = save in real time
+    public int AutoSaveMinutes = 5;     //0 = save in real time
     [YamlIgnore]
     public bool AutoSaveEnabled => AutoSaveMinutes > 0;
 
@@ -18,6 +20,9 @@ public class Settings : BaseModel<Settings>
     public int MasterItem = -1;
 
     public bool AutoLinkExits = true;
+
+    //if null, everyone can invoke the editor (this doesn't change what permissions they have to in game objects just controls the UI)
+    public string? PermissionRequiredForInlineEditor = "basic";
 
     public string? OverrideSiteDirectory = null;
 

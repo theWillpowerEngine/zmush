@@ -1,3 +1,5 @@
+* add 'find'
+
 * Add character name to the document.title for ease of multi-boxing
 
 * Find a way to limit who can call functions so that we don't just expose admin functionality (A special flag that requires roles to set?  A series of locks?)
@@ -48,7 +50,7 @@
 * Added flags:  Sealed, Teleporter, SetAndGet
 * Made special output a visibly-different section of the UI and added "copy to clipboard" on click
 * Added commands:  @chown, @parent, @attr/lock, @attr/listlocks, @attr/unlock, @decompile, !who
-* Added keywords:  roll, roll-pool, move, +, -, *, /
+* Added keywords:  find, roll, roll-pool, move, +, -, *, /
 * Added predicates:  ?flag
 
 #### 0.0.2 -> 0.0.3 

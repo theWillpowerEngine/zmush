@@ -113,7 +113,7 @@ public static partial class Engine
             Directory.CreateDirectory(HTMLRoot);
             Log($"No HTML root directory found.  Initializing to default site (hope you like it ugly)");
 
-            File.WriteAllText(Path.Combine(HTMLRoot, "index.htm"), Loader.GetEmbeddedResource("site.index.htm").Replace("{ZMVER}", Version));
+            File.WriteAllText(Path.Combine(HTMLRoot, "index.htm"), Loader.GetEmbeddedResource("site.index.htm"));
             File.WriteAllText(Path.Combine(HTMLRoot, "site.css"), Loader.GetEmbeddedResource("site.site.css"));
         }
 

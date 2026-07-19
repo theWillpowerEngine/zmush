@@ -1,21 +1,8 @@
+Complete Reference Guide:  https://docs.google.com/document/d/1J9dWANA0xQfWYWvj0RUqwac7M3QZLCJe5KIG6l-wQi0
+
+
+
 # ZMUSH Reference Guide (0.0.3)
-
-## Building, Configuring and Running the Server
-
-Make sure you have git installed, and the ability to build .net core 10.0 applications (you'll need dotnet itself, and the 10.0 SDK).  An example of installing the appropriate .net stuff (adapt for your operating system) is:
-
-    sudo dnf install dotnet-sdk-10.0
-
-Run the following commands:
-
-    git clone https://github.com/theWillpowerEngine/zmush.git
-    cd zmush
-    dotnet build
-
-    cd bin/Debug
-    ./zmush
-
-The server is now running.  You can shut it down safely by pressing 'x'.  The server supports several command line arguments, you can add --help when running the server to see a full list of them.
 
 ### Useful Commands (In-Game)
 
@@ -28,8 +15,6 @@ Note the ID (for this example, #9)
     @cr/u login:pwd=#9
 
 
-
-
 ## Quick References
 
 ### Settings
@@ -38,10 +23,12 @@ Note the ID (for this example, #9)
     AutoLinkExits       bool        If true, exits will automatically be turned into Action Links, allowing them to be clicked on
     AutoSaveMinutes     int         Number of minutes between automatic ZObject save.  If 0 or less, ZObjects will save every time, which could impact disk life and performance under heavy use
     BreakOnException    bool        If true, the server will crash if an exception occurs.  You should basically never set this unless working on the C# code
+    EditorPerms         string      If not empty, a permission required (besides admin) to launch to inline editor.  Requires index regeneration
     LogQuotaExceeds     bool        If true, any time a Zelazny evaluation is stopped because of quota it will log some useful tracing information
     MasterItem          int         ID of the Master Item, which is the default parent of every newly-created Item (default -1)
     MasterPC            int         ID of the Master PC, which is the default parent of every newly-created PC (default -1)
     MasterRoom          int         ID of the Master Room, which is the default parent of every newly-created room (default #1)
+    Name                string      The name of the game (will effect the title when the index is next regenerated)
     ShowHTTP            bool        If true, will show all HTTP requests in the log (VERY spammy, but can be useful for debugging)
     StartRoom           int         ID of the room new PCs are created in
 
@@ -171,6 +158,7 @@ Neuter
         shutdown (sd)
         backup (b)
         restore (r) #   - the first backup is 0
+        reindex (ri) - Reload the web server files and reapply any settings
 
     !who
 
@@ -190,6 +178,9 @@ Neuter
     do <val>... - Evaluate each value and return the last one
 
     emit <obj> <message> - Send a message.  Context sensitive (can send to a player, a room or even an item)
+    emit <message> - Send message to actor.  In rare situations where there is no actor the context is used instead.  Will generally send to the player who initiated the action.
+
+    find <obj> - returns "" if no object can be found, otherwise returns the OID
 
     force <obj> <command> - Force <object> to run command
 
