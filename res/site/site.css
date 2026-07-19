@@ -12,16 +12,70 @@ body {
     bottom: 0;
     padding: 8px;
     background: #EAE2B7;
+    overflow: visible;
+}
+
+#commandRow {
+    display: flex;
+    align-items: stretch;
+    gap: 8px;
+}
+
+#codeEditorToggle {
+    flex: 0 0 auto;
+    min-width: 38px;
+    border: 2px solid #003049;
+    background-color: #EAE2B7;
+    color: #003049;
+    font-size: 16pt;
+    line-height: 1;
+    cursor: pointer;
 }
 
 #cmd {
-    width: 100%;
+    flex: 1 1 auto;
+    width: auto;
     box-sizing: border-box;
     border: 2px solid #003049;
     background-color: #EAE2B7;
 }
 
 #cmd:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px #94B0DA;
+}
+
+#codeEditor {
+    position: absolute;
+    right: 8px;
+    bottom: calc(100% + 8px);
+    width: min(42vw, 540px);
+    padding: 8px;
+    border: 2px solid #003049;
+    background: #EAE2B7;
+    box-shadow: 0 8px 24px rgba(0, 48, 73, 0.35);
+}
+
+#codeEditorLinks {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-bottom: 8px;
+}
+
+#codeEditorText {
+    width: 100%;
+    min-height: 180px;
+    box-sizing: border-box;
+    border: 2px solid #003049;
+    background-color: #EAE2B7;
+    color: #003049;
+    resize: vertical;
+    font-family: inherit;
+    font-size: inherit;
+}
+
+#codeEditorText:focus {
     outline: none;
     box-shadow: 0 0 0 2px #94B0DA;
 }
