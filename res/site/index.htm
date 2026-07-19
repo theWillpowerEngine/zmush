@@ -266,6 +266,7 @@
             })
 
             $('#cmd').on('keydown', function (e) {
+                debugger;
                 if (e.key === 'Enter' || e.keyCode == 13) {
                     e.preventDefault()
                     const text = $(this).val()
@@ -297,6 +298,13 @@
                     Z.commandIdx = -1
                     return false
                 }
+
+                else if (e.key === "E" && e.ctrlKey) {
+                    e.preventDefault()
+                    Z.showCodeEditor()
+                    return false
+                }
+
             })
 
             $("#user").focus();
