@@ -2,22 +2,7 @@ Complete Reference Guide:  https://docs.google.com/document/d/1J9dWANA0xQfWYWvj0
 
 
 
-# ZMUSH Reference Guide (0.0.3)
-
-### Useful Commands (In-Game)
-
-#### Create a New User
-
-    @cr/c Name
-
-Note the ID (for this example, #9)
-
-    @cr/u login:pwd=#9
-
-
-## Quick References
-
-### Settings
+## Settings
 
     Name                Type        Action
     AutoLinkExits       bool        If true, exits will automatically be turned into Action Links, allowing them to be clicked on
@@ -32,55 +17,8 @@ Note the ID (for this example, #9)
     ShowHTTP            bool        If true, will show all HTTP requests in the log (VERY spammy, but can be useful for debugging)
     StartRoom           int         ID of the room new PCs are created in
 
-### Locks
 
-    Lock        Arg        Type(s)      Category    Function
-    public      -           -           Access      Disable normal security, anyone can edit
-    id          Id List     -           Access      Allow certain characters access to the ZObject.  Space delimited
-    full        -           -           Access      Overrides any other acccess-level locks and returns to default (only owner + admins)
-
-    fixed       -           Item        Item        Only those with access to the ZObject can pick it up or drop it
-    static      -           Item        Item        Cannot be picked up or dropped (the static lock has to be removed first)
- 
-    allow       Id List     Exit        Exit        Allow certain people (locked otherwise.  Can't combine with deny).  Space delimited
-    deny        Id List     Exit        Exit        Deny certain people (unlocked otherwise.  Can't combine with allow).  Space delimited
-    check       Code        Exit        Exit        Run Zelazny, can pass if it returns a truthy value.  If there are multiple checks only one has to pass.  Allow/Deny only matter if there are no checks
-
-    owner       -           Attribute   Access      Only the owner can set this attribute (note:  supercedes other locks)
-    id          Id List     Attribute   Access      List of Ids that can set this attribute.  Don't technically have to be characters
-    template    -           Attribute   Inherit     When a new ZObject is created or parented to this, copy this attribute don't inherit it (includes locks)
-
-### Flags
-
-Dark
-Darksight
-Handler (enables command handlers)
-CanForce
-ForceMajeure (ignores unforceable commands from Settings file)
-NukeSafe
-SetAndGet (can freely get and set attributes on objects they otherwise don't have permissions to.  Doesn't override attribute locks though, just object-level locks and ownership)
-Sealed (Can't have exits added to it)
-Teleporter
-
-U1 - U10
-S1 - S10
-
-Male
-Female
-Neuter
-
-### Special Attributes
-
-    $<command string>   Custom Commands
-    >name([parm]...)    Function
-
-#### Exits
-
-    arriveMsg    Special Message to show when arriving (special registers:   %a %an)
-    leaveMsg     Special Message to show when leaving (special registers:   %a %an)
-    lockMsg      Special Message to show if the exit is locked to the person (private emit) (special registers:   %a %an)
-
-### Commands
+## Commands
 
     look (l) [<obj>]
 
@@ -167,9 +105,7 @@ Neuter
 
     clear
 
-## Zelazny
-
-### Keywords
+## Zelazny Keywords
 
     <operator> <left> <right> - Operators:  +, -, *, /
 
@@ -211,7 +147,7 @@ Neuter
     val (v) <attr> - Get value of attribute from context
     val (v) <obj> <attr> - Get alue of attribute from object
 
-#### PDL / List Keywords
+### PDL / List Keywords
 
     add <string> <val> - Return a new stringified list adding <val>.  String can be either a string or a list itself
     

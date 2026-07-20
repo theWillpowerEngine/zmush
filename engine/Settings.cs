@@ -40,9 +40,8 @@ public class Settings : BaseModel<Settings>
 
     public Dictionary<HashSet<Flag>, HashSet<string>> FlagPerms = new Dictionary<HashSet<Flag>, HashSet<string>>()
     {
-        { new HashSet<Flag>() { Flag.Darksight }, new HashSet<string>() { "basic" } },
-        { new HashSet<Flag>() { Flag.Dark }, new HashSet<string>() { "advanced" } },
-        { new HashSet<Flag>() { Flag.CanForce }, new HashSet<string>() { "advanced" } },
+        { new HashSet<Flag>() { Flag.Darksight, Flag.SetAndGet }, new HashSet<string>() { "basic" } },
+        { new HashSet<Flag>() { Flag.Dark, Flag.CanForce }, new HashSet<string>() { "advanced" } },
         { new HashSet<Flag>() { Flag.ForceMajeure }, new HashSet<string>() { "admin" } },
     };
 
