@@ -22,6 +22,8 @@
 
     <EmbeddedResource Include="res\site\index.htm" />
     <EmbeddedResource Include="res\site\site.css" />
+    <EmbeddedResource Include="res\site\editor.js" />
+    <EmbeddedResource Include="res\site\game.js" />
   </ItemGroup>
 
 

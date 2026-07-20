@@ -24,7 +24,6 @@ public class Settings : BaseModel<Settings>
     //if null, everyone can invoke the editor (this doesn't change what permissions they have to in game objects just controls the UI)
     public string? PermissionRequiredForInlineEditor = "basic";
 
-    [YamlIgnore]
     public string? OverrideSiteDirectory = null;
 
     public HashSet<string> UnforceableCommands = new HashSet<string>()

@@ -37,7 +37,13 @@ public static partial class Engine
             var settings = File.ReadAllText(Path.Combine(RootPath, "Settings"));
             try
             {
+                var overridePath = Settings.OverrideSiteDirectory;
+                if (string.IsNullOrWhiteSpace(overridePath) || !Directory.Exists(overridePath))
+                    Settings.OverrideSiteDirectory = null;
+
                 Settings = Settings.FromYaml(settings);
+
+                Settings.OverrideSiteDirectory = overridePath ?? Settings.OverrideSiteDirectory;
             }
             catch (Exception ex)
             {
@@ -115,6 +121,8 @@ public static partial class Engine
 
             File.WriteAllText(Path.Combine(HTMLRoot, "index.htm"), Loader.GetEmbeddedResource("site.index.htm"));
             File.WriteAllText(Path.Combine(HTMLRoot, "site.css"), Loader.GetEmbeddedResource("site.site.css"));
+            File.WriteAllText(Path.Combine(HTMLRoot, "game.js"), Loader.GetEmbeddedResource("site.game.js"));
+            File.WriteAllText(Path.Combine(HTMLRoot, "editor.js"), Loader.GetEmbeddedResource("site.editor.js"));
         }
 
         Loader.LoadSiteContent();

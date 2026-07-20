@@ -16,6 +16,9 @@
         integrity="sha256-OaVG6prZf4v69dPg6PhVattBXkcOWQB62pdZ3ORyrao=" crossorigin="anonymous"></script>
 
     <script src=" https://cdn.jsdelivr.net/npm/js-cookie@3.0.8/dist/js.cookie.min.js "></script>
+
+    <script src="game.js"></script>
+    <script src="editor.js"></script>
 </head>
 
 <body>
@@ -50,168 +53,15 @@
     </div>
 
     <script>
-        var refreshTimer = null
-
-        function handleResult(res) {
-            Z.frameText = res.text
-            for (var l of res.logs) {
-                if (!l) continue;
-                Z.logs.push(l)
-                $("#log").append(l + "<br />")
-            }
-        }
-
-        const Z = {
-            alwaysEdit: parseInt("~~CanEditByDefault~~"),
-            frameText: null,
-            logs: [],
-
-            commands: [],
-            commandIdx: -1,
-
-            post(url, data, callback) {
-                $.post(url, data instanceof Object ? JSON.stringify(data) : data, (res) => {
-                    callback(1, res)
-                }).fail((xhr, status, error) => {
-                    if (xhr.status == 403) {
-                        Cookies.remove("ZSession")
-                        location.reload()
-                        return
-                    }
-
-                    if (xhr.status == 0 && !error) {
-                        Cookies.remove("ZSession")
-                        location.reload()
-                        return
-                    }
-
-                    console.error("API Error! Status: " + xhr.status + ", Error: " + error);
-                    console.error("Response Text: " + xhr.responseText);
-
-                    callback(0, { status: xhr.status, statusMsg: error, error: xhr.responseText })
-                })
-            },
-
-            startGame() {
-                $("#authed").fadeIn()
-                $("#inputBar").fadeIn(() => {
-                    Cookies.set("ZInGame", "Yes")
-                    Z.frame()
-                    $("#cmd").focus()
-                });
-            },
-
-            setRefreshTimer(clearOnly) {
-                if (refreshTimer) clearTimeout(refreshTimer);
-                if (clearOnly) return;
-
-                refreshTimer = setTimeout(() => {
-                    Z.post("/log", window.sessionId, (suc, res) => {
-                        if (suc) {
-                            var eles = res.split("\n")
-                            for (var i = 0; i < eles.length; i++) {
-                                if (!eles[i]) continue;
-                                var e = eles[i].trim()
-                                if (e != "") {
-                                    Z.logs.push(e)
-                                    $("#log").append(e + "<br />")
-                                }
-                            }
-
-                            var removed = false;
-                            while (Z.logs.length > 20) {
-                                Z.logs.shift()
-                                removed = true;
-                            }
-
-                            if (removed)
-                                $("#log").html(Z.logs.join("<br />") + "<br />")
-
-                        } else {
-                            Z.logs.push("API Error:  " + res.error)
-                            $("#log").append("API Error:  " + res.error + "<br />")
-                        }
-                        Z.setRefreshTimer()
-                    })
-
-                }, 5000);
-            },
-
-            frame(force) {
-                Z.setRefreshTimer(true)
-
-                if (!Z.frameText || force) {
-                    Z.frameText = null
-                    Z.post("/frame", window.sessionId, (suc, res) => {
-                        if (suc) {
-                            handleResult(res)
-                            Z.frame()
-                        } else {
-                            Z.logs.push("API Error:  " + res.error)
-                            $("#log").append("API Error:  " + res.error + "<br />")
-                        }
-                    })
-                } else {
-                    var log = $("#log").html()
-                    if (!log || log == "undefined") log = ""
-
-                    $("#authed").html(Z.frameText)
-
-                    var newLog = $("#log").html()
-                    $("#log").html(log + newLog)
-
-                    Z.setRefreshTimer()
-                }
-            },
-
-            command(cmd) {
-                Z.setRefreshTimer(true)
-
-                Z.commands.push(cmd)
-                while (Z.commands.length > 20) Z.commands.shift()
-                Z.commandIdx = -1
-
-                if (cmd.toLowerCase() == "clear") {
-                    $("#log").html("")
-                    Z.logs = []
-                    Z.frame(true)
-                    $("#cmd").val("").focus()
-                    return
-                }
-
-                Z.post("/command", { sessionId: window.sessionId, command: cmd }, (suc, res) => {
-                    if (suc) {
-                        handleResult(res)
-
-                        Z.frame()
-                        $("#cmd").val("")
-                        $("#cmd").focus()
-                    } else {
-                        Z.logs.push("API Error:  " + res.error)
-                        $("#log").append("API Error:  " + res.error + "<br />")
-                    }
-                    Z.setRefreshTimer()
-                })
-            },
-
-            showCodeEditor() {
-                $("#codeEditor").fadeIn(() => {
-                    $("#codeEditorText").focus()
-                })
-            },
-
-            hideCodeEditor() {
-                $("#codeEditor").fadeOut(() => {
-                    $("#cmd").focus()
-                })
-            }
-        }
-
         window['ZVER'] = "~~ZMVER~~";
         window['sessionId'] = Cookies.get("ZSession")
-        window['ZInGame'] = Cookies.get("ZInGame") === "Yes"
+
+        const ZInGame = false;
+        //window['ZInGame'] = Cookies.get("ZInGame") === "Yes"
 
         $(() => {
+
+            //Action Link Click
             $(document).on('click', ".action-link", function (e) {
                 if (!$(this).attr("data-action")) return
 
@@ -223,6 +73,7 @@
                 Z.command(cmd);
             });
 
+            //Toggle for the code editor
             $(document).on('click', "#codeEditorToggle", function (e) {
                 e.preventDefault()
                 if ($("#codeEditor").is(":visible")) {
@@ -232,41 +83,14 @@
                 }
             });
 
+            //TODO
             $(document).on('click', "#codeEditorSave, #codeEditorCancel", function (e) {
                 e.preventDefault()
                 Z.hideCodeEditor()
             });
 
-            if (!ZInGame && sessionId) {
-                Z.post("/reauth", sessionId, (suc, res) => {
-                    if (suc) {
-                        $("#banner").fadeOut(() => {
-                            Z.startGame()
-                        })
-                    } else {
-                        $("#banner").fadeOut(() => {
-                            $("#login").fadeIn(() => {
-                                $("#user").focus()
-                            })
-                        })
-                    }
-                })
-
-            } else {
-                $("#banner").fadeOut(() => {
-                    $("#login").fadeIn()
-                })
-            }
-
-            $('#pass').keypress(function (e) {
-                if (e.keyCode == 13) {
-                    $('#b').click()
-                    return false
-                }
-            })
-
+            //Key handling for the command box
             $('#cmd').on('keydown', function (e) {
-                debugger;
                 if (e.key === 'Enter' || e.keyCode == 13) {
                     e.preventDefault()
                     const text = $(this).val()
@@ -307,8 +131,7 @@
 
             })
 
-            $("#user").focus();
-
+            //Login button click
             $("#b").click(() => {
                 Z.post("/auth", { u: $("#user").val(), p: $("#pass").val() }, (suc, res) => {
                     if (suc) {
@@ -324,6 +147,39 @@
                 })
 
             })
+
+            /////////////
+            // Page landing auth flow starts here:
+
+            if (!ZInGame && sessionId) {
+                Z.post("/reauth", sessionId, (suc, res) => {
+                    if (suc) {
+                        $("#banner").fadeOut(() => {
+                            Z.startGame()
+                        })
+                    } else {
+                        $("#banner").fadeOut(() => {
+                            $("#login").fadeIn(() => {
+                                $("#user").focus()
+                            })
+                        })
+                    }
+                })
+
+            } else {
+                $("#banner").fadeOut(() => {
+                    $("#login").fadeIn()
+                })
+            }
+
+            $('#pass').keypress(function (e) {
+                if (e.keyCode == 13) {
+                    $('#b').click()
+                    return false
+                }
+            })
+
+            $("#user").focus();
         })
     </script>
 </body>
