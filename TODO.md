@@ -1,3 +1,5 @@
+Strings are not working in the JS reader figure it out (Claude is a retard)
+
 * Add character name to the document.title for ease of multi-boxing
 
 * Find a way to limit who can call functions so that we don't just expose admin functionality (A special flag that requires roles to set?  A series of locks?)

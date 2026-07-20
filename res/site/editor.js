@@ -9,6 +9,16 @@ const editor = {
             let result = ""
             for (const item of code) {
                 if (typeof item === "string") {
+
+                    if (item.indexOf(" ") > -1) {
+                        if (item.indexOf("'") === -1)
+                            item = "'" + item + "'"
+                        else if (item.indexOf("\"") === -1)
+                            item = "\"" + item + "\""
+                        else
+                            item = "`" + item + "`"
+                    }
+
                     result += " " + item
                 } else if (Array.isArray(item)) {
                     result += "\n" + "  ".repeat(depth) + "{"
@@ -99,6 +109,7 @@ function readCode(code) {
                 state.i += 1
                 work += escapeChar(code[state.i])
             } else if (c === stringDelim) {
+                work = stringDelim + work + stringDelim
                 addWork()
                 stringDelim = null
             } else {
@@ -152,13 +163,10 @@ function readCode(code) {
             }
 
             case '"':
-                addWork()
-                stringDelim = '"'
-                break
-
             case "`":
+            case "'":
                 addWork()
-                stringDelim = "`"
+                stringDelim = c
                 break
 
             default:

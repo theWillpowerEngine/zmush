@@ -89,6 +89,22 @@
                 Z.hideCodeEditor()
             });
 
+            //Key handling for the code editor
+            var $ide = $('#codeEditorText')
+            $ide.on('keydown', function (e) {
+                if (e.key === 'Escape' || e.keyCode == 27) {
+                    e.preventDefault()
+                    Z.hideCodeEditor()
+                    return false
+                }
+
+                else if (e.key === 'Enter' && e.ctrlKey) {
+                    $ide.val(editor.formatCode($ide.val()))
+                    return true
+                }
+
+            })
+
             //Key handling for the command box
             $('#cmd').on('keydown', function (e) {
                 if (e.key === 'Enter' || e.keyCode == 13) {
