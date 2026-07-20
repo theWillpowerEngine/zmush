@@ -1,5 +1,4 @@
-Complete Reference Guide:  https://docs.google.com/document/d/1J9dWANA0xQfWYWvj0RUqwac7M3QZLCJe5KIG6l-wQi0
-
+"Complete" Reference Guide:  https://docs.google.com/document/d/1J9dWANA0xQfWYWvj0RUqwac7M3QZLCJe5KIG6l-wQi0
 
 
 ## Settings
@@ -104,6 +103,7 @@ Complete Reference Guide:  https://docs.google.com/document/d/1J9dWANA0xQfWYWvj0
     !password <current password>=<new password>
 
     clear
+
 
 ## Zelazny Keywords
 
