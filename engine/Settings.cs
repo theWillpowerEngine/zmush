@@ -26,6 +26,8 @@ public class Settings : BaseModel<Settings>
 
     public string? OverrideSiteDirectory = null;
 
+    public string LibraryPath = "./libs";
+
     public HashSet<string> UnforceableCommands = new HashSet<string>()
     {
         "@eval", "@server", "@password", "!password", "@lock", "@unlock"

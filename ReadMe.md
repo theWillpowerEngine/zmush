@@ -96,6 +96,7 @@
         backup (b)
         restore (r) #   - the first backup is 0
         reindex (ri) - Reload the web server files and reapply any settings
+        import (im) - Import/Install a library
 
     !who
 

@@ -1,0 +1,7 @@
+@tel 0
+@create Chat Manager (CHM)
+drop CHM
+@set CHM=static
+@set CHM=fixed
+@set CHM=handler
+@attr CHM.$chat/list=emit "Yo ho hello there"

@@ -875,6 +875,24 @@ public static partial class Engine
                         PlayerEmit(session.Key, $"Reindexed site content.");
                         break;
 
+                    case "import":
+                    case "im":
+                        var lib = Loader.LoadLibrary(rest);
+                        if (lib == null)
+                        {
+                            PlayerEmit(session.Key, $"Library '{rest}' not found.");
+                            break;
+                        }
+
+                        Log($"User #{session.UserId} initiated server import of library '{rest}'");
+                        PlayerEmit(session.Key, $"Starting import of library '{rest}'...");
+                        foreach (var line in lib)
+                        {
+                            Command(session, line);
+                        }
+                        PlayerEmit(session.Key, $"Completed import of library '{rest}'.");
+                        break;
+
                     case "backup":
                     case "b":
                         Log($"User #{session.UserId} initiated server backup.");

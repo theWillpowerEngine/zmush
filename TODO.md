@@ -33,7 +33,7 @@
   @attr cg.$+attrs=?? {v %a Internal} {emit %a "You've already set your attributes.  If you beg an admin they might reset them, but for now you're stuck with them"} {do {set %a Internal {- {roll 4 4} 1}} {set %a External {- {roll 4 4} 1}} {set %a Mystical {- {roll 4 4} 1}} {emit %a "Your attributes have been set.  Proceed to step 2 when ready!"}}
 
 
-* Public chat channels (make it a library and use as a PoC for zelazny libraries)
+* Public chat channels
 
 
 ### Changelogs

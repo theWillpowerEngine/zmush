@@ -6,6 +6,8 @@ public static partial class Engine
     public static string ObjectPath => Path.Combine(RootPath, "obj") + Path.DirectorySeparatorChar;
     public static string HTMLRoot => (Settings.OverrideSiteDirectory ?? Path.Combine(RootPath, "site")) + Path.DirectorySeparatorChar;
 
+    public static string LibraryRoot => Settings.LibraryPath.StartsWith(".") ? Path.Combine(RootPath, Settings.LibraryPath) + Path.DirectorySeparatorChar : Settings.LibraryPath + Path.DirectorySeparatorChar;
+
     public static void InitDirectories(string rootPath)
     {
         if (!rootPath.EndsWith(Path.DirectorySeparatorChar))

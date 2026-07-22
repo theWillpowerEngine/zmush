@@ -100,6 +100,26 @@ public static class Loader
         }
     }
 
+    public static List<string>? LoadLibrary(string lib)
+    {
+        if (!Directory.Exists(Engine.LibraryRoot))
+            return null;
+
+        var files = Directory.GetFiles(Engine.LibraryRoot, "*.lib", SearchOption.AllDirectories);
+        var retVal = new List<string>();
+        foreach (var file in files)
+        {
+            if (!file.EndsWith($"{lib}.lib", StringComparison.OrdinalIgnoreCase))
+                continue;
+
+            var yaml = File.ReadAllText(file);
+            retVal.AddRange(yaml.Split('\n', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries));
+            return retVal;
+        }
+
+        return null;
+    }
+
     internal static (byte[] content, string mime) GetContentAndMime(string route)
     {
         if (_cache.TryGetValue(route, out var content) && _cachedMimes.TryGetValue(route, out var mime))
