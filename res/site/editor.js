@@ -7,7 +7,7 @@ const editor = {
 
         const format = (code, depth) => {
             let result = ""
-            for (const item of code) {
+            for (var item of code) {
                 if (typeof item === "string") {
 
                     if (item.indexOf(" ") > -1) {
@@ -39,7 +39,7 @@ const editor = {
         var code = readCode(s)
         const deformat = (code) => {
             let result = ""
-            for (const item of code) {
+            for (var item of code) {
                 if (typeof item === "string") {
                     result += " " + item
                 } else if (Array.isArray(item)) {
@@ -52,7 +52,104 @@ const editor = {
         }
 
         return deformat(code).trim()
+    },
+
+    _highlightTimeout: null,
+    startEditorTimeout($ide) {
+        return
+        if (editor._highlightTimeout) clearTimeout(editor._highlightTimeout)
+        editor._highlightTimeout = setTimeout(() => {
+            var text = $ide.html()
+            const selection = window.getSelection()
+
+            var charAfterCaret = text.charAt(selection.focusOffset)
+            var charBeforeCaret = text.charAt(selection.focusOffset - 1)
+
+            if (charAfterCaret == "{") {
+                text = text.substring(0, selection.focusOffset) + "<mark>{</mark>" + text.substring(selection.focusOffset + 1)
+                var pos = selection.focusOffset
+                $ide.html(text)
+                // $ide[0].setSelectionRange(pos, pos)
+
+
+                // var endIndex = findMatchingEndBracket(text, $ide[0].selectionStart, "}")
+                // if (endIndex > -1) {
+                //     $ide[0].setSelectionRange($ide[0].selectionStart, endIndex + 1)
+                // }
+            }
+
+            console.log(charBeforeCaret + ":" + charAfterCaret)
+        }, 5)
+    },
+
+    bindEditorEvents(textAreaSelector) {
+        var $ide = $(textAreaSelector)
+        if ($ide.length === 0) throw new Error("No element found for selector: " + textAreaSelector)
+
+        $ide.off("keydown").on("keydown", function (e) {
+            if (e.key === 'Escape' || e.keyCode == 27) {
+                e.preventDefault()
+                Z.hideCodeEditor()
+                return false
+            }
+
+            else
+                editor.startEditorTimeout($ide)
+        })
+
+        $ide.off("paste").on("paste", function (e) {
+
+            if ($ide.val().trim().length > 0) {
+                setTimeout(() => {
+                    $ide.html(editor.formatCode($ide.html()))
+                }, 0)
+                return
+            }
+
+            e.preventDefault()
+            var text = e.originalEvent.clipboardData.getData("text/plain")
+            console.log(text)
+            $ide.html(text)
+
+            setTimeout(() => {
+                $ide.html(editor.formatCode($ide.html()))
+            }, 0)
+
+        })
+
+        $ide.off("input").on("input", function (e) {
+            editor.startEditorTimeout($ide)
+        })
     }
+}
+
+
+function findMatchingEndBracket(s, startIndex, closeBracket) {
+    let depth = 0
+    let openBracket = s[startIndex]
+    for (let i = startIndex; i < s.length; i++) {
+        const c = s[i]
+        if (c === openBracket) depth += 1
+        else if (c === closeBracket) {
+            depth -= 1
+            if (depth === 0) return i
+        }
+    }
+    return -1 // no matching bracket found
+}
+
+function findMatchinStartBracket(s, endIndex, openBracket) {
+    let depth = 0
+    let closeBracket = s[endIndex]
+    for (let i = endIndex; i >= 0; i--) {
+        const c = s[i]
+        if (c === closeBracket) depth += 1
+        else if (c === openBracket) {
+            depth -= 1
+            if (depth === 0) return i
+        }
+    }
+    return -1 // no matching bracket found
 }
 
 
@@ -119,7 +216,7 @@ function readCode(code) {
         }
 
         // --- comments ---
-        if (c === "") {
+        if (c === ";") {
             addWork()
 
             if (lookAhead === "{") {
@@ -127,9 +224,9 @@ function readCode(code) {
                 state.i += 1
                 scanTo(code, state, "}", "{") // discard
             } else {
-                // regular comment: runs to end-of-line or a closing ''
+                // regular comment: runs to end-of-line or a closing ';'
                 let j = state.i + 1
-                while (j < code.length && code[j] !== "" && code[j] !== "\r" && code[j] !== "\n") {
+                while (j < code.length && code[j] !== ";" && code[j] !== "\r" && code[j] !== "\n") {
                     j += 1
                 }
                 state.i = j

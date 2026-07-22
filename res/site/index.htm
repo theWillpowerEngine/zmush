@@ -48,7 +48,8 @@
                 <b>[</b><a href="#" class="color-green" id="codeEditorSave">save</a><b>]</b>
                 <b>[</b><a href="#" class="color-green" id="codeEditorCancel">cancel</a><b>]</b>
             </div>
-            <textarea id="codeEditorText" placeholder="Type code here..."></textarea>
+
+            <div id="codeEditorText" contenteditable="true" placeholder=""> </div>
         </div>
     </div>
 
@@ -73,7 +74,7 @@
                 Z.command(cmd);
             });
 
-            //Toggle for the code editor
+            editor.bindEditorEvents("#codeEditorText")
             $(document).on('click', "#codeEditorToggle", function (e) {
                 e.preventDefault()
                 if ($("#codeEditor").is(":visible")) {
@@ -88,22 +89,6 @@
                 e.preventDefault()
                 Z.hideCodeEditor()
             });
-
-            //Key handling for the code editor
-            var $ide = $('#codeEditorText')
-            $ide.on('keydown', function (e) {
-                if (e.key === 'Escape' || e.keyCode == 27) {
-                    e.preventDefault()
-                    Z.hideCodeEditor()
-                    return false
-                }
-
-                else if (e.key === 'Enter' && e.ctrlKey) {
-                    $ide.val(editor.formatCode($ide.val()))
-                    return true
-                }
-
-            })
 
             //Key handling for the command box
             $('#cmd').on('keydown', function (e) {
@@ -139,7 +124,7 @@
                     return false
                 }
 
-                else if (e.key === "E" && e.ctrlKey) {
+                else if (e.key.toLowerCase() === "e" && e.ctrlKey) {
                     e.preventDefault()
                     Z.showCodeEditor()
                     return false

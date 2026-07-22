@@ -49,7 +49,7 @@ body {
     position: absolute;
     right: 8px;
     bottom: calc(100% + 8px);
-    width: min(42vw, 540px);
+    width: calc(40%);
     padding: 8px;
     border: 2px solid #003049;
     background: #EAE2B7;
@@ -73,6 +73,9 @@ body {
     resize: vertical;
     font-family: "Courier New", Courier, monospace;
     font-size: 10pt;
+    white-space: pre;
+    overflow-wrap: normal;
+    overflow-x: scroll;
 }
 
 #codeEditorText:focus {
