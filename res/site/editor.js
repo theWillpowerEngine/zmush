@@ -56,26 +56,29 @@ const editor = {
 
     _highlightTimeout: null,
     startEditorTimeout($ide) {
-        return
         if (editor._highlightTimeout) clearTimeout(editor._highlightTimeout)
         editor._highlightTimeout = setTimeout(() => {
-            var text = $ide.html()
-            const selection = window.getSelection()
+            const element = $ide[0]
+            const text = element.textContent || ""
+            const caretOffset = getCaretTextOffset(element)
+            const hasMark = element.querySelector("mark") != null
 
-            var charAfterCaret = text.charAt(selection.focusOffset)
-            var charBeforeCaret = text.charAt(selection.focusOffset - 1)
+            if (caretOffset == null) return
 
-            if (charAfterCaret == "{") {
-                text = text.substring(0, selection.focusOffset) + "<mark>{</mark>" + text.substring(selection.focusOffset + 1)
-                var pos = selection.focusOffset
-                $ide.html(text)
-                // $ide[0].setSelectionRange(pos, pos)
+            const charAfterCaret = text.charAt(caretOffset)
+            const charBeforeCaret = text.charAt(caretOffset - 1)
 
+            if (charAfterCaret == "{" || hasMark) {
+                let html = escapeHtml(text)
+                if (charAfterCaret == "{") {
+                    html =
+                        escapeHtml(text.substring(0, caretOffset)) +
+                        "<mark>{</mark>" +
+                        escapeHtml(text.substring(caretOffset + 1))
+                }
 
-                // var endIndex = findMatchingEndBracket(text, $ide[0].selectionStart, "}")
-                // if (endIndex > -1) {
-                //     $ide[0].setSelectionRange($ide[0].selectionStart, endIndex + 1)
-                // }
+                $ide.html(html)
+                setCaretTextOffset(element, caretOffset)
             }
 
             console.log(charBeforeCaret + ":" + charAfterCaret)
@@ -124,6 +127,59 @@ const editor = {
 }
 
 
+function removeHTMLMarkup(s) {
+    return s.replace(/<[^>]*>/g, "")
+}
+
+function escapeHtml(s) {
+    return s
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+}
+
+function getCaretTextOffset(root) {
+    const selection = window.getSelection()
+    if (!selection || selection.rangeCount === 0) return null
+
+    const range = selection.getRangeAt(0)
+    if (!root.contains(range.endContainer)) return null
+
+    const preCaretRange = range.cloneRange()
+    preCaretRange.selectNodeContents(root)
+    preCaretRange.setEnd(range.endContainer, range.endOffset)
+    return preCaretRange.toString().length
+}
+
+function setCaretTextOffset(root, targetOffset) {
+    const selection = window.getSelection()
+    if (!selection) return
+
+    const range = document.createRange()
+    const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT)
+
+    let node = walker.nextNode()
+    let remaining = targetOffset
+
+    while (node) {
+        const len = node.nodeValue ? node.nodeValue.length : 0
+        if (remaining <= len) {
+            range.setStart(node, remaining)
+            range.collapse(true)
+            selection.removeAllRanges()
+            selection.addRange(range)
+            return
+        }
+        remaining -= len
+        node = walker.nextNode()
+    }
+
+    range.selectNodeContents(root)
+    range.collapse(false)
+    selection.removeAllRanges()
+    selection.addRange(range)
+}
+
 function findMatchingEndBracket(s, startIndex, closeBracket) {
     let depth = 0
     let openBracket = s[startIndex]
@@ -156,8 +212,8 @@ function findMatchinStartBracket(s, endIndex, openBracket) {
 function escapeChar(ch) {
     if (ch === undefined) return ""
     switch (ch) {
-        case "s": return "&nbsp"
-        case "t": return "&emsp"
+        case "s": return "&nbsp;"
+        case "t": return "&emsp;"
         case "n": return "<br />"
         default: return ch
     }

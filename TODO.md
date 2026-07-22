@@ -1,4 +1,4 @@
-Strings are not working in the JS reader figure it out (Claude is a retard)
+Continue IDE (bracket matching)
 
 * Add character name to the document.title for ease of multi-boxing
 
