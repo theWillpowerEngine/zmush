@@ -63,6 +63,16 @@ body {
     margin-bottom: 8px;
 }
 
+.ide {
+    background-color: #003049;
+    color: #EAE2B7;
+}
+
+.ide-unmatched {
+    background-color: #D62828;
+    color: #EAE2B7;
+}
+
 #codeEditorText {
     width: 100%;
     min-height: 250px;

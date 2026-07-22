@@ -68,20 +68,54 @@ const editor = {
             const charAfterCaret = text.charAt(caretOffset)
             const charBeforeCaret = text.charAt(caretOffset - 1)
 
-            if (charAfterCaret == "{" || hasMark) {
-                let html = escapeHtml(text)
-                if (charAfterCaret == "{") {
+            var didSomething = false
+            let html = escapeHtml(text)
+
+            if (charAfterCaret == "{") {
+                var endIndex = findMatchingEndBracket(text, caretOffset, "}")
+                if (endIndex > -1) {
                     html =
                         escapeHtml(text.substring(0, caretOffset)) +
-                        "<mark>{</mark>" +
+                        "<mark class='ide'>{</mark>" +
+                        escapeHtml(text.substring(caretOffset + 1, endIndex)) +
+                        "<mark class='ide'>}</mark>" +
+                        escapeHtml(text.substring(endIndex + 1))
+                } else {
+                    html =
+                        escapeHtml(text.substring(0, caretOffset)) +
+                        "<mark class='ide-unmatched'>{</mark>" +
                         escapeHtml(text.substring(caretOffset + 1))
                 }
+                didSomething = true
+            }
 
+            else if (charBeforeCaret == "}") {
+                var startIndex = findMatchinStartBracket(text, caretOffset - 1, "{")
+                if (startIndex > -1) {
+                    html =
+                        escapeHtml(text.substring(0, startIndex)) +
+                        "<mark class='ide'>{</mark>" +
+                        escapeHtml(text.substring(startIndex + 1, caretOffset - 1)) +
+                        "<mark class='ide'>}</mark>" +
+                        escapeHtml(text.substring(caretOffset))
+                } else {
+                    html =
+                        escapeHtml(text.substring(0, caretOffset - 1)) +
+                        "<mark class='ide-unmatched'>}</mark>" +
+                        escapeHtml(text.substring(caretOffset))
+                }
+                didSomething = true
+            }
+
+            else if (hasMark) {
+                html = escapeHtml(text)
+                didSomething = true
+            }
+
+            if (didSomething) {
                 $ide.html(html)
                 setCaretTextOffset(element, caretOffset)
             }
-
-            console.log(charBeforeCaret + ":" + charAfterCaret)
         }, 5)
     },
 
@@ -98,6 +132,10 @@ const editor = {
 
             else
                 editor.startEditorTimeout($ide)
+        })
+
+        $ide.off('click').on('click', function (e) {
+            editor.startEditorTimeout($ide)
         })
 
         $ide.off("paste").on("paste", function (e) {
@@ -124,11 +162,6 @@ const editor = {
             editor.startEditorTimeout($ide)
         })
     }
-}
-
-
-function removeHTMLMarkup(s) {
-    return s.replace(/<[^>]*>/g, "")
 }
 
 function escapeHtml(s) {
