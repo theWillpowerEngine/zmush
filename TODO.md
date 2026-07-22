@@ -1,5 +1,3 @@
-Continue IDE (bracket matching)
-
 * Add character name to the document.title for ease of multi-boxing
 
 * Find a way to limit who can call functions so that we don't just expose admin functionality (A special flag that requires roles to set?  A series of locks?)
@@ -47,6 +45,7 @@ Continue IDE (bracket matching)
 * The ZObject executing a function/command handler is now saved in a special hidden register and checked for permissions/access
 * Added template lock for attributes
 * Key system flags will no longer inherit
+* Added a code editor with (very) basic IDE functionality so it's not torture to write Zelazny anymore
 * Added flags:  Sealed, Teleporter, SetAndGet
 * Made special output a visibly-different section of the UI and added "copy to clipboard" on click
 * Added commands:  @chown, @parent, @attr/lock, @attr/listlocks, @attr/unlock, @decompile, !who

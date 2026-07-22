@@ -130,6 +130,17 @@ const editor = {
                 return false
             }
 
+            else if (e.key === 's' && (e.ctrlKey || e.metaKey)) {
+                e.preventDefault()
+                var code = $ide[0].textContent || ""
+                code = code.trim()
+                code = editor.deformatCode(code)
+                navigator.clipboard.writeText(code)
+                Z.hideCodeEditor()
+                $ide.html("")
+                return false
+            }
+
             else
                 editor.startEditorTimeout($ide)
         })
@@ -161,6 +172,22 @@ const editor = {
         $ide.off("input").on("input", function (e) {
             editor.startEditorTimeout($ide)
         })
+
+        $(document).on('click', "#codeEditorSave, #codeEditorCancel", function (e) {
+            e.preventDefault()
+
+            if (e.target.id === "codeEditorSave") {
+                var code = $ide[0].textContent || ""
+                code = code.trim()
+                code = editor.deformatCode(code)
+                //set code to the clipboard
+                navigator.clipboard.writeText(code)
+            }
+
+            Z.hideCodeEditor()
+            $ide.html("")
+        });
+
     }
 }
 

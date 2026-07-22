@@ -142,9 +142,14 @@ const Z = {
         })
     },
 
-    showCodeEditor() {
+    showCodeEditor(code) {
         $("#codeEditor").fadeIn(() => {
-            $("#codeEditorText").focus()
+            var $ide = $("#codeEditorText")
+            $ide.focus()
+            $ide.html(code)
+
+            $ide.html(editor.formatCode($ide.html()))
+            editor.startEditorTimeout($ide)
         })
     },
 

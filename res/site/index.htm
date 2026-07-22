@@ -44,9 +44,13 @@
         </div>
 
         <div id="codeEditor" style="display:none;">
-            <div id="codeEditorLinks" style="color:#003049;">
-                <b>[</b><a href="#" class="color-green" id="codeEditorSave">save</a><b>]</b>
-                <b>[</b><a href="#" class="color-green" id="codeEditorCancel">cancel</a><b>]</b>
+            <div id="codeEditorLinks"
+                style="color:#003049; display:flex; align-items:center; justify-content:space-between;">
+                <div>Code Editor</div>
+                <div>
+                    <b>[</b><a href="#" class="color-green" id="codeEditorSave">copy (ctrl-s)</a><b>]</b>
+                    <b>[</b><a href="#" class="color-green" id="codeEditorCancel">close (esc)</a><b>]</b>
+                </div>
             </div>
 
             <div id="codeEditorText" contenteditable="true" placeholder=""> </div>
@@ -82,12 +86,6 @@
                 } else {
                     Z.showCodeEditor()
                 }
-            });
-
-            //TODO
-            $(document).on('click', "#codeEditorSave, #codeEditorCancel", function (e) {
-                e.preventDefault()
-                Z.hideCodeEditor()
             });
 
             //Key handling for the command box
@@ -126,10 +124,18 @@
 
                 else if (e.key.toLowerCase() === "e" && e.ctrlKey) {
                     e.preventDefault()
-                    Z.showCodeEditor()
+                    const textarea = $('#cmd')[0];
+                    const start = textarea.selectionStart;
+                    const end = textarea.selectionEnd;
+
+                    if (start !== end) { // Ensure there's a selection  
+                        const selectedText = textarea.value.substring(start, end);
+                        Z.showCodeEditor(selectedText)
+                    } else {
+                        Z.showCodeEditor()
+                    }
                     return false
                 }
-
             })
 
             //Login button click
