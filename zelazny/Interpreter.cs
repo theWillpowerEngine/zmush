@@ -33,7 +33,9 @@ public static class Interpreter
                 if (eles.Length != 2)
                     return $"--Exception: Invalid dotted notation: {cmd.Value}--";
 
-                o = Engine.GlobalFind(context, eles[0]);
+                o = Engine.Find(context, eles[0]);
+                if (o == null)
+                    o = Engine.GlobalFind(context, eles[0]);
 
                 if (o == null)
                     return $"--Exception: Object '{eles[0]}' not found--";
@@ -114,7 +116,7 @@ public static class Interpreter
             //PDL Keywords
             case "add":
                 if (list.Count != 3)
-                    return "--Exception: 'list-add' requires exactly 2 parameters--";
+                    return "--Exception: 'add' requires exactly 2 parameters--";
 
                 s = ParseValue(list[1], context, ref quota, registers);
                 s2 = ParseValue(list[2], context, ref quota, registers);
@@ -122,9 +124,30 @@ public static class Interpreter
                 s = PDL.Add(s, s2);
                 return s;
 
+            case "filter":
+                if (list.Count != 3)
+                    return "--Exception: 'filter' requires exactly 2 parameters--";
+
+                s = ParseValue(list[1], context, ref quota, registers);
+
+                var listToFilter = PDL.Split(s);
+
+                s2 = "|";
+                foreach (var si in listToFilter)
+                {
+                    registers.DoWithNewIterator(si, () =>
+                    {
+                        int q = -1;
+                        s = ParseValue(list[2], context, ref q, registers);
+                        if (!Reader.ExceptionGuard(s) && Matcher.IsTruthy(s))
+                            s2 = PDL.Add(s2, si);
+                    });
+                }
+                return s2;
+
             case "index":
                 if (list.Count != 3)
-                    return "--Exception: 'list-index' requires exactly 2 parameters--";
+                    return "--Exception: 'index' requires exactly 2 parameters--";
 
                 s = ParseValue(list[1], context, ref quota, registers);
                 s2 = ParseValue(list[2], context, ref quota, registers);
@@ -134,41 +157,39 @@ public static class Interpreter
 
             case "map":
                 if (list.Count != 3)
-                    return "--Exception: 'list-map' requires exactly 2 parameters--";
+                    return "--Exception: 'map' requires exactly 2 parameters--";
 
                 s = ParseValue(list[1], context, ref quota, registers);
 
-
-                var oldIterator = registers?.IterativeElement ?? "";
-                registers?.IterativeElement = s;
-
+                s2 = "|";
                 var items = PDL.Split(s);
-                s2 = "";
                 foreach (var item in items)
                 {
-                    registers?.IterativeElement = item;
-                    s2 = PDL.Add(s2, ParseValue(list[2], context, ref quota, registers));
+                    registers.DoWithNewIterator(item, () =>
+                    {
+                        int q = -1;
+                        s2 = PDL.Add(s2, ParseValue(list[2], context, ref q, registers));
+                    });
                 }
 
-                registers?.IterativeElement = oldIterator;
                 return s2;
 
             case "remove":
                 if (list.Count != 3)
-                    return "--Exception: 'list-remove' requires exactly 2 parameters--";
+                    return "--Exception: 'remove' requires exactly 2 parameters--";
 
                 s = ParseValue(list[1], context, ref quota, registers);
                 s2 = ParseValue(list[2], context, ref quota, registers);
 
                 if (!int.TryParse(s2, out var idx2))
-                    return "--Exception: 'list-remove' requires the second parameter to be a numeric index (1-based)--";
+                    return "--Exception: 'remove' requires the second parameter to be a numeric index (1-based)--";
 
                 s = PDL.RemoveAtIndex(s, idx2);
                 return s;
 
             case "remove-all":
                 if (list.Count != 3)
-                    return "--Exception: 'list-remove-all' requires exactly 2 parameters--";
+                    return "--Exception: 'remove-all' requires exactly 2 parameters--";
 
                 s = ParseValue(list[1], context, ref quota, registers);
                 s2 = ParseValue(list[2], context, ref quota, registers);
@@ -628,7 +649,7 @@ public static class Interpreter
                 }
 
                 Engine.Settings.Save();
-                return s;
+                return s ?? "";
 
             case "val":
             case "v":

@@ -1,4 +1,11 @@
-* Add character name to the document.title for ease of multi-boxing
+* Test Filter keyword
+  *We need to add the basic comparison predicates like ?>, they're in the readme but don't exist yet
+
+
+* Make the log bigger in the client (try to make it fit to the window size)
+* ?online pred
+
+* Finish chat library
 
 * Find a way to limit who can call functions so that we don't just expose admin functionality (A special flag that requires roles to set?  A series of locks?)
 
@@ -7,8 +14,6 @@
   * ...
 
 * Attribute visibility locks (dark) ??
-
-* More PDL methods:  filter, ...
 
 * Consider adding "layer" tags like ooc where people can add stuff that folks can flag to subscribe or unsubscribe to
   * Config driven?
@@ -24,7 +29,8 @@
 
 * Session Timeout
 
-* This is aids but at some point we need an "IDE" for writing Zelazny even I resort to using Kate or VSCode for long shit
+* Add character name to the document.title for ease of multi-boxing
+
 
 ### In-Game Projects
 

@@ -4,4 +4,9 @@ drop CHM
 @set CHM=static
 @set CHM=fixed
 @set CHM=handler
-@attr CHM.$chat/list=emit "Yo ho hello there"
+@attr CHM.channels=|general
+@attr CHM.channelAliases=|gen
+
+@attr CHM.>getChannelsForPlayer(id)=filter {v channels} {?contains `members_[%i]` id}
+
+@attr CHM.$chat/list=emit {concat "Chat channels: " {CHM.getChannelsForPlayer %a}} 
