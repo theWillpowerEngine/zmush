@@ -1,6 +1,9 @@
 * Test Filter keyword
   *We need to add the basic comparison predicates like ?>, they're in the readme but don't exist yet
 
+* Add "Format" button and shortcut to client
+* Add shortcut to quickly get to the command box (if you start typing and aren't in the other textbox?)
+* Experiment with "autoformat on }"
 
 * Make the log bigger in the client (try to make it fit to the window size)
 * ?online pred
