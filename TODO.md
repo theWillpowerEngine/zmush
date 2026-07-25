@@ -34,6 +34,7 @@ continue +chat/join
 * Session Timeout
 
 * Add character name to the document.title for ease of multi-boxing
+* Make it so you can pin/unpin special output
 
 
 ### In-Game Projects

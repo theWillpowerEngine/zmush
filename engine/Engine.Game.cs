@@ -1518,7 +1518,7 @@ public static partial class Engine
                                 handlerVal = "{" + handlerVal + "}";
 
                             var registers = Matcher.ExtractCommandHandlerRegisters(command, a.Name.Substring(1));
-                            s = ZString.Eval(handlerVal, user, ref user.Quota, new Registers(registers, user)
+                            s = ZString.Eval(handlerVal, h, ref user.Quota, new Registers(registers, user)
                             {
                                 Executor = h
                             });

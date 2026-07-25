@@ -423,7 +423,7 @@ public static class Interpreter
                     return $"--Exception: 'move' could not find object '{s}'--";
 
                 if (!context.HasFlag(Flag.Teleporter, true) && !(registers?.Executor?.HasFlag(Flag.Teleporter, true) ?? false) && !Engine.IsAdminUser(context.Id))
-                    if (!o.CheckPermissions(context, registers?.Executor))
+                    if (!o.CheckPermissions(context, registers))
                         return $"--Exception: 'move' permission denied for object '{s}'--";
 
                 s2 = ParseValue(list[2], context, ref quota, registers);
@@ -510,7 +510,7 @@ public static class Interpreter
                     list[3].TT = TokenType.Name;
                 s = ParseValue(list[3], context, ref quota, registers);
 
-                if (!o.CheckPermissions(context, registers?.Executor))
+                if (!o.CheckPermissions(context, registers))
                     return $"--Exception: You do not have permission to set attributes on #{o.Id}--";
 
                 var attr = o.Attrs.FirstOrDefault(a => a.Name.ToLowerInvariant() == s2.ToLowerInvariant());
@@ -697,7 +697,7 @@ public static class Interpreter
                     if (oV == null)
                         return $"--Exception: Object '{oVName}' not found--";
 
-                    if (!oV.CheckPermissions(context, registers?.Executor))
+                    if (!oV.CheckPermissions(context, registers))
                         return $"--Exception: You do not have permission to get attributes on #{oV.Id}--";
 
                     return oV.GetAttrValue(ParseValue(list[2], context, ref quota, registers)) ?? "";

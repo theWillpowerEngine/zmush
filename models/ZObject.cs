@@ -84,15 +84,15 @@ public class ZObject
             Workers.QueueForSave(this);
     }
 
-    public bool CheckPermissions(int objectId, ZObject? overrideZO = null)
+    public bool CheckPermissions(int objectId, Registers? regs = null)
     {
         if (!Engine.Objects.TryGetValue(objectId, out var o))
             return false;
 
-        return CheckPermissions(o, overrideZO);
+        return CheckPermissions(o, regs);
     }
 
-    public bool CheckPermissions(ZObject o, ZObject? executor = null)
+    public bool CheckPermissions(ZObject o, Registers? regs)
     {
         if (o.Id == Owner)
             return true;
@@ -112,11 +112,21 @@ public class ZObject
         if (o.HasFlag(Flag.SetAndGet))
             return true;
 
-        if (executor != null)
+        if (regs != null)
         {
-            if (CheckPermissions(executor, null))
-                return true;
+            if (regs.Executor != null)
+            {
+                if (CheckPermissions(regs.Executor, null))
+                    return true;
+            }
+
+            if (Engine.Objects.TryGetValue(regs.ActorId, out var actor))
+            {
+                if (CheckPermissions(actor, null))
+                    return true;
+            }
         }
+
 
         //Not sure if this does anything since IsAdminUser looks at sessions, but we might need this logic at some point...
         // if (o.ZOT != ZObType.Character)
