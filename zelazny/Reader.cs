@@ -55,7 +55,7 @@ public static class Reader
     private static List<string> KWs = new()
     {
         "add", "index", "item-at", "remove", "remove-all",
-        "map", "filter",
+        "map", "filter", "join",
 
         "+", "-", "*", "/",
 
@@ -103,7 +103,7 @@ public static class Reader
             work += c;
         }
 
-        return $"--Exception: Unterminated string, missing {terminator} in {work}";
+        return $"--Exception: Unterminated block, missing {terminator} in {work}";
     }
     public static bool ExceptionGuard(string s)
     {
@@ -345,6 +345,14 @@ public static class Reader
                 return "&emsp;";
             case 'n':
                 return "<br />";
+
+            case '{':
+            case '}':
+            case '[':
+            case ']':
+            case '%':
+                return lookAhead.ToString();
+
             default:
                 return $"%{lookAhead}";
         }

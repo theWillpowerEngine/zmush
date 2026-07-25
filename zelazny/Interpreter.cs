@@ -1,5 +1,12 @@
 using System.Text;
 
+public class ZelaznyException : Exception
+{
+    public ZelaznyException(string message) : base(message)
+    {
+    }
+}
+
 public static class Interpreter
 {
     internal static string Evaluate(Token toke, ZObject context, ref int quota, Registers? registers = null)
@@ -163,7 +170,7 @@ public static class Interpreter
                 s2 = ParseValue(list[2], context, ref quota, registers);
 
                 if (!int.TryParse(s2, out var idx2))
-                    return "--Exception: 'item-at' requires the second parameter to be a numeric index (1-based)--";
+                    return $"--Exception: 'item-at' requires the second parameter to be a numeric index (1-based), not '{s2}'--";
 
                 try
                 {
@@ -173,6 +180,16 @@ public static class Interpreter
                 {
                     return $"--Exception: 'item-at' index {idx2} is out of bounds for list '{s}'--";
                 }
+                return s;
+
+            case "join":
+                if (list.Count != 3)
+                    return "--Exception: 'join' requires exactly 2 parameters--";
+
+                s = ParseValue(list[1], context, ref quota, registers);
+                s2 = ParseValue(list[2], context, ref quota, registers);
+
+                s = string.Join(s2, PDL.Split(s));
                 return s;
 
             case "map":
@@ -819,7 +836,10 @@ public static class Interpreter
         switch (t.TT)
         {
             case TokenType.Code:
-                return Evaluate(t, context, ref quota, registers);
+                var res = Evaluate(t, context, ref quota, registers);
+                if (Reader.ExceptionGuard(res))
+                    throw new ZelaznyException(res);
+                return res;
 
             case TokenType.Tag:
                 return GetTagValue(t);
@@ -915,6 +935,8 @@ public static class Interpreter
                         return t.Value;
 
                     var o = Engine.GlobalFind(context, parts[0]);
+                    if (o == null) o = Engine.Find(context, parts[0]);
+
                     if (o == null)
                         return t.Value;
                     var attr = o.GetAttrValue(parts[1]);

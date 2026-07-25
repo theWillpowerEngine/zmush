@@ -121,8 +121,6 @@
 
     force <obj> <command> - Force <object> to run command
 
-    id <obj> - Return ZOID
-
     let (<name> <val>)* <action> - Create variables.  
 
     log <val> - Logs a message with the 'zelazny' tag in the zmush log
@@ -156,6 +154,8 @@
 
     index <list> <val> - Return index of item in list (1 based).  0 if not found
     item-at <list> <index> - Returns the items at the index in the list (1 based).  Exception if not found.
+
+    join <list> <delim> - Flatted the PDL to a delimited string (no starting or ending delim)
 
     map <list> <command> - Evaluate command for each item in list, returning the new list.  %i will be the iterative element
 

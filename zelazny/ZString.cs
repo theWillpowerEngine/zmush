@@ -139,7 +139,14 @@ public class ZString
                     if (quota == 0)
                         return "[Limit:  Quota exceeded]";
 
-                    evalled += Interpreter.Evaluate(token, context, ref quota, Registers) + " ";
+                    try
+                    {
+                        evalled += Interpreter.Evaluate(token, context, ref quota, Registers) + " ";
+                    }
+                    catch (ZelaznyException ex)
+                    {
+                        return ex.Message;
+                    }
                     break;
 
                 case TokenType.Tag:

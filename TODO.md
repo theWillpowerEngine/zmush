@@ -1,8 +1,10 @@
-* Check into why getting the alias function isn't working (I ran it down to index is not in the let scope) (try changing the variable name)
-  * Good time to check let scopes in general.  The autolet needs to work in this context.  Two variables with the same name working right, etc.
+continue +chat/join
 
-* Ctrl-V in the editor should paste normally if the editor isn't empty (and then format), right now it replaces
-* Editor needs undo badly
+* IDE Bugs:
+  * Ctrl-V in the editor should paste normally if the editor isn't empty (and then format), right now it replaces
+  * Editor needs undo badly
+  * If you press enter next to a highlighted bracket weird shit happens
+  * Editor is Adding extra string characters to strings (`s).
 
 * We need to add the basic comparison predicates like ?>, they're in the readme but don't exist yet
 * ?online pred
@@ -57,7 +59,7 @@
 * Added flags:  Sealed, Teleporter, SetAndGet
 * Made special output a visibly-different section of the UI and added "copy to clipboard" on click
 * Added commands:  @chown, @parent, @attr/lock, @attr/listlocks, @attr/unlock, @decompile, !who
-* Added keywords:  find, roll, roll-pool, move, +, -, *, /, item-at, filter, map
+* Added keywords:  find, roll, roll-pool, move, +, -, *, /, item-at, filter, map, join
 * Added predicates:  ?flag, ?and, ?or, ?oid, 
 
 #### 0.0.2 -> 0.0.3 
