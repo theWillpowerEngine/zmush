@@ -155,6 +155,26 @@ public static class Interpreter
                 var idx = PDL.FindIndex(s, s2);
                 return idx.ToString();
 
+            case "item-at":
+                if (list.Count != 3)
+                    return "--Exception: 'item-at' requires exactly 2 parameters--";
+
+                s = ParseValue(list[1], context, ref quota, registers);
+                s2 = ParseValue(list[2], context, ref quota, registers);
+
+                if (!int.TryParse(s2, out var idx2))
+                    return "--Exception: 'item-at' requires the second parameter to be a numeric index (1-based)--";
+
+                try
+                {
+                    s = PDL.Split(s)[idx2 - 1];
+                }
+                catch (Exception)
+                {
+                    return $"--Exception: 'item-at' index {idx2} is out of bounds for list '{s}'--";
+                }
+                return s;
+
             case "map":
                 if (list.Count != 3)
                     return "--Exception: 'map' requires exactly 2 parameters--";
@@ -181,10 +201,10 @@ public static class Interpreter
                 s = ParseValue(list[1], context, ref quota, registers);
                 s2 = ParseValue(list[2], context, ref quota, registers);
 
-                if (!int.TryParse(s2, out var idx2))
+                if (!int.TryParse(s2, out i))
                     return "--Exception: 'remove' requires the second parameter to be a numeric index (1-based)--";
 
-                s = PDL.RemoveAtIndex(s, idx2);
+                s = PDL.RemoveAtIndex(s, i);
                 return s;
 
             case "remove-all":
@@ -710,6 +730,20 @@ public static class Interpreter
                 if (isNE) res = !res;
                 break;
 
+            case "?and":
+                if (!isValidComparison)
+                    return $"--Exception: '?and' requires 2-4 parameters--";
+                s = ParseValue(rest[1], context, ref quota, registers);
+                res = Matcher.IsTruthy(checkVal) && Matcher.IsTruthy(s);
+                break;
+
+            case "?or":
+                if (!isValidComparison)
+                    return $"--Exception: '?or' requires 2-4 parameters--";
+                s = ParseValue(rest[1], context, ref quota, registers);
+                res = Matcher.IsTruthy(checkVal) || Matcher.IsTruthy(s);
+                break;
+
             case "?contains":
                 if (!isValidComparison)
                     return $"--Exception: '?contains' requires 2-4 parameters--";
@@ -791,6 +825,7 @@ public static class Interpreter
                 return GetTagValue(t);
 
             case TokenType.Name:
+            default:
                 if (t.Value.StartsWith("%"))
                 {
                     if (registers == null) return "";
@@ -895,9 +930,6 @@ public static class Interpreter
                     if (letVar != null)
                         return letVar.Value;
                 }
-                return t.Value;
-
-            default:
                 return t.Value;
         }
     }

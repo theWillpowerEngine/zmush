@@ -1,9 +1,10 @@
-*We need to add the basic comparison predicates like ?>, they're in the readme but don't exist yet
+* Check into why getting the alias function isn't working (I ran it down to index is not in the let scope) (try changing the variable name)
+  * Good time to check let scopes in general.  The autolet needs to work in this context.  Two variables with the same name working right, etc.
 
-* Add shortcut to quickly get to the command box (if you start typing and aren't in the other textbox?)
-* Experiment with "autoformat on }"
+* Ctrl-V in the editor should paste normally if the editor isn't empty (and then format), right now it replaces
+* Editor needs undo badly
 
-* Make the log bigger in the client (try to make it fit to the window size)
+* We need to add the basic comparison predicates like ?>, they're in the readme but don't exist yet
 * ?online pred
 
 * Finish chat library
@@ -56,8 +57,8 @@
 * Added flags:  Sealed, Teleporter, SetAndGet
 * Made special output a visibly-different section of the UI and added "copy to clipboard" on click
 * Added commands:  @chown, @parent, @attr/lock, @attr/listlocks, @attr/unlock, @decompile, !who
-* Added keywords:  find, roll, roll-pool, move, +, -, *, /
-* Added predicates:  ?flag
+* Added keywords:  find, roll, roll-pool, move, +, -, *, /, item-at, filter, map
+* Added predicates:  ?flag, ?and, ?or, ?oid, 
 
 #### 0.0.2 -> 0.0.3 
 

@@ -74,6 +74,9 @@ public static class Matcher
 
     public static bool IsTruthy(string val)
     {
+        if (Reader.ExceptionGuard(val))
+            return false;
+
         var valIsTruthy = val != "0" && val != "" && val.ToLower() != "false" && val.ToLower() != "no";
         return valIsTruthy;
     }

@@ -155,6 +155,7 @@
     filter <list> <pred> - %i is the iterative element
 
     index <list> <val> - Return index of item in list (1 based).  0 if not found
+    item-at <list> <index> - Returns the items at the index in the list (1 based).  Exception if not found.
 
     map <list> <command> - Evaluate command for each item in list, returning the new list.  %i will be the iterative element
 
@@ -189,6 +190,9 @@ And the dual predicates are:
      Predicate       Description
     ?=              if the values are equal
     ?!              if the values are not equal
+
+    ?or             duh
+    ?and            duh
 
     ?contains       if the first value contains the second.  First value can be a list, or a string
     ?flag           if the object referenced by the first value has the flag in the second

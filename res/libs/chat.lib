@@ -7,6 +7,12 @@ drop CHM
 @attr CHM.channels=|general
 @attr CHM.channelAliases=|gen
 
-@attr CHM.>getChannelsForPlayer(id)=filter {v CHM channels} {?contains {v CHM `members_[%i]`} id}
+@attr CHM.>getChannelsForPlayer(id)=filter {v CHM channels} {CHM.?playerInChannel %i id}
+@attr CHM.>getChannelFromAlias(alias)={let i {idx CHM.channelAliases alias} {?? idx {item-at CHM.channels idx} 0}
+@attr CHM.>?playerInChannel(chan id)=?or {?contains {v CHM `members_[chan]`} id} {?contains {v CHM `members_[chan]`} id}
+
+@attr CHM.$!* *=?? {CHM.?playerInChannel %1 %a} {emit "You do the thing!"} {emit "No such channel!"}
+
+
 
 @attr CHM.$chat/list=emit {concat "Chat channels: " {CHM.getChannelsForPlayer %a}} 

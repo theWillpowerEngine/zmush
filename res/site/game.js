@@ -67,7 +67,7 @@ const Z = {
                     }
 
                     var removed = false;
-                    while (Z.logs.length > 20) {
+                    while (Z.logs.length > 25) {
                         Z.logs.shift()
                         removed = true;
                     }
