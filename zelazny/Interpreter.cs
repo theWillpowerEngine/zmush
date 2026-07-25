@@ -132,7 +132,7 @@ public static class Interpreter
 
                 var listToFilter = PDL.Split(s);
 
-                s2 = "|";
+                s2 = "";
                 foreach (var si in listToFilter)
                 {
                     registers.DoWithNewIterator(si, () =>
@@ -161,7 +161,7 @@ public static class Interpreter
 
                 s = ParseValue(list[1], context, ref quota, registers);
 
-                s2 = "|";
+                s2 = "";
                 var items = PDL.Split(s);
                 foreach (var item in items)
                 {

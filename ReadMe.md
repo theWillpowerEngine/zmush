@@ -152,6 +152,8 @@
 
     add <string> <val> - Return a new stringified list adding <val>.  String can be either a string or a list itself
     
+    filter <list> <pred> - %i is the iterative element
+
     index <list> <val> - Return index of item in list (1 based).  0 if not found
 
     map <list> <command> - Evaluate command for each item in list, returning the new list.  %i will be the iterative element

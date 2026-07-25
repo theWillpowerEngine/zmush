@@ -1,5 +1,4 @@
-* Test Filter keyword
-  *We need to add the basic comparison predicates like ?>, they're in the readme but don't exist yet
+*We need to add the basic comparison predicates like ?>, they're in the readme but don't exist yet
 
 * Add shortcut to quickly get to the command box (if you start typing and aren't in the other textbox?)
 * Experiment with "autoformat on }"

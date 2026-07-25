@@ -7,6 +7,6 @@ drop CHM
 @attr CHM.channels=|general
 @attr CHM.channelAliases=|gen
 
-@attr CHM.>getChannelsForPlayer(id)=filter {v channels} {?contains `members_[%i]` id}
+@attr CHM.>getChannelsForPlayer(id)=filter {v CHM channels} {?contains {v CHM `members_[%i]`} id}
 
 @attr CHM.$chat/list=emit {concat "Chat channels: " {CHM.getChannelsForPlayer %a}} 

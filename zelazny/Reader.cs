@@ -346,7 +346,7 @@ public static class Reader
             case 'n':
                 return "<br />";
             default:
-                return lookAhead?.ToString() ?? "";
+                return $"%{lookAhead}";
         }
     }
 }
