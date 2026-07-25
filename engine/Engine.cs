@@ -230,15 +230,15 @@ public static partial class Engine
         return ret.ToList();
     }
 
-    public static ZObject? Find(int userId, string name, bool localRoomOnly = false)
+    public static ZObject? Find(int userId, string name, Registers? regs, bool localRoomOnly = false)
     {
         if (!Objects.TryGetValue(userId, out var user))
             return null;
 
-        return Find(user, name, localRoomOnly);
+        return Find(user, name, regs, localRoomOnly);
     }
 
-    public static ZObject? Find(ZObject context, string name, bool localRoomOnly = false)
+    public static ZObject? Find(ZObject context, string name, Registers? regs = null, bool localRoomOnly = false)
     {
         name = name.ToLower().Trim();
 
@@ -260,8 +260,20 @@ public static partial class Engine
                 return obj;
         }
 
-        if (name == "this" || name == "self" || name == "me")
+        if (name == "this" || name == "self")
             return context;
+
+        if (name == "actor" || name == "me")
+            if (regs != null && Objects.TryGetValue(regs.ActorId, out var me))
+                return me;
+            else
+                return context;
+
+        if (name == "caller" || name == "executor")
+            if (regs?.Executor != null)
+                return regs.Executor;
+            else
+                return context;
 
         if (name == "here")
             return room;
@@ -296,9 +308,6 @@ public static partial class Engine
             if (Objects.TryGetValue(id, out var obj))
                 return obj;
         }
-
-        if (name == "this" || name == "self" || name == "me" || name == "here")
-            return context;
 
         var found = Objects.Values.FirstOrDefault(o => o.Name.ToLower() == name);
         if (found != null) return found;

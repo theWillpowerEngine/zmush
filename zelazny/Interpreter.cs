@@ -40,7 +40,7 @@ public static class Interpreter
                 if (eles.Length != 2)
                     return $"--Exception: Invalid dotted notation: {cmd.Value}--";
 
-                o = Engine.Find(context, eles[0]);
+                o = Engine.Find(context, eles[0], registers);
                 if (o == null)
                     o = Engine.GlobalFind(context, eles[0]);
 
@@ -271,6 +271,7 @@ public static class Interpreter
                 {
                     s = ParseValue(list[1], context, ref quota, registers);
                     o = Engine.GlobalFind(context, s);
+                    if (o == null) o = Engine.Find(context, s, registers);
 
                     s2 = ParseValue(list[2], context, ref quota, registers);
                 }
@@ -315,7 +316,7 @@ public static class Interpreter
                     return "--Exception: 'find' requires exactly 1 parameter--";
 
                 s = ParseValue(list[1], context, ref quota, registers);
-                o = Engine.Find(context, s);
+                o = Engine.Find(context, s, registers);
                 if (o == null)
                     o = Engine.GlobalFind(context, s);
                 if (o == null)
@@ -419,6 +420,8 @@ public static class Interpreter
 
                 s = ParseValue(list[1], context, ref quota, registers);
                 o = Engine.GlobalFind(context, s);
+                if (o == null) o = Engine.Find(context, s, registers);
+
                 if (o == null)
                     return $"--Exception: 'move' could not find object '{s}'--";
 
@@ -501,7 +504,7 @@ public static class Interpreter
                     list.Insert(1, new Token("this", TokenType.Name));
 
                 s = ParseValue(list[1], context, ref quota, registers);
-                o = Engine.Find(context, s);
+                o = Engine.Find(context, s, registers);
                 if (o == null)
                     return $"--Exception: Object '{s}' not found--";
 
@@ -693,7 +696,7 @@ public static class Interpreter
                 if (list.Count == 3)
                 {
                     var oVName = ParseValue(list[1], context, ref quota, registers);
-                    var oV = Engine.Find(context, oVName);
+                    var oV = Engine.Find(context, oVName, registers);
                     if (oV == null)
                         return $"--Exception: Object '{oVName}' not found--";
 
@@ -798,7 +801,7 @@ public static class Interpreter
                 if (!isValidComparison)
                     return $"--Exception: '?flag' requires 2-4 parameters--";
                 s = ParseValue(rest[1], context, ref quota, registers);
-                o = Engine.Find(context, checkVal);
+                o = Engine.Find(context, checkVal, registers);
                 if (o == null)
                     o = Engine.GlobalFind(context, checkVal);
                 if (o == null)
@@ -935,7 +938,7 @@ public static class Interpreter
                         return t.Value;
 
                     var o = Engine.GlobalFind(context, parts[0]);
-                    if (o == null) o = Engine.Find(context, parts[0]);
+                    if (o == null) o = Engine.Find(context, parts[0], registers);
 
                     if (o == null)
                         return t.Value;
