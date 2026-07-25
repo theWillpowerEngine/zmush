@@ -141,6 +141,12 @@ const editor = {
                 return false
             }
 
+            else if (e.key === 'f' && (e.ctrlKey || e.metaKey)) {
+                e.preventDefault()
+                $ide.html(editor.formatCode($ide.html()))
+                return false
+            }
+
             else
                 editor.startEditorTimeout($ide)
         })
@@ -186,6 +192,11 @@ const editor = {
 
             Z.hideCodeEditor()
             $ide.html("")
+        });
+
+        $(document).on('click', "#codeEditorFormat", function (e) {
+            e.preventDefault()
+            $ide.html(editor.formatCode($ide.html()))
         });
 
     }

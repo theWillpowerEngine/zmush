@@ -48,8 +48,9 @@
                 style="color:#003049; display:flex; align-items:center; justify-content:space-between;">
                 <div>Code Editor</div>
                 <div>
-                    <b>[</b><a href="#" class="color-green" id="codeEditorSave">copy (ctrl-s)</a><b>]</b>
-                    <b>[</b><a href="#" class="color-green" id="codeEditorCancel">close (esc)</a><b>]</b>
+                    <b>[</b><a href="#" class="color-green" id="codeEditorFormat">format</a><b>]</b>
+                    <b>[</b><a href="#" class="color-green" id="codeEditorSave">copy</a><b>]</b>
+                    <b>[</b><a href="#" class="color-green" id="codeEditorCancel">close</a><b>]</b>
                 </div>
             </div>
 
@@ -65,6 +66,14 @@
         //window['ZInGame'] = Cookies.get("ZInGame") === "Yes"
 
         $(() => {
+
+            $(document).on('keydown', "body", function (e) {
+                var targ = $(e.target)
+                if (targ.is("#cmd")) return
+                if (targ.is("#codeEditorText")) return
+
+                $("#cmd").focus()
+            })
 
             //Action Link Click
             $(document).on('click', ".action-link", function (e) {
