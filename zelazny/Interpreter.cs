@@ -311,6 +311,35 @@ public static class Interpreter
                 }
                 return s2;
 
+            case "eval":
+            case "ev":
+                if (list.Count == 3)
+                {
+                    var oVName = ParseValue(list[1], context, ref quota, registers);
+                    var oV = Engine.Find(context, oVName, registers);
+                    if (oV == null)
+                        return $"--Exception: Object '{oVName}' not found--";
+
+                    if (!oV.CheckPermissions(context, registers))
+                        return $"--Exception: You do not have permission to get attributes on #{oV.Id}--";
+
+                    s = oV.GetAttrValue(ParseValue(list[2], context, ref quota, registers)) ?? "";
+                    if (s != "")
+                        s = ZString.Eval(s, context, ref quota, registers);
+
+                    return s;
+                }
+                else if (list.Count == 2)
+                {
+                    s = context.GetAttrValue(ParseValue(list[1], context, ref quota, registers)) ?? "";
+                    if (s != "")
+                        s = ZString.Eval(s, context, ref quota, registers);
+
+                    return s;
+                }
+                else
+                    return "--Exception: 'eval' requires 1 or 2 parameters--";
+
             case "find":
                 if (list.Count != 2)
                     return "--Exception: 'find' requires exactly 1 parameter--";

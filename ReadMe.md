@@ -117,6 +117,9 @@
     emit <obj> <message> - Send a message.  Context sensitive (can send to a player, a room or even an item)
     emit <message> - Send message to actor.  In rare situations where there is no actor the context is used instead.  Will generally send to the player who initiated the action.
 
+    eval (ev) <attr> - Evaluate attribute from context
+    eval (ev) <obj> <attr> - Evaluate attribute from object
+
     find <obj> - returns "" if no object can be found, otherwise returns the OID
 
     force <obj> <command> - Force <object> to run command
@@ -135,7 +138,7 @@
 
     set [<obj>] <attr> <val> - Set attribute value on obj, or the context
 
-    setv <name> <val> - Set variable value.  
+    setv <name> <val> - Set variable value (can create new variables too) 
 
     single <val>... - Returns the first of the values that follow it that isn't empty.
 
@@ -143,8 +146,8 @@
 
     string (str) <interpolated string> - Anything in [] will be evaluated as code.  For example:  @eval str "The attr is: [v here a]"
 
-    val (v) <attr> - Get value of attribute from context
-    val (v) <obj> <attr> - Get alue of attribute from object
+    val (v) <attr> - Get value of attribute from context (as prose)
+    val (v) <obj> <attr> - Get value of attribute from object (as prose)
 
 ### PDL / List Keywords
 

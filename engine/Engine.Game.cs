@@ -669,12 +669,12 @@ public static partial class Engine
                     break;
                 }
 
-                if (o.HasFlag(flag.Value) && !unset)
+                if (o.HasFlag(flag.Value, true) && !unset)
                 {
                     PlayerEmit(session.Key, $"#{o.Id} already has the '{flag}' flag.  If you want to unset it, use: @flag #{o.Id} !{flag}");
                     break;
                 }
-                else if (!o.HasFlag(flag.Value) && unset)
+                else if (!o.HasFlag(flag.Value, true) && unset)
                 {
                     PlayerEmit(session.Key, $"#{o.Id} does not have the '{flag}' flag.  If you want to set it, use: @flag #{o.Id} {flag}");
                     break;
@@ -1574,7 +1574,8 @@ public static partial class Engine
         var pcs = zobs.Where(o => o.ZOT == ZObType.Character).Where(o => o.IsVisibleTo(user)).ToList();
         var exits = zobs.Where(o => o.ZOT == ZObType.Exit).Where(o => o.IsVisibleTo(user)).ToList();
 
-        ret = ZString.Eval(ret, loc);
+        var regs = new Registers(user);
+        ret = ZString.Eval(ret, loc, regs);
 
         ret += "<br /><br /><table width='99%'><tr><td width='33%' valign='top'>";
         if (exits.Any())

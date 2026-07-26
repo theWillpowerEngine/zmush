@@ -64,6 +64,7 @@ public static class Reader
 
         "concat",
         "emit",
+        "eval", "ev",
         "find",
         "force",
         "do",

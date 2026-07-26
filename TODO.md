@@ -60,7 +60,7 @@ continue +chat/join
 * Added flags:  Sealed, Teleporter, SetAndGet
 * Made special output a visibly-different section of the UI and added "copy to clipboard" on click
 * Added commands:  @chown, @parent, @attr/lock, @attr/listlocks, @attr/unlock, @decompile, !who
-* Added keywords:  find, roll, roll-pool, move, +, -, *, /, item-at, filter, map, join
+* Added keywords:  find, roll, roll-pool, move, +, -, *, /, item-at, filter, map, join, eval
 * Added predicates:  ?flag, ?and, ?or, ?oid, 
 
 #### 0.0.2 -> 0.0.3 
