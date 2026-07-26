@@ -597,7 +597,7 @@ public static partial class Engine
                     break;
                 }
 
-                session.SpecialOutput($"<b>{o.Name} (#{o.Id})</b>%n");
+                session.SpecialOutput($"<b>{o.Name} (#{o.Id} - {o.ZOT})</b>%n");
                 session.SpecialOutput(o.Desc + "%n");
                 if (o.Parent >= 0)
                     session.SpecialOutput($"%t<b>Parent:</b> #{o.Parent}%n");
