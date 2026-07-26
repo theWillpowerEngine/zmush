@@ -324,21 +324,22 @@ public static class Interpreter
                         return $"--Exception: You do not have permission to get attributes on #{oV.Id}--";
 
                     s = oV.GetAttrValue(ParseValue(list[2], context, ref quota, registers)) ?? "";
-                    if (s != "")
-                        s = ZString.Eval(s, context, ref quota, registers);
-
-                    return s;
                 }
                 else if (list.Count == 2)
                 {
                     s = context.GetAttrValue(ParseValue(list[1], context, ref quota, registers)) ?? "";
-                    if (s != "")
-                        s = ZString.Eval(s, context, ref quota, registers);
-
-                    return s;
                 }
                 else
                     return "--Exception: 'eval' requires 1 or 2 parameters--";
+
+                if (s != "")
+                {
+                    if (!s.Trim().StartsWith("{"))
+                        s = "{" + s + "}";
+
+                    s = ZString.Eval(s, context, ref quota, registers);
+                }
+                return s;
 
             case "find":
                 if (list.Count != 2)
@@ -769,9 +770,9 @@ public static class Interpreter
 
         switch (cmd.Value)
         {
-            case "?=":
-            case "?!":
-                var isNE = cmd.Value == "?!";
+            case "?eq":
+            case "?neq":
+                var isNE = cmd.Value == "?neq";
                 if (!isValidComparison)
                     return $"--Exception: '{cmd.Value}' requires 2-4 parameters--";
                 s = ParseValue(rest[1], context, ref quota, registers);

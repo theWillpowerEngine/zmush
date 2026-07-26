@@ -59,7 +59,7 @@ public static class Reader
 
         "+", "-", "*", "/",
 
-        "?>", "?<", "?=", "?>=", "?<=", "?!=", "?and", "?or",
+        "?>", "?<", "?eq", "?neq", "?>=", "?<=", "?and", "?or",
         "?=", "?!", "??", "?contains", "if",
 
         "concat",
@@ -231,6 +231,7 @@ public static class Reader
                     break;
 
                 case '"':
+                case '\'':
                     addWork();
                     stringDelim = c;
                     break;
