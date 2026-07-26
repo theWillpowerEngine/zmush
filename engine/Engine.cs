@@ -9,7 +9,7 @@ using System.Text;
 
 public static partial class Engine
 {
-    public const string Version = "0.0.3";
+    public const string Version = "0.0.4";
 
     public static Random R = new();
 
