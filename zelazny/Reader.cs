@@ -60,7 +60,10 @@ public static class Reader
         "+", "-", "*", "/",
 
         "?>", "?<", "?eq", "?neq", "?>=", "?<=", "?and", "?or",
-        "?=", "?!", "??", "?contains", "if",
+        "?=", "?!", "??", "?contains",
+        "?online",
+        "if",
+
 
         "concat",
         "emit",

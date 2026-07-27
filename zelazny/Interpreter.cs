@@ -844,6 +844,19 @@ public static class Interpreter
                 wasSingleton = true;
                 break;
 
+            case "?online":
+                if (!isValidSingleton)
+                    return $"--Exception: '?online' requires 1-3 parameters--";
+                o = Engine.Find(context, checkVal, registers);
+                if (o == null)
+                    o = Engine.GlobalFind(context, checkVal);
+                if (o == null)
+                    return "0";
+
+                res = Engine.Sessions.Any(s => s.Value.UserId == o.Id);
+                wasSingleton = true;
+                break;
+
             case "?flag":
                 if (!isValidComparison)
                     return $"--Exception: '?flag' requires 2-4 parameters--";

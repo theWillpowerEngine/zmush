@@ -8,5 +8,7 @@ Website (coming soon):   https://zmu.sh/
 
 ### 0.0.5
 
+* Added library:  chat
 * Added keywords:  add-set
+* Added predicates:  ?online
 * 
