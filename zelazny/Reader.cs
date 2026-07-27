@@ -54,7 +54,7 @@ public static class Reader
 {
     private static List<string> KWs = new()
     {
-        "add", "index", "item-at", "remove", "remove-all",
+        "add", "add-set", "index", "item-at", "remove", "remove-all",
         "map", "filter", "join",
 
         "+", "-", "*", "/",
@@ -73,7 +73,7 @@ public static class Reader
         "match",
         "move",
         "roll", "roll-pool",
-        "set",
+        "set", "setv",
         "single",
         "stg", "sts",
         "string", "str",

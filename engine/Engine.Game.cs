@@ -43,7 +43,7 @@ public static partial class Engine
         string s, s2;
 
         string? subCmd = null;
-        if (kw.Contains("/") || kw.Contains("\\"))
+        if (kw.IndexOf("/") > 1 || kw.IndexOf("\\") > 1)
         {
             var eles2 = kw.Split(new char[] { '/', '\\' }, 2);
             kw = eles2[0].ToLowerInvariant();

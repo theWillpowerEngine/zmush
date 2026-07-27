@@ -131,6 +131,23 @@ public static class Interpreter
                 s = PDL.Add(s, s2);
                 return s;
 
+            case "add-set":
+                if (list.Count != 4)
+                    return "--Exception: 'add-set' requires exactly 3 parameters--";
+
+                o = Engine.Find(context, ParseValue(list[1], context, ref quota, registers), registers);
+                if (o == null)
+                    return $"--Exception: Object '{list[1].Value}' not found--";
+
+                s2 = ParseValue(list[2], context, ref quota, registers);
+                s = o.GetAttrValue(s2) ?? "";
+
+                s = PDL.Add(s, ParseValue(list[3], context, ref quota, registers));
+                o.SetAttrValue(s2, s);
+                return s;
+
+
+
             case "filter":
                 if (list.Count != 3)
                     return "--Exception: 'filter' requires exactly 2 parameters--";

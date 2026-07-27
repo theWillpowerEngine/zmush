@@ -11,19 +11,6 @@ drop CHM
 @attr CHM.>getChannelFromAlias(alias)=[i {index CHM.channelAliases alias}] {?? i {item-at CHM.channels i} 0}
 @attr CHM.>isPlayerInChannel(chan id)=?or {?contains {v CHM `members_[chan]`} id} {let alias {CHM.getChannelFromAlias chan} {?contains {v CHM `members_[alias]`} id}}
 
-@attr CHM.$+* *=?? {CHM.isPlayerInChannel %1 %a} {emit "You do the thing!"} {emit "No such channel!"}
+@attr CHM.$/* *=?? {CHM.isPlayerInChannel %1 %a} {emit "You do the thing!"} {emit "No such channel!"}
 
-@attr CHM.$+chat/list=do {emit {concat "Your Channels: " {join {CHM.getChannelsForPlayer %a} ", "}}} {emit {concat "All Channels: " {join CHM.channels ", "}} }
-
-
-
-
-
-@attr CHM.$+chat/join *=?? {CHM.isPlayerInChannel %1 %a} {emit "You're already in that channel!"} {let alias {CHM.getChannelFromAlias %1} {?? alias }}
-
-{?? {CHM.isPlayerInChannel %1 %a}
-    {emit "You're already in that channel!"} 
-    {let alias {CHM.getChannelFromAlias %1} 
-        {?? alias}
-    }
-}
+@attr CHM.$+chat/join *={?? {CHM.isPlayerInChannel %1 %a} {emit "You're already in that channel!"} {let alias {CHM.getChannelFromAlias %1} {do {setv alias {?? alias alias %1}} {add-set CHM `members_[alias]` %a} {emit `You join [alias]!`}}}}
