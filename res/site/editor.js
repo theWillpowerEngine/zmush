@@ -1,5 +1,10 @@
 const editor = {
+    undoStack: [],
+    redoStack: [],
+
     formatCode(s) {
+        if (s.trim().length === 0) return ""
+
         if (s.trim()[0] != "{") {
             s = "{" + s + "}"
         }
@@ -62,6 +67,8 @@ const editor = {
             const text = element.textContent || ""
             const caretOffset = getCaretTextOffset(element)
             const hasMark = element.querySelector("mark") != null
+
+            if (text.trim().length === 0) return
 
             if (caretOffset == null) return
 
@@ -147,8 +154,58 @@ const editor = {
                 return false
             }
 
-            else
+            else if (e.key === 'z' && (e.ctrlKey || e.metaKey)) {
+                e.preventDefault()
+                if (editor.undoStack.length > 0) {
+                    const currentState = $ide.html()
+                    let previousState = editor.undoStack.pop()
+                    while (previousState == currentState && editor.undoStack.length > 0) {
+                        previousState = editor.undoStack.pop()
+                    }
+                    editor.redoStack.push(currentState)
+                    $ide.html(previousState)
+                }
+                return false
+            }
+
+            else if (e.key === 'y' && (e.ctrlKey || e.metaKey)) {
+                e.preventDefault()
+                if (editor.redoStack.length > 0) {
+                    const currentState = $ide.html()
+                    let nextState = editor.redoStack.pop()
+                    while (nextState == currentState && editor.redoStack.length > 0) {
+                        nextState = editor.redoStack.pop()
+                    }
+                    editor.undoStack.push(currentState)
+                    $ide.html(nextState)
+                    return false
+                }
+            }
+
+            else if (
+                (e.key == 'a' && (e.ctrlKey || e.metaKey))
+                || (e.key == '_' && (e.ctrlKey || e.metaKey))
+            ) {
+                return true;
+
+            }
+            else {
+                var html = $ide.html()
+                if (editor.undoStack.length == 0 || editor.undoStack[editor.undoStack.length - 1] !== html) {
+                    editor.redoStack.push(html)
+                    editor.undoStack.push(html)
+                }
+
+                while (editor.undoStack.length > 25) {
+                    editor.undoStack.shift()
+                }
+                while (editor.redoStack.length > 25) {
+                    editor.redoStack.shift()
+                }
+
                 editor.startEditorTimeout($ide)
+                return true;
+            }
         })
 
         $ide.off('click').on('click', function (e) {
@@ -157,7 +214,7 @@ const editor = {
 
         $ide.off("paste").on("paste", function (e) {
 
-            if ($ide.val().trim().length > 0) {
+            if ($ide.html().trim().length > 0) {
                 setTimeout(() => {
                     $ide.html(editor.formatCode($ide.html()))
                 }, 0)
@@ -170,13 +227,22 @@ const editor = {
             $ide.html(text)
 
             setTimeout(() => {
-                $ide.html(editor.formatCode($ide.html()))
+                var formed = editor.formatCode($ide.html())
+                if (editor.undoStack.length == 0 || editor.undoStack[editor.undoStack.length - 1] !== formed) {
+                    editor.redoStack.push($ide.html())
+                    editor.undoStack.push(formed)
+                }
+
+                while (editor.undoStack.length > 25) {
+                    editor.undoStack.shift()
+                }
+                while (editor.redoStack.length > 25) {
+                    editor.redoStack.shift()
+                }
+
+                $ide.html(formed)
             }, 0)
 
-        })
-
-        $ide.off("input").on("input", function (e) {
-            editor.startEditorTimeout($ide)
         })
 
         $(document).on('click', "#codeEditorSave, #codeEditorCancel", function (e) {

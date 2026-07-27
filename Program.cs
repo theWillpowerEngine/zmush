@@ -1,7 +1,7 @@
 ﻿using CommandLine;
 
 var serverRoot = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "/z";
-//Engine.Settings.OverrideSiteDirectory = "/home/malf/code/zmush/res/site";     //Uncomment this when editing site files for testing, it makes reloading ez.
+Engine.Settings.OverrideSiteDirectory = "/home/malf/code/zmush/res/site";     //Uncomment this when editing site files for testing, it makes reloading ez.
 
 CLA? opts = null;
 
