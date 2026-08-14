@@ -474,7 +474,7 @@ public static partial class Engine
                     break;
                 }
 
-                if (!o.CheckPermissions(session.UserId))
+                if (!o.CheckPermissions(session.UserId) && !o.HasFlag(Flag.OpenSource))
                 {
                     PlayerEmit(session.Key, $"You don't have permission to decompile #{o.Id}");
                     Log("hax", $"User #{session.UserId} attempted to decompile #{o.Id} without permission.");

@@ -11,14 +11,15 @@ public enum ZObType
 
 public enum Flag
 {
+    CanForce,
     Dark,
     Darksight,
-    Handler,
-    CanForce,
     ForceMajeure,
+    Handler,
     NukeSafe,
-    SetAndGet,
+    OpenSource,
     Sealed,
+    SetAndGet,
     Teleporter,
 
     U1, U2, U3, U4, U5, U6, U7, U8, U9, U10,
