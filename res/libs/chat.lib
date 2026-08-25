@@ -43,7 +43,4 @@ drop CHM
 @attr CHM.$+chat/list=do {emit {concat "Your Channels: " {join {CHM.getChannelsForPlayer %a} ", "}}} {emit {concat "All Channels: " {join CHM.channels ", "}} }
 
 --  +chat/create
-@attr CHM.$+chat/create *:*=[alias {CORL.shorter %1 %2} channel {CORL.longer %1 %2}] {?or {?! CHM.canCreateChannels} {?contains CHM.canCreateChannels %a} {do {add-set CHM channels channel}{add-set CHM channelAliases alias}{emit `You add [channel] with alias [alias].`}}{emit "You're not allowed to make channels, sorry!"}}
-
-
-
+@attr CHM.$+chat/create *:*=[alias {CORL.shorter %1 %2} channel {CORL.longer %1 %2}] {?or {?! CHM.canCreateChannels} {?contains CHM.canCreateChannels %a} {do {add-set CHM channels channel} {add-set CHM channelAliases alias} {set CHM `creator_[alias]` %a} {emit `You add [channel] with alias [alias].`}}{emit "You're not allowed to make channels, sorry!"}}
