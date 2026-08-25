@@ -1002,9 +1002,9 @@ public static partial class Engine
                     }
 
                     RoomEmit(o.Location, $"{o.Name} disappears in a puff of smoke.");
+                    RoomEmit(target.Id, $"{o.Name} appears in a puff of smoke.");
                     o.Location = target.Id;
                     o.Save();
-                    RoomEmit(o.Location, $"{o.Name} appears in a puff of smoke.");
 
                     Log("admin", $"{user.Name} (#{user.Id}) teleported #{o.Id} '{o.Name}' to #{target.Id} '{target.Name}'");
                     PlayerEmit(session.Key, $"Teleported #{o.Id} '{o.Name}' to #{target.Id} '{target.Name}'");

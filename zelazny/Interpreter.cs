@@ -945,6 +945,10 @@ public static class Interpreter
             case TokenType.Tag:
                 return GetTagValue(t);
 
+            case TokenType.String:
+                if (registers == null) return t.Value;
+                return registers.ApplyToString(t.Value);
+
             case TokenType.Name:
             default:
                 if (t.Value.StartsWith("%"))
@@ -969,6 +973,7 @@ public static class Interpreter
                             return registers?.ActorName ?? "";
 
                         case "l":
+                        case "L":
                             actor = Engine.Objects[actorId];
                             return actor.Location.ToString();
 
