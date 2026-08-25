@@ -10,6 +10,6 @@ Website (coming soon):   https://zmu.sh/
 
 * A variety of QoL improvements to the code editor (undo/redo, select all, better paste functionality, etc.)
 * Added library:  chat
-* Added keywords:  add-set
+* Added keywords:  add-set, rem-set
 * Added predicates:  ?online
 * 

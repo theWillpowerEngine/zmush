@@ -146,8 +146,6 @@ public static class Interpreter
                 o.SetAttrValue(s2, s);
                 return s;
 
-
-
             case "filter":
                 if (list.Count != 3)
                     return "--Exception: 'filter' requires exactly 2 parameters--";
@@ -227,6 +225,21 @@ public static class Interpreter
                 }
 
                 return s2;
+
+            case "rem-set":
+                if (list.Count != 4)
+                    return "--Exception: 'rem-set' requires exactly 3 parameters--";
+
+                o = Engine.Find(context, ParseValue(list[1], context, ref quota, registers), registers);
+                if (o == null)
+                    return $"--Exception: Object '{list[1].Value}' not found--";
+
+                s2 = ParseValue(list[2], context, ref quota, registers);
+                s = o.GetAttrValue(s2) ?? "";
+
+                s = PDL.RemoveAll(s, ParseValue(list[3], context, ref quota, registers));
+                o.SetAttrValue(s2, s);
+                return s;
 
             case "remove":
                 if (list.Count != 3)
