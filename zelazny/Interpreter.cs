@@ -607,6 +607,15 @@ public static class Interpreter
                 }
                 return "";
 
+            case "size":
+                if (list.Count != 2)
+                    return "--Exception: 'size' requires exactly 1 parameter--";
+
+                s = ParseValue(list[1], context, ref quota, registers) ?? "";
+                if (PDL.Is(s))
+                    return PDL.Split(s).Count.ToString();
+                return s.Length.ToString();
+
             case "stg":
                 if (list.Count != 2)
                     return "--Exception: 'stg' requires exactly 1 parameter--";
@@ -810,6 +819,15 @@ public static class Interpreter
                 if (isNE) res = !res;
                 break;
 
+            case "?>":
+            case "?<":
+                var isGT = cmd.Value == "?>";
+                if (!isValidComparison)
+                    return $"--Exception: '{cmd.Value}' requires 2-4 parameters--";
+                s = ParseValue(rest[1], context, ref quota, registers);
+                res = isGT ? ZMath.GT(checkVal, s) : ZMath.LT(checkVal, s);
+                break;
+
             case "?and":
                 if (!isValidComparison)
                     return $"--Exception: '?and' requires 2-4 parameters--";
@@ -840,6 +858,13 @@ public static class Interpreter
                 if (!isValidSingleton)
                     return $"--Exception: '??' requires 1-3 parameters--";
                 res = Matcher.IsTruthy(checkVal);
+                wasSingleton = true;
+                break;
+
+            case "?!":
+                if (!isValidSingleton)
+                    return $"--Exception: '?!' requires 1-3 parameters--";
+                res = !Matcher.IsTruthy(checkVal);
                 wasSingleton = true;
                 break;
 

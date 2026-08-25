@@ -41,4 +41,9 @@ public static class PDL
         var parts = list.Split('|', StringSplitOptions.RemoveEmptyEntries);
         return parts.ToList();
     }
+
+    internal static bool Is(string s)
+    {
+        return s.Trim().StartsWith("|");
+    }
 }

@@ -582,7 +582,8 @@ public static partial class Engine
                     rest = "{" + rest + "}";
 
                 var evaled = ZString.Eval(rest, user, ref user.Quota);
-                PlayerEmit(session.Key, $"Result: {evaled}");
+                if (subCmd == null || !subCmd.StartsWith("q"))
+                    PlayerEmit(session.Key, $"Result: {evaled}");
                 break;
 
             case "@examine":

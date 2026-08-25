@@ -59,8 +59,8 @@ public static class Reader
 
         "+", "-", "*", "/",
 
-        "?>", "?<", "?eq", "?neq", "?>=", "?<=", "?and", "?or",
-        "?=", "?!", "??", "?contains",
+        "?>", "?<", "?eq", "?neq", "?and", "?or",
+        "?!", "??", "?contains",
         "?online",
         "if",
 
@@ -78,6 +78,7 @@ public static class Reader
         "roll", "roll-pool",
         "set", "setv",
         "single",
+        "size",
         "stg", "sts",
         "string", "str",
         "val", "v",

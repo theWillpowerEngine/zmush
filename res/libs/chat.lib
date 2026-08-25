@@ -1,4 +1,7 @@
 @tel 0
+
+@eval/q ?! {find CORL} {emit "The chat library requires the core library to function but it's not installed.  The chat library will install okay but some functionality won't work,  To install the core library run: @srv/im core"}
+
 @create Chat Manager (CHM)
 drop CHM
 @set CHM=static
@@ -11,8 +14,11 @@ drop CHM
 ------------------------------------
 -- Relevant configuration
 
---if this is blank, anyone can create channels
+--  if this is blank, anyone can create channels
 @attr CHM.canCreateChannels = |1
+
+--  Staff is a private channel and someone (the master user in this case) needs to start in it so others can be invited
+@attr CHM.members_staff=|1
 
 ------------------------------------
 -- Functions
@@ -21,10 +27,23 @@ drop CHM
 @attr CHM.>getChannelFromAlias(alias)=[i {index CHM.channelAliases alias}] {?? i {item-at CHM.channels i} 0}
 @attr CHM.>isPlayerInChannel(chan id)=?or {?contains {v CHM `members_[chan]`} id} {let alias {CHM.getChannelFromAlias chan} {?contains {v CHM `members_[alias]`} id}}
 
-
 ------------------------------------
 -- Commands
 
+--  +chat/join
 @attr CHM.$+chat/join *=?or {?contains CHM.channels %1} {?contains CHM.channelAliases %1} {?? {CHM.isPlayerInChannel %1 %a} {emit "You're already in that channel!"} {let alias {CHM.getChannelFromAlias %1} {do {setv alias {?? alias alias %1}} {?contains CHM.privateChannels alias {emit "No such channel!"} {do {add-set CHM `members_[alias]` %a} {emit `You join [alias]!`}}}}}} {emit "No such channel!"}
+
+--  +chat/leave
 @attr CHM.$+chat/leave *={?? {CHM.isPlayerInChannel %1 %a} {let alias {CHM.getChannelFromAlias %1} {do {setv alias {?? alias alias %1}} {rem-set CHM `members_[alias]` %a} {emit `You leave [alias]!`}}} {emit "You're not in that channel!"}}
+
+--  /<channel> <message>    (the main chat command)
 @attr CHM.$/* *={?? {CHM.isPlayerInChannel %1 %a} {let alias {CHM.getChannelFromAlias %1} {do {setv alias {?? alias alias %1}} {setv members {v CHM `members_[alias]`}} {map {filter members {?online %i}} {emit %i `([alias]) [%an]:  [%2]`}}}} {emit "No such channel!"}}
+
+--  +chat/list
+@attr CHM.$+chat/list=do {emit {concat "Your Channels: " {join {CHM.getChannelsForPlayer %a} ", "}}} {emit {concat "All Channels: " {join CHM.channels ", "}} }
+
+--  +chat/create
+@attr CHM.$+chat/create *:*=[alias {CORL.shorter %1 %2} channel {CORL.longer %1 %2}] {?or {?! CHM.canCreateChannels} {?contains CHM.canCreateChannels %a} {do {add-set CHM channels channel}{add-set CHM channelAliases alias}{emit `You add [channel] with alias [alias].`}}{emit "You're not allowed to make channels, sorry!"}}
+
+
+

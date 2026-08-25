@@ -112,8 +112,9 @@ public static class Loader
             if (!file.EndsWith($"{lib}.lib", StringComparison.OrdinalIgnoreCase))
                 continue;
 
-            var yaml = File.ReadAllText(file);
-            retVal.AddRange(yaml.Split('\n', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries));
+            var content = File.ReadAllText(file);
+            retVal.AddRange(content.Split('\n', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries));
+            retVal.RemoveAll(s => s.StartsWith("--"));
             return retVal;
         }
 

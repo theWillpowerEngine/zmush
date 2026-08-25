@@ -1,0 +1,11 @@
+@tel 0
+@create Core Library (CORL)
+drop CORL
+@set CORL=static
+@set CORL=fixed
+
+--  Input Helper Functions
+
+@attr CORL.>shorter(first second)=?> {size first} {size second} second first
+@attr CORL.>longer(first second)=?> {size first} {size second} first second
+
