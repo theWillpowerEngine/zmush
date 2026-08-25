@@ -25,6 +25,6 @@ drop CHM
 ------------------------------------
 -- Commands
 
-@attr CHM.$+chat/join *={?? {CHM.isPlayerInChannel %1 %a} {emit "You're already in that channel!"} {let alias {CHM.getChannelFromAlias %1} {do {setv alias {?? alias alias %1}} {?contains CHM.privateChannels alias {emit "No such channel!"} {do {add-set CHM `members_[alias]` %a} {emit `You join [alias]!`}}}}}}
+@attr CHM.$+chat/join *=?or {?contains CHM.channels %1} {?contains CHM.channelAliases %1} {?? {CHM.isPlayerInChannel %1 %a} {emit "You're already in that channel!"} {let alias {CHM.getChannelFromAlias %1} {do {setv alias {?? alias alias %1}} {?contains CHM.privateChannels alias {emit "No such channel!"} {do {add-set CHM `members_[alias]` %a} {emit `You join [alias]!`}}}}}} {emit "No such channel!"}
 @attr CHM.$+chat/leave *={?? {CHM.isPlayerInChannel %1 %a} {let alias {CHM.getChannelFromAlias %1} {do {setv alias {?? alias alias %1}} {rem-set CHM `members_[alias]` %a} {emit `You leave [alias]!`}}} {emit "You're not in that channel!"}}
 @attr CHM.$/* *={?? {CHM.isPlayerInChannel %1 %a} {let alias {CHM.getChannelFromAlias %1} {do {setv alias {?? alias alias %1}} {setv members {v CHM `members_[alias]`}} {map {filter members {?online %i}} {emit %i `([alias]) [%an]:  [%2]`}}}} {emit "No such channel!"}}
