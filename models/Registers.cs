@@ -89,10 +89,7 @@ public class Registers
         }
 
         s = s.Replace("%an", ActorName);
-        s = s.Replace("%a", ActorId.ToString());
-
         var actor = Engine.Objects[ActorId];
-        s = s.Replace("%l", actor.Location.ToString());
 
         var pronoun = actor.Male switch
         {
@@ -101,6 +98,7 @@ public class Registers
             null => "it"
         };
         s = s.Replace("%as", pronoun);
+        s = s.Replace("%As", pronoun[..1].ToUpper() + pronoun[1..]);
 
         pronoun = actor.Male switch
         {
@@ -109,6 +107,7 @@ public class Registers
             null => "it"
         };
         s = s.Replace("%ao", pronoun);
+        s = s.Replace("%Ao", pronoun[..1].ToUpper() + pronoun[1..]);
 
         pronoun = actor.Male switch
         {
@@ -117,8 +116,12 @@ public class Registers
             null => "its"
         };
         s = s.Replace("%ap", pronoun);
+        s = s.Replace("%Ap", pronoun[..1].ToUpper() + pronoun[1..]);
 
         s = s.Replace("%i", IterativeElement);
+        s = s.Replace("%a", ActorId.ToString());
+        s = s.Replace("%l", actor.Location.ToString());
+        s = s.Replace("%L", actor.Location.ToString());
 
         return s;
     }
