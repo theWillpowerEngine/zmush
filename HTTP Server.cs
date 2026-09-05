@@ -118,6 +118,10 @@ class HttpGameSession : HttpSession
                         {
                             commandSession.LastActivity = DateTime.Now;
 
+                            if (commandSession.WaitTime != null && commandSession.WaitTime < DateTime.Now)
+                            {
+                            }
+
                             var result = Engine.Command(commandSession, command.command);
 
                             SendFrameResponse(commandSession, result);

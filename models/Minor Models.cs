@@ -42,6 +42,8 @@ public class SessionModel : BaseModel<SessionModel>
     public string LoginName = "";
     public HashSet<string> Roles = new HashSet<string>();
 
+    public DateTime? WaitTime = null;
+
     private StringBuilder so = new();
 
     public void SpecialOutput(string s)

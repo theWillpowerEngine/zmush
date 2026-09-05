@@ -19,7 +19,6 @@
 
   <ItemGroup>
     <EmbeddedResource Include="res\default.z" />
-
     <EmbeddedResource Include="res\site\index.htm" />
     <EmbeddedResource Include="res\site\site.css" />
     <EmbeddedResource Include="res\site\editor.js" />
